@@ -7,7 +7,10 @@ stellarPY
 """
 
 from stellar import *
+from debug import *
+import numpy as np
 
 file = 'IMG_2860.tif'
 
-converter(file)
+fileArray = converter(file)
+writeLogToFile(fileArray)
