@@ -8,10 +8,6 @@ stellarPY
 
 from stellar import *
 
-#file = 'IMG_2860e.tif'
+file = 'IMG_2860.tif'
 
-#converter('IMG_2860e.tif')
-
-image = Image.open('img2860.tif')
-imageArray = np.array(image)
-print(imageArray)
+converter(file)
