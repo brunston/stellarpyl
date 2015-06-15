@@ -14,18 +14,18 @@ def converter(imageToConvert):
     Converts image given in filepath format as tif to a numpy array and returns
     """
     #note- for some reason, Lightroom-cropped tif files do not play nice.
-    #Use original files.    
-    
+    #Use original files.
+
     image = Image.open(imageToConvert)
     imageArray = np.array(image)
-    
+
     #troubleshooting statements
     print(imageArray)
     print(imageArray.shape)
     print(imageArray.dtype)
-    
+
     return imageArray
-                
+
 def crop(image): #Working from previous code now contained in oldcrop
     """
     Crops an image img based on the number of empty pixels [0,0,0]
@@ -41,17 +41,19 @@ def crop(image): #Working from previous code now contained in oldcrop
     incrementer = False
     counterPerRow = 0
     duplicate = image
-    for i in range(len(duplicate[0][i])-1):
-        if duplicate[0][i] == [0,0,0]:
+    for i in range(len(duplicate[0])-1):
+        if (duplicate[0][i]-[0,0,0]).all():
+            counterPerRow +=1
+        if counterPerRow == len(duplicate[0]):
             duplicate = np.delete(duplicate, 0, 0)
             #TODO something interesting to think about -- could it be that
-            #noise from the detector is going to prevent a row of perfect zeros?
-
+            #noise from the detector going to prevent a row of perfect zeros?
+    return duplicate
 #TODO write a function which will determine the greatest singluar value
 #in our array so that we can see how much tolerance we have of deleting
 #1s, 2s, 3s etc.
 
-            
+
 def oldcrop(image):
     """
     OLD OLD CODE CODE DO NOT USE

@@ -7,15 +7,50 @@ stellarPY
 """
 
 import numpy as np
+from PIL import Image
 from stellar import *
 
-def writeLogToFile(nparray):
+def writeLogToFile(nparray,logname):
     """
     Writes a log to a file with the contents of a numpy array nparray
     """
-    
-    with open('log.log', 'w') as file:
+
+    with open(logname, 'w') as file:
         for i in range(len(nparray)-1):
             file.write(str(nparray[i]))
-            
+
     #this function does not return anything, only writing a file
+
+def testZeros(nparray):
+    """
+    testZeros will create a zeroed test array with the same dimensions as
+    inputted nparray
+    """
+    returner = np.zeros_like(nparray)
+    return returner
+
+def testArray():
+    """
+    testArray returns an ndarray of shape [3,50,3] to emulate a small version
+    of the tif file ndarray but in a very controlled manner so that testing
+    the crop function can be done smoothly.
+    """
+    dataNone = [0,0,0] #this simulates an empty pixel value
+    dataLow = [1,0,2] #values of these pixels go from 0 to 255
+    dataHigh = [50,43,29] #this is our test 'high' value
+    emptyRow = []
+    for i in range(50): #creating a 50-pixel wide row
+        emptyRow.append(dataNone)
+    semiFilled = []
+    for j in range(10): #ten pixels of empty
+        semiFilled.append(dataNone)
+    for k in range(10): #ten pixels of low
+        semiFilled.append(dataLow)
+    for l in range(20): #20 pixels of high
+        semiFilled.append(dataHigh)
+    for m in range(10): #10 pixels of empty
+        semiFilled.append(dataNone)
+    retArray = [emptyRow, semiFilled, emptyRow]
+    retNP = np.array(retArray, dtype=np.uint8)
+    print(retNP)
+    return retNP
