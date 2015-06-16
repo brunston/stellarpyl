@@ -20,9 +20,9 @@ def converter(imageToConvert):
     imageArray = np.array(image)
 
     #troubleshooting statements
-    print(imageArray)
-    print(imageArray.shape)
-    print(imageArray.dtype)
+    print("ndarray imageArray:\n", imageArray)
+    print("imageArray shape:", imageArray.shape)
+    print("imageArray dtype:", imageArray.dtype)
 
     return imageArray
 
@@ -39,47 +39,23 @@ def crop(image): #Working from previous code now contained in oldcrop
     OUT IF IT IS IN THAT ORDER).
     """
     incrementer = False
-    counterPerRow = 0
     duplicate = image
-    for i in range(len(duplicate[0])-1):
-        if (duplicate[0][i]-[0,0,0]).all():
-            counterPerRow +=1
-        if counterPerRow == len(duplicate[0]):
-            duplicate = np.delete(duplicate, 0, 0)
+    for j in range(len(duplicate)-1): #goes by line
+        counterPerRow = 0
+        #what is up with the first for loop being -1
+        #and the second just left
+        for i in range(len(duplicate[j])): #goes py pixel in line
+            if np.array_equal(duplicate[j][i], np.array([0,0,0])):
+                #adds to counter if pixel is empty
+                counterPerRow = counterPerRow + 1
+                if counterPerRow == len(duplicate[0]):
+                    #if whole row is empty, delete the row in question
+                    duplicate = np.delete(duplicate, j, 0)
+                    print("for loopcount:", i)
+                    print("counterPerRow value:", counterPerRow)
             #TODO something interesting to think about -- could it be that
-            #noise from the detector going to prevent a row of perfect zeros?
+            #noise from the detector is gonna prevent a row of perfect zeros?
     return duplicate
 #TODO write a function which will determine the greatest singluar value
 #in our array so that we can see how much tolerance we have of deleting
 #1s, 2s, 3s etc.
-
-
-def oldcrop(image):
-    """
-    OLD OLD CODE CODE DO NOT USE
-    """
-    """
-    Crops an image img based on the number of empty pixels [0,0,0]
-    Crops top-to-bottom, right-to-left, bottom-to-top, and then left-to-right
-    based on the way that the current set of data has been collected.
-    """
-    """
-    The importation of the tif using PIL works like this: Each row in the
-    array array[i] is a list of lists. Each list in the list (array[i][j]) is
-    a list of 3 values where each value refers to the RGB value (HAVE TO FIND
-    OUT IF IT IS IN THAT ORDER).
-    """
-    incrementer = False
-    counterPerRow = 0
-    duplicate = image
-    while incrementer == False:
-        for i in range(len(image)-1): #per row
-            for j in range(len(image[i])-1): #per pixel
-                if image[i][j] == [0,0,0]:
-                    counterPerRow = counterPerRow + 1
-            if counterPerRow == len(image[i]):
-                #delete duplicate top row.
-                #how to do this without messing up the count
-                #always test the top row? that could do it, instaed of using
-                #a metric blah of for loopings.
-                pass

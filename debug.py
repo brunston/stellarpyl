@@ -8,7 +8,7 @@ stellarPY
 
 import numpy as np
 from PIL import Image
-from stellar import *
+import stellar as st
 
 def writeLogToFile(nparray,logname):
     """
@@ -19,6 +19,7 @@ def writeLogToFile(nparray,logname):
         for i in range(len(nparray)-1):
             file.write(str(nparray[i]))
 
+    print("Wrote log to", logname)
     #this function does not return anything, only writing a file
 
 def testZeros(nparray):
@@ -52,5 +53,5 @@ def testArray():
         semiFilled.append(dataNone)
     retArray = [emptyRow, semiFilled, emptyRow]
     retNP = np.array(retArray, dtype=np.uint8)
-    print(retNP)
+    print("array generated:\n", retNP)
     return retNP

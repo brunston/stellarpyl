@@ -6,18 +6,18 @@ stellarPY
 @org: UH-IFA / SPS
 """
 
-from stellar import *
-from debug import *
+import stellar as st
+import debug as de
 import numpy as np
 
-file = 'IMG_2860.tif'
+# file = 'IMG_2860.tif'
+#
+# fileArray = converter(file)
+# writeLogToFile(fileArray,'log.log')
+#
+test = de.testArray() #will print out the array generated.
 
-fileArray = converter(file)
-writeLogToFile(fileArray,'log.log')
+cropped = st.crop(test)
+print("duplicate returned from crop()", cropped)
 
-test = testArray()
-
-cropped = crop(test)
-print(cropped)
-
-writeLogToFile(cropped,'cropped.log')
+de.writeLogToFile(cropped,'cropped.log')
