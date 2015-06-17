@@ -1,0 +1,49 @@
+#Work Completed (as digitized from my notebooks), UHawaii Internship
+
+2015.6.11
+
+* begun work on code - had OSError issues as documented in http://goo.gl/yuo5eS
+* outlined how the program should run
+* found out what is going on - lightroom cropping is messing with the TIFF file integrity
+    * Start cropping using the program to preserve the data so that it can be read by the pillow library
+
+2015.06.12
+
+* began work on cropping function.
+* created a debugging file with such functions as creating  test array of all zeros from a given TIF-generated array
+* created a logging function
+* started a new cropping function based on realizations about structure
+
+2015.06.15
+
+* am using Github to store work
+* added MIT license
+* testArray() is a controlled test arena for the crop function
+* encountered issue with comparing 3-element arrays
+    * this issue is due to the truth value of an array with more than one element being ambiguous
+* fixed ValueError (from above issue), now the crop function doesn't operate as expected. Returns the same array as is put into the function
+* substituted if np.array_equal(n1,n2) for problem code
+    * now the program crops out any empty (fully black) horizontal line from the file.
+
+2015.06.16
+
+* had meeting with Geoff today
+    * more stretch goals:
+        * user input star temperature, generate Planck curve, divide data by the ideal curve to normalize the data -this makes it a lot easier to compare to existing scientific data
+        * loop running through, looking for the 'flattest' line with different temperature Planck curves if you do not know the temperature of the star
+    * by august
+        * which journal would be most amenable, submission guidelines
+    * by the last week of july
+        * journal planning (bullet point evaluation)
+        * description of algorithm
+            * step by step about how the program processes the data
+        * Screenshots
+        * Example of data run through the program
+* figured how the numpy array slicing works as it pertains to the vertical use case, in scratch.py
+* changed imports for each file to use 2 letter prefixes denoting the file so that I know where various functions reside.
+* figured out what's going on with crop. right now it is currently deleting right away and so the index of the rows and columns is changing and more importantly the shape of the array changes.
+    * ideas to fix this:
+        * instead of creating a copy of the old array and subtracting, create a .size [0,0,0] array and add to it...
+            * will still be adding black columns if you import by rows and vice versa if I add by columns.
+        * instead of scanning through the whole array go recursively and check the top, bottom, and sides. This way, we don't accidentally delete anything inside our data, and we also are able to ignore the indexing at all, because we'll be drawing from array[0] and array[len-1] each round. if it doesn't find anything then it can jump out of the recursion...
+            * could also use a loop for this.
