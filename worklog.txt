@@ -47,3 +47,12 @@
             * will still be adding black columns if you import by rows and vice versa if I add by columns.
         * instead of scanning through the whole array go recursively and check the top, bottom, and sides. This way, we don't accidentally delete anything inside our data, and we also are able to ignore the indexing at all, because we'll be drawing from array[0] and array[len-1] each round. if it doesn't find anything then it can jump out of the recursion...
             * could also use a loop for this.
+
+2015.06.17
+
+* working on a recursive version of the crop function
+    * old code is now located in oldcode.py
+    * trying to decide whether I should do the crop in the program at all, given the amount of time I have spent on it versus the amount of relevancy to the project
+* wrote an intensity function which takes a numpy array and adds up the intensity assuming an angle variance of 0 degrees on the spectra. Left room there for an absolute response function and also left room to add angle variance into the code.
+* also wrote a plot function
+* the code successfully produced a very noisy version of the code but the spectra and star can both be seen clearly. See sample20150617.png for a screenshot.
