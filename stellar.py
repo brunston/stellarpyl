@@ -35,19 +35,26 @@ def crop(image):
     """
     duplicate = np.copy(image)
     counterPerRow = 0
-    for i in range(len(duplicate[0])): #goes by pixel in row
-        if np.array_equal(duplicate[0][i], np.array([0,0,0])):
-            #adds to counter if pixel is empty
-            counterPerRow = counterPerRow + 1
-        # else:
-        #     print("breaking")
-        #     print("duplicate:\n", duplicate)
-        #     break
-        if counterPerRow == len(duplicate[0]):
-            #if whole row is empty, delete the row in question
-            duplicate = np.delete(duplicate, 0, 0)
-            print("Cropping row 0")
-            crop(duplicate)
+    numRow = len(duplicate)
+    numCol = len(duplicate[0])
+
+    #row[i] = duplicate[i]
+    #column[j] = duplicate[:,j]
+    
+    indicator = False
+    while indicator == False:
+        numRow = len(duplicate)
+        a = 0
+        for i in range(numCol):
+            if np.array_equal(duplicate[a][i], np.array([0,0,0])):
+                #adds to counter if iterated pixel is empty
+                counterPerRow += 1
+            else:
+                break
+            if counterPerRow == len(duplicate[a]):
+                #if the entire row of pixels is empty, delete row
+                duplicate = np.delete(duplicate, 0, 0)
+                print("cropping row:", a)
     print("duplicate right before return:\n", duplicate)
     return duplicate
 

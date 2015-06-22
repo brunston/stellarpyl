@@ -55,3 +55,75 @@ def testArray():
     retNP = np.array(retArray, dtype=np.uint8)
     print("array generated:\n", retNP)
     return retNP
+
+def joshArray0():
+    dataNone = [0,0,0] #this simulates an empty pixel value
+    dataLow = [1,0,2] #values of these pixels go from 0 to 255
+    dataHigh = [50,43,29] #this is our test 'high' value
+    emptyRow = []
+    for i in range(50): #creating a 50-pixel wide row
+        emptyRow.append(dataNone)
+    retArray = [emptyRow]
+    retNP = np.array(retArray, dtype = np.uint8)
+    print("josh array empty 1 row:\n", retNP)
+    return retNP
+
+def joshArray01():
+    dataNone = [0,0,0] #this simulates an empty pixel value
+    dataLow = [1,0,2] #values of these pixels go from 0 to 255
+    dataHigh = [50,43,29] #this is our test 'high' value
+    emptyRow = []
+    for i in range(50): #creating a 50-pixel wide row
+        emptyRow.append(dataNone)
+    semiFilled = []
+    for j in range(10): #ten pixels of empty
+        semiFilled.append(dataNone)
+    for k in range(10): #ten pixels of low
+        semiFilled.append(dataLow)
+    for l in range(20): #20 pixels of high
+        semiFilled.append(dataHigh)
+    for m in range(10): #10 pixels of empty
+        semiFilled.append(dataNone)
+    retArray = [emptyRow, semiFilled]
+    print("josh array 1 empty 1 filled")
+    retNP = np.array(retArray, dtype=np.uint8)
+
+def joshArray001():
+    dataNone = [0,0,0] #this simulates an empty pixel value
+    dataLow = [1,0,2] #values of these pixels go from 0 to 255
+    dataHigh = [50,43,29] #this is our test 'high' value
+    emptyRow = []
+    for i in range(50): #creating a 50-pixel wide row
+        emptyRow.append(dataNone)
+    semiFilled = []
+    for j in range(10): #ten pixels of empty
+        semiFilled.append(dataNone)
+    for k in range(10): #ten pixels of low
+        semiFilled.append(dataLow)
+    for l in range(20): #20 pixels of high
+        semiFilled.append(dataHigh)
+    for m in range(10): #10 pixels of empty
+        semiFilled.append(dataNone)
+    retArray = [emptyRow, emptyRow, semiFilled]
+    print("josh array 1 empty 1 filled")
+    retNP = np.array(retArray, dtype=np.uint8)
+
+def joshArray00():
+    dataNone = [0,0,0] #this simulates an empty pixel value
+    dataLow = [1,0,2] #values of these pixels go from 0 to 255
+    dataHigh = [50,43,29] #this is our test 'high' value
+    emptyRow = []
+    for i in range(50): #creating a 50-pixel wide row
+        emptyRow.append(dataNone)
+    semiFilled = []
+    for j in range(10): #ten pixels of empty
+        semiFilled.append(dataNone)
+    for k in range(10): #ten pixels of low
+        semiFilled.append(dataLow)
+    for l in range(20): #20 pixels of high
+        semiFilled.append(dataHigh)
+    for m in range(10): #10 pixels of empty
+        semiFilled.append(dataNone)
+    retArray = [emptyRow, semiFilled]
+    print("josh array 2 empty")
+    retNP = np.array(retArray, dtype=np.uint8)

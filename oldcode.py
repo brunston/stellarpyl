@@ -8,6 +8,27 @@ stellarPY
 
 #where old code goes to. This file is a small farm up north
 
+def crop(image):
+    #oldcode from before I decided to implement Evan's suggestions and Josh's debugging arrays.
+    duplicate = np.copy(image)
+    counterPerRow = 0
+    for i in range(len(duplicate[0])): #goes by pixel in row
+        if np.array_equal(duplicate[0][i], np.array([0,0,0])):
+            #adds to counter if pixel is empty
+            counterPerRow = counterPerRow + 1
+        # else:
+        #     print("breaking")
+        #     print("duplicate:\n", duplicate)
+        #     break
+        if counterPerRow == len(duplicate[0]):
+            #if whole row is empty, delete the row in question
+            duplicate = np.delete(duplicate, 0, 0)
+            print("Cropping row 0")
+            crop(duplicate)
+    print("duplicate right before return:\n", duplicate)
+    return duplicate
+
+
 def crop(image): #Working from previous code now contained in oldcrop
     """
     Crops an image img based on the number of empty pixels [0,0,0]
