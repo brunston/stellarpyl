@@ -31,56 +31,97 @@ def converter(imageToConvert):
 def crop(image):
     """
     Crops image based on the number of empty pixels [0,0,0]
-    Crops top-to-bottom, right-to-left, bottom-to-top, and then left-to-right
+    Crops top-to-bottom, bottom-to-top, right-to-left, and then left-to-right
     based on the way that the current set of data has been collected.
     """
     duplicate = np.copy(image)
     print("duplicate:\n", duplicate)
-    counterPerRow = 0
-    numRow = len(duplicate)
-    numCol = len(duplicate[0])
-
-    #row[i] = duplicate[i]
-    #column[j] = duplicate[:,j]
+    #these get initialized now and updated in each while loop.
+    numCol = len(duplicate[0]) #number of columns in image
+    numRow = len(duplicate) #number of rows in image
 
     #cropping from top
-    while True:
+    toggleTop = True
+    while toggleTop == True:
         numRow = len(duplicate)
         a = 0
+        counterPerRow = 0
         for i in range(numCol):
             if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
-
-                pdb.set_trace()
+                toggleTop = False
                 break
             else:
                 counterPerRow += 1
         if counterPerRow == len(duplicate[a]):
             #if the entire row of pixels is empty, delete row
-            duplicate = np.delete(duplicate, 0, 0)
+            duplicate = np.delete(duplicate, a, 0)
             print("cropping row:", a)
-            print("New duplicate:\n", duplicate)
-        else:#fix
-            break#thesetwolines 
+        # else: #is this else redundant?
+        #     #will the first 'if not' catch all that we need to catch?
+        #     toggle = False
+
+    print("beginning bottom crop, top ran fine")
 
     #cropping from bottom
-    # while True:
-    #     numRow = len(duplicate)
-    #     a = numRow-1
-    #     for i in range(numCol):
-    #         if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
-    #             #adds to counter if iterated pixel is empty
-    #
-    #             pdb.set_trace()
-    #             break
-    #         else:
-    #             counterPerRow += 1
-    #     if counterPerRow == len(duplicate[a]):
-    #         #if the entire row of pixels is empty, delete row
-    #         duplicate = np.delete(duplicate, 0, 0)
-    #         print("cropping row:", a)
-    #         print("New duplicate:\n", duplicate)
-    #     else:
-    #         break
+    toggleBot = True
+    while toggleBot == True:
+        numRow = len(duplicate)
+        a = numRow-1
+        counterPerRow = 0
+        for i in range(numCol):
+            if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
+                toggleBot = False
+                break
+            else:
+                counterPerRow += 1
+        if counterPerRow == numCol:
+            #if the entire row of pixels is empty, delete row
+            duplicate = np.delete(duplicate, a, 0)
+            print("cropping row:", a)
+        # else: #is this else redundant?
+        #     #will the first 'if not' catch all that we need to catch?
+        #     toggle = False
+
+    print("beginning right->left crop, bottom ran fine")
+
+    #cropping from right to left
+    toggleRight = True
+    while toggleRight == True:
+        numRow = len(duplicate)
+        numCol = len(duplicate[0]) #needs to be updated each time loop iterates
+        a = numCol - 1
+        counterPerCol = 0
+        for i in range(numRow):
+            if not np.array_equal(duplicate[i][a], np.array([0,0,0])):
+                #note the reverse of the i and a ^^ for vertical crop
+                toggleRight = False
+                break
+            else:
+                counterPerCol += 1
+        if counterPerCol == numRow:
+            #if the entire col of pixels is empty, delete col
+            duplicate = np.delete(duplicate, a, 1)
+            print("cropping col:", a)
+
+    print("beginning left->right crop, right->left ran fine")
+    #cropping from left to right
+    toggleLeft = True
+    while toggleLeft == True:
+        numRow = len(duplicate)
+        numCol = len(duplicate[0]) #needs to be updated each time loop iterates
+        a = 0
+        counterPerCol = 0
+        for i in range(numRow):
+            if not np.array_equal(duplicate[i][a], np.array([0,0,0])):
+                #note the reverse of the i and a ^^ for vertical crop
+                toggleLeft = False
+                break
+            else:
+                counterPerCol += 1
+        if counterPerCol == numRow:
+            #if the entire col of pixels is empty, delete col
+            duplicate = np.delete(duplicate, a, 1)
+            print("cropping col:", a)
 
     print("duplicate right before return:\n", duplicate)
     return duplicate

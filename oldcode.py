@@ -75,3 +75,25 @@ def crop(image): #Working from previous code now contained in oldcrop
 #TODO write a function which will determine the greatest singluar value
 #in our array so that we can see how much tolerance we have of deleting
 #1s, 2s, 3s etc.
+
+#code from some thing i was working on
+def weird():
+    while toggleBot == True:
+        numRow = len(duplicate)
+        a = numRow-1
+        counterPerCol = 0
+        for i in range(numCol):
+            if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
+                #adds to counter if iterated pixel is empty
+                toggleBot = False
+                break
+            else:
+                counterPerCol += 1
+        if counterPerCol == len(duplicate[a][0]):
+            #if the entire row of pixels is empty, delete row
+            duplicate = np.delete(duplicate, 0, 0)
+            print("cropping row:", a)
+            print("New duplicate:\n", duplicate)
+        # else:
+        #     break
+    return None #added after transfer to oldcode

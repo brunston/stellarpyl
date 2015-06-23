@@ -15,7 +15,7 @@ import numpy as np
 #fileArray = st.converter(file)
 # writeLogToFile(fileArray,'log.log')
 #
-test = de.joshArray01() #will print out the array generated.
+test = de.testArray() #will print out the array generated.
 
 cropped = st.crop(test)
 print("duplicate returned from crop():\n", cropped)
