@@ -56,3 +56,11 @@
 * wrote an intensity function which takes a numpy array and adds up the intensity assuming an angle variance of 0 degrees on the spectra. Left room there for an absolute response function and also left room to add angle variance into the code.
 * also wrote a plot function
 * the code successfully produced a very noisy version of the code but the spectra and star can both be seen clearly. See sample20150617.png for a screenshot.
+
+2015.06.18
+
+* Tried reading two articles about the camera response functions
+    * Quick Approximation of Camera's Spectral Response from Casual Lighting (Prasad Nguyen Brown 2013)
+    * Modeling the Interaction of Light Between Diffuse Surfaces (Goral et al 1984)
+* Sent off a few emails in trying to figure out what these equations do and how best to implement etc.
+* Still haven't heard back from Evan
