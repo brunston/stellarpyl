@@ -9,6 +9,7 @@ stellarPY
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
+import pdb
 
 def converter(imageToConvert):
     """
@@ -34,27 +35,53 @@ def crop(image):
     based on the way that the current set of data has been collected.
     """
     duplicate = np.copy(image)
+    print("duplicate:\n", duplicate)
     counterPerRow = 0
     numRow = len(duplicate)
     numCol = len(duplicate[0])
 
     #row[i] = duplicate[i]
     #column[j] = duplicate[:,j]
-    
-    indicator = False
-    while indicator == False:
+
+    #cropping from top
+    while True:
         numRow = len(duplicate)
         a = 0
         for i in range(numCol):
-            if np.array_equal(duplicate[a][i], np.array([0,0,0])):
-                #adds to counter if iterated pixel is empty
-                counterPerRow += 1
-            else:
+            if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
+
+                pdb.set_trace()
                 break
-            if counterPerRow == len(duplicate[a]):
-                #if the entire row of pixels is empty, delete row
-                duplicate = np.delete(duplicate, 0, 0)
-                print("cropping row:", a)
+            else:
+                counterPerRow += 1
+        if counterPerRow == len(duplicate[a]):
+            #if the entire row of pixels is empty, delete row
+            duplicate = np.delete(duplicate, 0, 0)
+            print("cropping row:", a)
+            print("New duplicate:\n", duplicate)
+        else:#fix
+            break#thesetwolines 
+
+    #cropping from bottom
+    # while True:
+    #     numRow = len(duplicate)
+    #     a = numRow-1
+    #     for i in range(numCol):
+    #         if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
+    #             #adds to counter if iterated pixel is empty
+    #
+    #             pdb.set_trace()
+    #             break
+    #         else:
+    #             counterPerRow += 1
+    #     if counterPerRow == len(duplicate[a]):
+    #         #if the entire row of pixels is empty, delete row
+    #         duplicate = np.delete(duplicate, 0, 0)
+    #         print("cropping row:", a)
+    #         print("New duplicate:\n", duplicate)
+    #     else:
+    #         break
+
     print("duplicate right before return:\n", duplicate)
     return duplicate
 

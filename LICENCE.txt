@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2015 brupoon
+Copyright (c) 2015 Brunston Poon
 Institutions: St. Paul's School and the University of Hawaii
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
