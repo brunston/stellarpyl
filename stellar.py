@@ -128,22 +128,23 @@ def crop(image):
 
 def pixelDistribution(data):
     """
-    Creates a plot which shows the relative pixel distribution of given data
-    so that we can figure out how much "noise" is feasible to get rid of with-
-    out harming the rest of the data
+    Creates a plot which shows the relative pixel distribution of data given
+    in ndarray format so that we can figure out how much "noise" is feasible
+    to get rid of without harming the rest of the data
     """
     numRow = len(data)
     numCol = len(data[0])
-    distributionArray = np.zeros(765, dtype=np.uint8)
-    x = np.arange(765)
-    for row in numRow:
-        for col in numCol:
-            pixelSum = np.sum(data[row][column])
+    distributionArray = np.zeros(766, dtype=np.uint8)
+    x = np.arange(765+1)
+    for row in range(numRow):
+        for col in range(numCol):
+            pixelSum = np.sum(data[row][col])
             distributionArray[pixelSum] += 1
-            
+
     plt.figure(0)
     plt.clf() #clears figure
-    plt.plot(xNP, distributionArray,'b.',markersize=4)
+    plt.plot(x, distributionArray,'b.',markersize=4)
+    return distributionArray
 
 
 def intensity(data,degreeOffset):

@@ -10,15 +10,16 @@ import stellar as st
 import debug as de
 import numpy as np
 
-#file = 'IMG_2860.tif'
+file = 'IMG_2860.tif'
 #
-#fileArray = st.converter(file)
+fileArray = st.converter(file)
+st.pixelDistribution(fileArray)
 # writeLogToFile(fileArray,'log.log')
 #
-test = de.testArray() #will print out the array generated.
-
-cropped = st.crop(test)
-print("duplicate returned from crop():\n", cropped)
+# test = de.testArray() #will print out the array generated.
+#
+# cropped = st.crop(test)
+# print("duplicate returned from crop():\n", cropped)
 
 # de.writeLogToFile(cropped,'cropped.log')
 
