@@ -51,7 +51,14 @@ def testArray():
         semiFilled.append(dataHigh)
     for m in range(10): #10 pixels of empty
         semiFilled.append(dataNone)
-    retArray = [emptyRow, emptyRow, semiFilled, emptyRow, emptyRow]
+    kinda = []
+    for n in range(10):
+        kinda.append(dataNone)
+    for o in range(20):
+        kinda.append(dataLow)
+    for p in range(20):
+        kinda.append(dataNone)
+    retArray = [emptyRow, kinda, semiFilled, emptyRow, emptyRow]
     retNP = np.array(retArray, dtype=np.uint8)
     print("array generated:\n", retNP)
     return retNP

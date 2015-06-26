@@ -22,11 +22,19 @@ def converter(imageToConvert):
     imageArray = np.array(image)
 
     #troubleshooting statements
-    print("ndarray imageArray:\n", imageArray)
+    # print("ndarray imageArray:\n", imageArray)
     print("imageArray shape:", imageArray.shape)
     print("imageArray dtype:", imageArray.dtype)
 
     return imageArray
+
+def restorer(arrayToConvert):
+    """
+    Converts array given as ndarray to a tif and returns None
+    """
+    image = Image.fromarray(arrayToConvert)
+    image.save("image.tiff", "TIFF")
+    return None
 
 def crop(image):
     """
@@ -39,7 +47,7 @@ def crop(image):
     #these get initialized now and updated in each while loop.
     numCol = len(duplicate[0]) #number of columns in image
     numRow = len(duplicate) #number of rows in image
-
+    deletionThreshold = 127 #threshold for the
     #cropping from top
     toggleTop = True
     while toggleTop == True:
@@ -47,9 +55,12 @@ def crop(image):
         a = 0
         counterPerRow = 0
         for i in range(numCol):
-            if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
+            if not (np.sum(duplicate[a][i]) <= deletionThreshold):
                 toggleTop = False
                 break
+            # if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
+            #     toggleTop = False
+            #     break
             else:
                 counterPerRow += 1
         if counterPerRow == len(duplicate[a]):
@@ -69,9 +80,12 @@ def crop(image):
         a = numRow-1
         counterPerRow = 0
         for i in range(numCol):
-            if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
+            if not (np.sum(duplicate[a][i]) <= deletionThreshold):
                 toggleBot = False
                 break
+            # if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
+            #     toggleBot = False
+            #     break
             else:
                 counterPerRow += 1
         if counterPerRow == numCol:
@@ -92,10 +106,13 @@ def crop(image):
         a = numCol - 1
         counterPerCol = 0
         for i in range(numRow):
-            if not np.array_equal(duplicate[i][a], np.array([0,0,0])):
-                #note the reverse of the i and a ^^ for vertical crop
+            if not (np.sum(duplicate[i][a]) <= deletionThreshold):
                 toggleRight = False
                 break
+            # if not np.array_equal(duplicate[i][a], np.array([0,0,0])):
+            #     #note the reverse of the i and a ^^ for vertical crop
+            #     toggleRight = False
+            #     break
             else:
                 counterPerCol += 1
         if counterPerCol == numRow:
@@ -112,10 +129,13 @@ def crop(image):
         a = 0
         counterPerCol = 0
         for i in range(numRow):
-            if not np.array_equal(duplicate[i][a], np.array([0,0,0])):
-                #note the reverse of the i and a ^^ for vertical crop
+            if not (np.sum(duplicate[i][a]) <= deletionThreshold):
                 toggleLeft = False
                 break
+            # if not np.array_equal(duplicate[i][a], np.array([0,0,0])):
+            #     #note the reverse of the i and a ^^ for vertical crop
+            #     toggleLeft = False
+            #     break
             else:
                 counterPerCol += 1
         if counterPerCol == numRow:
@@ -123,7 +143,10 @@ def crop(image):
             duplicate = np.delete(duplicate, a, 1)
             print("cropping col:", a)
 
-    print("duplicate right before return:\n", duplicate)
+    #troubleshooting
+    print("duplicate shape:", duplicate.shape)
+    print("duplicate dtype:", duplicate.dtype)
+
     return duplicate
 
 def pixelDistribution(data):
@@ -147,7 +170,7 @@ def pixelDistribution(data):
     return distributionArray
 
 
-def intensity(data,degreeOffset):
+def intensity(data,degreeOffset=0):
     """
     Creates an intensity array for the data given in a numpy array. Also allows
     for the insertion of an absolute response function.
@@ -178,7 +201,7 @@ def plotGraph(intensity):
         #of the function can be set up to use a wavelength-to-pixel ratio.
         x.append(i*1)
     xNP = np.array(x)
-    plt.figure(0)
+    plt.figure(1)
     plt.clf() #clears figure
     plt.plot(xNP, intensity,'b.',markersize=4)
     plt.title("intensity plot, intensity vs wavelength")

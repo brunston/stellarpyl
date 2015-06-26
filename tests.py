@@ -13,15 +13,14 @@ import numpy as np
 file = 'IMG_2860.tif'
 #
 fileArray = st.converter(file)
-st.pixelDistribution(fileArray)
+cropped = st.crop(fileArray)
+st.restorer(cropped)
+distribution = st.pixelDistribution(cropped)
+intensity = st.intensity(cropped)
+st.plotGraph(intensity)
 # writeLogToFile(fileArray,'log.log')
-#
+# #
 # test = de.testArray() #will print out the array generated.
-#
+# #
 # cropped = st.crop(test)
 # print("duplicate returned from crop():\n", cropped)
-
-# de.writeLogToFile(cropped,'cropped.log')
-
-#intenseTest = st.intensity(fileArray, 0)
-#
