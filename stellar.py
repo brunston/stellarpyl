@@ -4,6 +4,7 @@ stellarPY
 @file: primary
 @author: Brunston Poon
 @org: UH-IFA / SPS
+@namingConvention: lowerCamelCase
 """
 
 import numpy as np
@@ -35,6 +36,109 @@ def restorer(arrayToConvert):
     image = Image.fromarray(arrayToConvert)
     image.save("image.tiff", "TIFF")
     return None
+
+def pixelDistribution(data):
+    """
+    Creates a plot which shows the relative pixel distribution of data given
+    in ndarray format so that we can figure out how much "noise" is feasible
+    to get rid of without harming the rest of the data
+    """
+    numRow = len(data)
+    numCol = len(data[0])
+    distributionArray = np.zeros(766, dtype=np.uint8)
+    x = np.arange(765+1)
+    for row in range(numRow):
+        for col in range(numCol):
+            pixelSum = np.sum(data[row][col])
+            distributionArray[pixelSum] += 1
+
+    plt.figure(0)
+    plt.clf() #clears figure
+    plt.plot(x, distributionArray,'b.',markersize=4)
+    return distributionArray
+
+
+def intensity(data,degreeOffset=0):
+    """
+    Creates an intensity array for the data given in a numpy array. Also allows
+    for the insertion of an absolute response function.
+    degreeOffset (float) refers to the offset of the data from the horizontal.
+    Counter-clockwise (i.e. 'above horizontal') is positive
+    Clockwise (i.e. 'below horizontal') is negative
+    """
+    intensity = []
+    if degreeOffset == 0: #i.e. we just want to add vertically
+        for k in range(len(data[0])): #goes by column
+            vertSlice = data[:,k] # a single column k with all rows
+            #print("vertSlice:\n", vertSlice)
+            runningTotal = 0
+            for pixel in vertSlice:
+                for color in pixel:
+                    runningTotal = color + runningTotal
+            intensity.append(runningTotal)
+    intensityNP = np.array(intensity)
+    return intensityNP
+
+def plotGraph(intensity):
+    """
+    Plots the intensity array generated and returns None
+    """
+    x = []
+    for i in range(len(intensity)):
+        #instead of pixel values as is by simply appending 0,1,2, this portion
+        #of the function can be set up to use a wavelength-to-pixel ratio.
+        x.append(i*1)
+    xNP = np.array(x)
+    plt.figure(1)
+    plt.clf() #clears figure
+    plt.plot(xNP, intensity,'b.',markersize=4)
+    plt.title("intensity plot, intensity vs wavelength")
+    plt.xlbl("wavelength (nm)")
+    plt.ylbl("intensity (8-bit pixel addition)")
+    return None
+
+def sumGenerator(data):
+    """
+    Creates a 2d matrix of intensity values from a given ndarray data which
+    has values in uint8 RGB form
+    """
+    new = []
+    for row in data:
+        rowArray = []
+        for pixel in row:
+            pixelSum = 0
+            for value in pixel:
+                pixelSum += value
+            rowArray.append(pixelSum)
+        new.append(rowArray)
+    newNP = np.array(new)
+    return newNP
+
+def absResponse(wavelength):
+    """
+    Would normally have a response function that changes based on the
+    wavelength. In this case, a response function has not been found or
+    created for the Canon 5D Mk I, so we are using a "response function"
+    of 1 across all wavelengths, resulting in no change.
+    """
+    return 1*wavelength
+
+def identifyTargetPixels(data):
+    """
+    Identifies target pixels much like the relevant/non-relevant indicator
+    in the crop() function. Takes data as ndarray, uint8
+    """
+    for row in data:
+        for pixel in row:
+            
+
+def regression(intensityMatrix):
+    """
+    Performs least-squares regression fitting on a given intensityMatrix
+    generated using sumGenerator()
+    """
+    x,y = [], []
+    x = np.arange(len(intensityMatrix[0])
 
 def crop(image):
     """
@@ -148,72 +252,3 @@ def crop(image):
     print("duplicate dtype:", duplicate.dtype)
 
     return duplicate
-
-def pixelDistribution(data):
-    """
-    Creates a plot which shows the relative pixel distribution of data given
-    in ndarray format so that we can figure out how much "noise" is feasible
-    to get rid of without harming the rest of the data
-    """
-    numRow = len(data)
-    numCol = len(data[0])
-    distributionArray = np.zeros(766, dtype=np.uint8)
-    x = np.arange(765+1)
-    for row in range(numRow):
-        for col in range(numCol):
-            pixelSum = np.sum(data[row][col])
-            distributionArray[pixelSum] += 1
-
-    plt.figure(0)
-    plt.clf() #clears figure
-    plt.plot(x, distributionArray,'b.',markersize=4)
-    return distributionArray
-
-
-def intensity(data,degreeOffset=0):
-    """
-    Creates an intensity array for the data given in a numpy array. Also allows
-    for the insertion of an absolute response function.
-    degreeOffset (float) refers to the offset of the data from the horizontal.
-    Counter-clockwise (i.e. 'above horizontal') is positive
-    Clockwise (i.e. 'below horizontal') is negative
-    """
-    intensity = []
-    if degreeOffset == 0: #i.e. we just want to add vertically
-        for k in range(len(data[0])): #goes by column
-            vertSlice = data[:,k] # a single column k with all rows
-            #print("vertSlice:\n", vertSlice)
-            runningTotal = 0
-            for pixel in vertSlice:
-                for color in pixel:
-                    runningTotal = color + runningTotal
-            intensity.append(runningTotal)
-    intensityNP = np.array(intensity)
-    return intensityNP
-
-def plotGraph(intensity):
-    """
-    Plots the intensity array generated
-    """
-    x = []
-    for i in range(len(intensity)):
-        #instead of pixel values as is by simply appending 0,1,2, this portion
-        #of the function can be set up to use a wavelength-to-pixel ratio.
-        x.append(i*1)
-    xNP = np.array(x)
-    plt.figure(1)
-    plt.clf() #clears figure
-    plt.plot(xNP, intensity,'b.',markersize=4)
-    plt.title("intensity plot, intensity vs wavelength")
-    plt.xlbl("wavelength (nm)")
-    plt.ylbl("intensity (8-bit pixel addition)")
-
-
-def absResponse(wavelength):
-    """
-    Would normally have a response function that changes based on the
-    wavelength. In this case, a response function has not been found or
-    created for the Canon 5D Mk I, so we are using a "response function"
-    of 1 across all wavelengths, resulting in no change.
-    """
-    return 1*wavelength
