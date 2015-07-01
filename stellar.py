@@ -123,22 +123,22 @@ def absResponse(wavelength):
     """
     return 1*wavelength
 
-def identifyTargetPixels(data):
-    """
-    Identifies target pixels much like the relevant/non-relevant indicator
-    in the crop() function. Takes data as ndarray, uint8
-    """
-    for row in data:
-        for pixel in row:
-            
+# def identifyTargetPixels(data):
+#     """
+#     Identifies target pixels much like the relevant/non-relevant indicator
+#     in the crop() function. Takes data as ndarray, uint8
+#     """
+#     for row in data:
+#         for pixel in row:
 
-def regression(intensityMatrix):
-    """
-    Performs least-squares regression fitting on a given intensityMatrix
-    generated using sumGenerator()
-    """
-    x,y = [], []
-    x = np.arange(len(intensityMatrix[0])
+# def regression(intensityMatrix):
+#     """
+#     Performs least-squares regression fitting on a given intensityMatrix
+#     generated using sumGenerator()
+#     """
+#     x,y = [], []
+#     x = np.arange(len(intensityMatrix[0])
+
 
 def crop(image):
     """
