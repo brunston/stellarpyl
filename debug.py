@@ -22,6 +22,17 @@ def writeLogToFile(nparray,logname):
     print("Wrote log to", logname)
     #this function does not return anything, only writing a file
 
+def testRotate():
+    """
+    returns a 2d ndarray which will test the rotate() function in stellar
+    """
+    array = list([[0,0,0,0,0,0],
+             [0,0,0,0,0,9,10],
+             [0,0,0,6,7,8,0],
+             [0,3,4,5,0,0,0],
+             [1,2,0,0,0,0,0]])
+    return np.array(array, dtype=np.uint8)
+
 def testZeros(nparray):
     """
     testZeros will create a zeroed test array with the same dimensions as

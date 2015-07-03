@@ -8,6 +8,7 @@ stellarPY
 """
 
 import numpy as np
+from scipy import ndimage
 from PIL import Image
 from matplotlib import pyplot as plt
 import pdb
@@ -56,7 +57,6 @@ def pixelDistribution(data):
     plt.clf() #clears figure
     plt.plot(x, distributionArray,'b.',markersize=4)
     return distributionArray
-
 
 def intensity(data,degreeOffset=0):
     """
@@ -113,6 +113,13 @@ def sumGenerator(data):
         new.append(rowArray)
     newNP = np.array(new)
     return newNP
+
+def rotate(data, angle):
+    """
+    Rotates an ndarray data which has already gone through the sumGenerator
+    process at an angle (float) given.
+    """
+    return ndimage.interpolation.rotate(data, angle)
 
 def absResponse(wavelength):
     """
