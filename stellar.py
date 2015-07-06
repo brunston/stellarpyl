@@ -119,6 +119,7 @@ def rotate(data, angle):
     Rotates an ndarray data which has already gone through the sumGenerator
     process at an angle (float) given.
     """
+    #TODO needs work
     return ndimage.interpolation.rotate(data, angle)
 
 def absResponse(wavelength):
@@ -138,16 +139,31 @@ def absResponse(wavelength):
 #     for row in data:
 #         for pixel in row:
 
-# def regression(intensityMatrix):
-#     """
-#     Performs least-squares regression fitting on a given intensityMatrix
-#     generated using sumGenerator()
-#     """
-#     x,y = [], []
-#     x = np.arange(len(intensityMatrix[0])
+def regression(intensityMatrix, threshold=127):
+    """
+    Performs least-squares regression fitting on a given intensityMatrix
+    generated using sumGenerator()
+
+    ndarrays are top-left 0,0. To account for this in least-squares regression
+    fit, we will use a positional y-value of
+    (len of column i.e. numRows) - (y-value)
+    """
+    x,y = [], []
+    numCol = len(intensityMatrix[0])
+    numRow = len(intensityMatrix)
+    for column in range(numCol):
+        for pixel in range(column):
+            if (intensityMatrix[pixel][column] >= threshold):
+                x.append(column)
+                #append positional y-value which becomes regression y-value
+                y.append(numRow-pixel)
+    A = np.vstack([x, np.ones_like(x)])
+    yn = np.array(y)
+    m, c = np.linalg.lstsq(A, yn)
+    print(m,c)
 
 
-def crop(image):
+def crop(image,deletionThreshold=127):
     """
     Crops image based on the number of empty pixels [0,0,0]
     Crops top-to-bottom, bottom-to-top, right-to-left, and then left-to-right
@@ -158,7 +174,6 @@ def crop(image):
     #these get initialized now and updated in each while loop.
     numCol = len(duplicate[0]) #number of columns in image
     numRow = len(duplicate) #number of rows in image
-    deletionThreshold = 127 #threshold for the
     #cropping from top
     toggleTop = True
     while toggleTop == True:
