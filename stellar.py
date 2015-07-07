@@ -13,6 +13,12 @@ from PIL import Image
 from matplotlib import pyplot as plt
 import pdb
 
+"""
+figure 0: pixelDistribution
+figure 1: intensity
+figure 2: regression from spectrum against points
+"""
+
 def converter(imageToConvert):
     """
     Converts image given in filepath format as tif to a numpy array and returns
@@ -156,12 +162,34 @@ def regression(intensityMatrix, threshold=127):
             if (intensityMatrix[pixel][column] >= threshold):
                 x.append(column)
                 #append positional y-value which becomes regression y-value
-                y.append(numRow-pixel)
-    A = np.vstack([x, np.ones_like(x)])
+                y.append(pixel)
+    A = np.vstack([x, np.ones_like(x)]).T
     yn = np.array(y)
-    m, c = np.linalg.lstsq(A, yn)
-    print(m,c)
+    print("A shape", A.shape)
+    print("yn shape", yn.shape)
+    print("yn dtype", yn.dtype)
+    m, c = np.linalg.lstsq(A, yn)[0]
+    print(m, c)
+    return [A,x,yn,m,c]
 
+def plotRegression(regArray):
+    """
+    Plots the regression provided against the points provided in the regArray
+    """
+    A = regArray[0] #x vstack
+    x = regArray[1] #x
+    yn = regArray[2] #np array of positional y value
+    m = regArray[3] #y=mx+c m
+    c = regArray[4] #y=mx+c c
+    lastxval = x[len(x)-1]
+
+    yeq = m * x + c
+    xForRegression = np.linspace(0,lastxval, len(yeq))
+
+    plt.figure(2)
+    plt.clf()
+    plt.plot(x, yn,'b.',markersize=4)
+    plt.plot(xForRegression,yeq,'g.',linestyle='-')
 
 def crop(image,deletionThreshold=127):
     """

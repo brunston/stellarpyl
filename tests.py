@@ -11,37 +11,39 @@ import debug as de
 import numpy as np
 
 while True:
-    print("q to exit")
-    print("0 for actual file, 1 for sample")
-    print("2 for regression test, 3 for rotate test")
-    blah = input("> ")
-    if blah == "0":
+    print("commands (shortnames are first two letters):")
+    print("'q', 'quit', 'exit', to exit")
+    print("'actual' for actual file, 'sample' for sample")
+    print("'regression' for regression test, 'rotate' for rotate test")
+    blah = input("enter command> ")
+    if blah in ("actual", "ac"): #ACTUAL
         file = 'IMG_2860.tif'
         fileArray = st.converter(file)
         cropped = st.crop(fileArray)
         st.restorer(cropped)
-        distribution = st.pixelDistribution(cropped)
+        #distribution = st.pixelDistribution(cropped)
         intensity = st.intensity(cropped)
         st.plotGraph(intensity)
         # writeLogToFile(fileArray,'log.log')
-    if blah == "1":
+    elif blah in ("sample", "sa"): #SAMPLE
         test = de.testArray() #will print out the array generated.
         # sums = st.sumGenerator(test)
         # print(sums)
         cropped = st.crop(test)
         print("duplicate returned from crop():\n", cropped)
 
-    if blah == "2":
+    elif blah in ("reg", "regression", "re"): #REGRESSION TEST
         testRotate = de.testRotate()
         print("testRotate:\n", testRotate)
-        st.regression(testRotate, 0) #test matrix threshold is 0
-        
+        regArray = st.regression(testRotate, 0) #test matrix threshold is 0
+        st.plotRegression(regArray)
 
-    if blah == "3":
+    elif blah in ("rotate", "ro"): #ROTATE TEST
         testArray = de.testArray()
         testRotate = de.testRotate()
         print("testRotate:\n",testRotate)
         rotated = st.rotate(testRotate,30.0)
         print("rotated:\n",rotated)
-    if blah in ("q", "quit", "exit"):
-        break
+
+    elif blah in ("q", "quit", "exit"): break
+    else: print("please input a recognized command")
