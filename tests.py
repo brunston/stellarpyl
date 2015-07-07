@@ -15,8 +15,12 @@ while True:
     print("'q', 'quit', 'exit', to exit")
     print("'actual' for actual file, 'sample' for sample")
     print("'regression' for regression test, 'rotate' for rotate test")
+    print("'simple' for the simple test")
     blah = input("enter command> ")
-    if blah in ("actual", "ac"): #ACTUAL
+    if blah in ("simple","si"): #SIMPLE TEST
+        array = de.simpleArray()
+        
+    elif blah in ("actual", "ac"): #ACTUAL
         file = 'IMG_2860.tif'
         fileArray = st.converter(file)
         cropped = st.crop(fileArray)

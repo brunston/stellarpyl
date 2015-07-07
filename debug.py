@@ -22,24 +22,51 @@ def writeLogToFile(nparray,logname):
     print("Wrote log to", logname)
     #this function does not return anything, only writing a file
 
-def testRotate():
+def simpleArray():
     """
-    returns a 2d ndarray which will test the rotate() function in stellar
+    Returns the hand-built simple array requested for simple testing of shape
     """
-    array = np.array([[0,0,0,0,0,0],
-             [0,0,0,0,0,9,10],
-             [0,0,0,6,7,8,0],
-             [0,3,4,5,0,0,0],
-             [1,2,0,0,0,0,0]])
-    return array
-
-def testZeros(nparray):
-    """
-    testZeros will create a zeroed test array with the same dimensions as
-    inputted nparray
-    """
-    returner = np.zeros_like(nparray)
-    return returner
+    dataNone = [0,0,0] #this simulates an empty pixel value
+    dataLow = [1,0,2] #values of these pixels go from 0 to 255
+    emptyRow = []
+    r,rg,g,gb,b = [40,20,20], [40,30,20], [20,40,20], [20,40,30], [20,20,40]
+    for i in range(20): #creating a 20-pixel wide row
+        emptyRow.append(dataNone)
+    kinda = []
+    for j in range(5): kinda.append(dataNone)
+    for k in range(10): kinda.append(dataLow)
+    for l in range(5): kinda.append(dataNone)
+    row1, row2, row3, row4, row5 = [], [], [], [], []
+    for m in range(2): row1.append(dataNone)
+    for n in range(2): row1.append(r)
+    for o in range(18): row1.append(dataNone)
+    for p in range(4): row2.append(dataNone)
+    for q in range(2): row2.append(rg)
+    for r in range(16): row2.append(dataNone)
+    for s in range(6): row3.append(dataNone)
+    for t in range(2): row3.append(g)
+    for u in range(14): row3.append(dataNone)
+    for v in range(6): row4.append(dataNone)
+    for w in range(2): row4.append(gb)
+    for x in range(12): row4.append(dataNone)
+    for y in range(8): row5.append(dataNone)
+    for z in range(2): row5.append(b)
+    for a in range(10): row5.append(dataNone)
+    print("kinda",kinda)
+    #retArray = [emptyRow, kinda, row1, row2, row3, row4, row5, emptyRow, emptyRow]
+    retArray = []
+    retArray.append(emptyRow)
+    retArray.append(kinda)
+    retArray.append(row1)
+    retArray.append(row2)
+    retArray.append(row3)
+    retArray.append(row4)
+    retArray.append(row5)
+    retArray.append(emptyRow)
+    retArray.append(emptyRow)
+    retNP = np.asarray(retArray)
+    print("array generated:\n", retNP)
+    return retNP
 
 def testArray():
     """
@@ -69,10 +96,30 @@ def testArray():
         kinda.append(dataLow)
     for p in range(20):
         kinda.append(dataNone)
+    print("kinda", kinda)
     retArray = [emptyRow, kinda, semiFilled, emptyRow, emptyRow]
     retNP = np.array(retArray, dtype=np.uint8)
     print("array generated:\n", retNP)
     return retNP
+
+def testRotate():
+    """
+    returns a 2d ndarray which will test the rotate() function in stellar
+    """
+    array = np.array([[0,0,0,0,0,0],
+             [0,0,0,0,0,9,10],
+             [0,0,0,6,7,8,0],
+             [0,3,4,5,0,0,0],
+             [1,2,0,0,0,0,0]])
+    return array
+
+def testZeros(nparray):
+    """
+    testZeros will create a zeroed test array with the same dimensions as
+    inputted nparray
+    """
+    returner = np.zeros_like(nparray)
+    return returner
 
 def joshArray0():
     dataNone = [0,0,0] #this simulates an empty pixel value
