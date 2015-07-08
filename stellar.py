@@ -152,7 +152,7 @@ def regression(intensityMatrix, threshold=127):
 
     ndarrays are top-left 0,0. To account for this in least-squares regression
     fit, we will use a positional y-value of
-    (len of column i.e. numRows) - (y-value)
+    (len of column i.e. numRows) - (y-value )
     """
     x,y = [], []
     numCol = len(intensityMatrix[0])
