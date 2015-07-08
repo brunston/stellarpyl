@@ -145,7 +145,7 @@ def absResponse(wavelength):
 #     for row in data:
 #         for pixel in row:
 
-def regression(intensityMatrix, threshold=127):
+def regression(data, threshold=127):
     """
     Performs least-squares regression fitting on a given intensityMatrix
     generated using sumGenerator()
@@ -154,23 +154,24 @@ def regression(intensityMatrix, threshold=127):
     fit, we will use a positional y-value of
     (len of column i.e. numRows) - (y-value )
     """
-    x,y = [], []
-    numCol = len(intensityMatrix[0])
-    numRow = len(intensityMatrix)
-    for column in range(numCol):
-        for pixel in range(column):
-            if (intensityMatrix[pixel][column] >= threshold):
-                x.append(column)
-                #append positional y-value which becomes regression y-value
-                y.append(pixel)
-    A = np.vstack([x, np.ones_like(x)]).T
-    yn = np.array(y)
-    print("A shape", A.shape)
-    print("yn shape", yn.shape)
-    print("yn dtype", yn.dtype)
-    m, c = np.linalg.lstsq(A, yn)[0]
-    print(m, c)
-    return [A,x,yn,m,c]
+    #point-gathering code
+    lowerx, lowery, upperx, uppery = data.getbbox()
+    xvals, yvals = [], []
+    for x in range(lowerx, upperx):
+        for y in range(lowery, uppery):
+            pixel = data.getpixel((x,y))
+            if pixel[0]+pixel[1]+pixel[2] > threshold: #intensitymatrix style sum
+                xvals.append(x)
+                yvals.append(y2-y) #accounting for upperleft vs lowerleft 0,0
+    print(xvals)
+    print(yvals)
+    #regression code
+    xvals_n, yvals_n = np.array(xvals), np.array(yvals)
+    A = np.vstack([xvals_n, np.ones(len(x))]).T
+    print(A)
+    m,c = np.linalg.listsq(A, yvals_n)[0]
+    print(m,c)
+    return [xvals_n,yvals_n,A,m,c]
 
 def plotRegression(regArray):
     """
