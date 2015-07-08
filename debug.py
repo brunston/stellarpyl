@@ -52,7 +52,7 @@ def simpleArray():
     for y in range(8): row5.append(dataNone)
     for z in range(2): row5.append(b)
     for a in range(10): row5.append(dataNone)
-    print("kinda",kinda)
+    #print("kinda",kinda)
     #retArray = [emptyRow, kinda, row1, row2, row3, row4, row5, emptyRow, emptyRow]
     retArray = []
     retArray.append(emptyRow)
@@ -96,7 +96,7 @@ def testArray():
         kinda.append(dataLow)
     for p in range(20):
         kinda.append(dataNone)
-    print("kinda", kinda)
+    #print("kinda", kinda)
     retArray = [emptyRow, kinda, semiFilled, emptyRow, emptyRow]
     retNP = np.array(retArray, dtype=np.uint8)
     print("array generated:\n", retNP)

@@ -99,8 +99,8 @@ def plotGraph(intensity):
     plt.clf() #clears figure
     plt.plot(xNP, intensity,'b.',markersize=4)
     plt.title("intensity plot, intensity vs wavelength")
-    plt.xlbl("wavelength (nm)")
-    plt.ylbl("intensity (8-bit pixel addition)")
+    # plt.xlbl("wavelength (nm)")
+    # plt.ylbl("intensity (8-bit pixel addition)")
     return None
 
 def sumGenerator(data):
