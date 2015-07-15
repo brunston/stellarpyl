@@ -9,8 +9,15 @@ stellarPY
 import stellar as st
 import debug as de
 import numpy as np
+from PIL import Image
 
-while True:
+path = '127.tiff'
+img = Image.open(path)
+regArray = st.regression(img)
+st.plotRegression(regArray)
+
+toggle = False
+while toggle == True:
     print("commands (shortnames are first two letters):")
     print("'q', 'quit', 'exit', to exit")
     print("'actual' for actual file, 'sample' for sample")

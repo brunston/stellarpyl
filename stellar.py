@@ -145,7 +145,7 @@ def absResponse(wavelength):
 #     for row in data:
 #         for pixel in row:
 
-def regression(data, threshold=127):
+def regression(img, threshold=127):
     """
     Performs least-squares regression fitting on a given intensityMatrix
     generated using sumGenerator()
@@ -155,42 +155,40 @@ def regression(data, threshold=127):
     (len of column i.e. numRows) - (y-value )
     """
     #point-gathering code
-    lowerx, lowery, upperx, uppery = data.getbbox()
+    lowerx, lowery, upperx, uppery = img.getbbox()
     xvals, yvals = [], []
     for x in range(lowerx, upperx):
         for y in range(lowery, uppery):
-            pixel = data.getpixel((x,y))
+            pixel = img.getpixel((x,y))
             if pixel[0]+pixel[1]+pixel[2] > threshold: #intensitymatrix style sum
                 xvals.append(x)
-                yvals.append(y2-y) #accounting for upperleft vs lowerleft 0,0
+                yvals.append(uppery-y) #accounting for upperleft vs lowerleft 0,0
     print(xvals)
     print(yvals)
     #regression code
     xvals_n, yvals_n = np.array(xvals), np.array(yvals)
-    A = np.vstack([xvals_n, np.ones(len(x))]).T
-    print(A)
-    m,c = np.linalg.listsq(A, yvals_n)[0]
-    print(m,c)
+    A = np.vstack([xvals_n, np.ones(len(xvals_n))]).T
+    print("A:\n", A)
+    m,c = np.linalg.lstsq(A, yvals_n)[0]
+    print("M, C:", m,c)
     return [xvals_n,yvals_n,A,m,c]
 
 def plotRegression(regArray):
     """
     Plots the regression provided against the points provided in the regArray
     """
-    A = regArray[0] #x vstack
-    x = regArray[1] #x
-    yn = regArray[2] #np array of positional y value
-    m = regArray[3] #y=mx+c m
-    c = regArray[4] #y=mx+c c
-    lastxval = x[len(x)-1]
-
-    yeq = m * x + c
-    xForRegression = np.linspace(0,lastxval, len(yeq))
+    x = regArray[0]
+    y = regArray[1]
+    A = regArray[2]
+    m = regArray[3]
+    c = regArray[4]
 
     plt.figure(2)
     plt.clf()
-    plt.plot(x, yn,'b.',markersize=4)
-    plt.plot(xForRegression,yeq,'g.',linestyle='-')
+    plt.plot(x, y,'o',label='original data',markersize=4)
+    plt.plot(x, m*x + c,'r',linestyle='-', label='fitted line')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.show()
 
 def crop(image,deletionThreshold=127):
     """

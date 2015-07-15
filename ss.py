@@ -25,7 +25,7 @@ A = np.vstack([x, np.ones(len(x))]).T
 
 print(A)
 
-m,c = np.linalg.listsq(A, y)[0]
+m,c = np.linalg.lstsq(A, y)[0]
 
 print(m,c)
 plt.plot(x,y,'o',label='original data', markersize = 10)
