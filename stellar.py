@@ -8,6 +8,7 @@ stellarPY
 """
 
 import numpy as np
+import math
 from scipy import ndimage
 from PIL import Image
 from matplotlib import pyplot as plt
@@ -84,6 +85,40 @@ def intensity(data,degreeOffset=0):
             intensity.append(runningTotal)
     intensityNP = np.array(intensity)
     return intensityNP
+
+def intensityP(img, data, regArray):
+    """
+    Creates a 'proper' intensity array for the data given in a numpy array and
+    using an open Image given in img. Degree offset is calculated by a
+    y = mx + c function as done in regression()
+    regArray = [xvals_n, yvals_n, A, m, c]
+    """
+    xvals_n, yvals_n = regArray[0], regArray[1]
+    A, m, c = regArray[2], regArray[3], regArray[4]
+    lowerx, lowery, upperx, uppery = img.getbbox()
+
+    for xpixel in range(lowerx, upperx):
+        sumPerX = 0
+        ypixel = m * xpixel + c #we need to floor this value to get a pixel value
+        ypixelfi = uppery - math.floor(yval) #f=floor, i=inverted
+        n = -1/m
+        modpixel = xpixel
+        while True:
+            modpixel -= 1
+            if (modpixel) >= 0:
+                try:
+                    crossDispersion = n * (modpixel - xpixel) + ypixel
+                    #taken from y - y1 = m(x - x1) which becomes
+                    #y = m(x - x1) + y1
+                    crossDispersionfi = uppery - math.floor(crossDispersion)
+                    sumPerX += data[xpixel][crossDispersionfi]
+                except IndexError:
+                    print("reached end of image, breaking")
+                    break
+            else:
+                break
+
+
 
 def plotGraph(intensity):
     """
@@ -177,11 +212,9 @@ def plotRegression(regArray):
     """
     Plots the regression provided against the points provided in the regArray
     """
-    x = regArray[0]
-    y = regArray[1]
-    A = regArray[2]
-    m = regArray[3]
-    c = regArray[4]
+    x, y, A = regArray[0], regArray[1], regArray[2]
+    m, c = regArray[3], regArray[4]
+
 
     plt.figure(2)
     plt.clf()
