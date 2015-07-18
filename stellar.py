@@ -13,6 +13,7 @@ from scipy import ndimage
 from PIL import Image
 from matplotlib import pyplot as plt
 import pdb
+import sys
 
 """
 figure 0: pixelDistribution
@@ -93,32 +94,74 @@ def intensityP(img, data, regArray):
     y = mx + c function as done in regression()
     regArray = [xvals_n, yvals_n, A, m, c]
     """
+    #logging begin
+    f = open('log_intensity.txt', 'w')
+    sys.stdout = f
+    np.set_printoptions(threshold=np.nan)
+
     xvals_n, yvals_n = regArray[0], regArray[1]
     A, m, c = regArray[2], regArray[3], regArray[4]
     lowerx, lowery, upperx, uppery = img.getbbox()
-
+    sumArray = []
     for xpixel in range(lowerx, upperx):
+        #this loop should run across the image by pixel
         sumPerX = 0
         ypixel = m * xpixel + c #we need to floor this value to get a pixel value
-        ypixelfi = uppery - math.floor(yval) #f=floor, i=inverted
+        ypixelfi = uppery - math.floor(ypixel) #f=floor, i=inverted
         n = -1/m
         modpixel = xpixel
-        while True:
+        while True: #this is the loop which side-walks up
+            print("- a pixel from modpixel, value: ", modpixel)
             modpixel -= 1
-            if (modpixel) >= 0:
+            if (modpixel) >= 0: #b/c -1 is a valid index
                 try:
+                    print("doing crossDispersion calculations")
                     crossDispersion = n * (modpixel - xpixel) + ypixel
                     #taken from y - y1 = m(x - x1) which becomes
                     #y = m(x - x1) + y1
                     crossDispersionfi = uppery - math.floor(crossDispersion)
-                    sumPerX += data[xpixel][crossDispersionfi]
+                    print("summing data")
+                    sumPerElement = 0
+                    for element in data[xpixel][crossDispersionfi]:
+                        sumPerElement += element
+                    sumPerX += sumPerElement
+                    #doing xpixel because the sum is per xpixel on the line...
                 except IndexError:
                     print("reached end of image, breaking")
                     break
             else:
                 break
+        modpixel = xpixel
+        while True: #this is the loop which side-walks down
+            modpixel += 1
+            print("+ a pixel from modpixel, value: ", modpixel)
+            try:
+                print("doing crossDispersion calculations")
+                crossDispersion = n * (modpixel - xpixel) + ypixel
+                #taken from y - y1 = m(x - x1) which becomes
+                #y = m(x - x1) + y1
+                crossDispersionfi = uppery - math.floor(crossDispersion)
+                print("summing data")
+                sumPerElement = 0
+                for element in data[xpixel][crossDispersionfi]:
+                    sumPerElement += element
+                sumPerX += sumPerElement
+            except IndexError:
+                print("reached end of image, breaking")
+                break
+        sumArray.append(sumPerX)
+    sumArrayn = np.array(sumArray)
+    print("sumArrayn:\n", sumArrayn)
 
+    #logging end
+    sys.stdout = sys.__stdout__
+    np.set_printoptions(threshold=1000)
 
+    return sumArrayn
+
+def plotIntensityP(intensityP):
+    #for element in intensityP:
+    pass
 
 def plotGraph(intensity):
     """

@@ -14,7 +14,10 @@ from PIL import Image
 path = '127.tiff'
 img = Image.open(path)
 regArray = st.regression(img)
+dataArray = st.converter(path)
 st.plotRegression(regArray)
+sumArray = st.intensityP(img,dataArray,regArray)
+st.plotGraph(sumArray)
 
 toggle = False
 while toggle == True:
