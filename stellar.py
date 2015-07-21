@@ -106,8 +106,8 @@ def intensityP(img, data, regArray):
     for xpixel in range(lowerx, upperx):
         #this loop should run across the image by pixel
         sumPerX = 0
-        ypixel = m * xpixel + c #we need to floor this value to get a pixel value
-        ypixelfi = uppery - math.floor(ypixel) #f=floor, i=inverted
+        ypixel = math.floor(m * xpixel + c) #we need to floor this value to get a pixel value
+        #ypixelfi = uppery - math.floor(ypixel) #f=floor, i=inverted
         n = -1/m
         modpixel = xpixel
         while True: #this is the loop which side-walks up
@@ -116,13 +116,13 @@ def intensityP(img, data, regArray):
             if (modpixel) >= 0: #b/c -1 is a valid index
                 try:
                     print("doing crossDispersion calculations")
-                    crossDispersion = n * (modpixel - xpixel) + ypixel
-                    #taken from y - y1 = m(x - x1) which becomes
-                    #y = m(x - x1) + y1
-                    crossDispersionfi = uppery - math.floor(crossDispersion)
+                    crossDispersion = math.floor(n * (modpixel - xpixel) + ypixel)
+                    #taken from y - y1 = n(x - x1) which becomes
+                    #y = n(x - x1) + y1
+                    #crossDispersionfi = uppery - math.floor(crossDispersion)
                     print("summing data")
                     sumPerElement = 0
-                    for element in data[xpixel][crossDispersionfi]:
+                    for element in data[xpixel][crossDispersion]:
                         sumPerElement += element
                     sumPerX += sumPerElement
                     #doing xpixel because the sum is per xpixel on the line...
@@ -137,13 +137,13 @@ def intensityP(img, data, regArray):
             print("+ a pixel from modpixel, value: ", modpixel)
             try:
                 print("doing crossDispersion calculations")
-                crossDispersion = n * (modpixel - xpixel) + ypixel
+                crossDispersion = math.floor(n * (modpixel - xpixel) + ypixel)
                 #taken from y - y1 = m(x - x1) which becomes
                 #y = m(x - x1) + y1
-                crossDispersionfi = uppery - math.floor(crossDispersion)
+                #crossDispersionfi = uppery - math.floor(crossDispersion)
                 print("summing data")
                 sumPerElement = 0
-                for element in data[xpixel][crossDispersionfi]:
+                for element in data[xpixel][crossDispersion]:
                     sumPerElement += element
                 sumPerX += sumPerElement
             except IndexError:
@@ -159,9 +159,112 @@ def intensityP(img, data, regArray):
 
     return sumArrayn
 
-def plotIntensityP(intensityP):
-    #for element in intensityP:
-    pass
+def intensityQ(img, data, regArray):
+    """
+    Creates a 'proper' intensity array for the data given in a numpy array and
+    using an open Image given in img. Degree offset is calculated by a
+    y = mx + c function as done in regression()
+    regArray = [xvals_n, yvals_n, A, m, c]
+    """
+    f = open('log_intensity.txt', 'w')
+    sys.stdout = f
+    np.set_printoptions(threshold=np.nan)
+    m, c = regArray[3], regArray[4]
+    
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    lineArray = []
+    for xpixel in range(lowerx, upperx):
+        ypixel = m * xpixel + c
+        n = -1/m
+        for modpixel in np.arange(lowerx, upperx, 0.1):
+            print("+ a pixel from modpixel, value: ", modpixel)
+            crossDispersion = n * (modpixel - xpixel) + ypixel
+            print("pixel (%.2f,%.2f)" %(modpixel, crossDispersion))
+            if (crossDispersion > lowery) and (crossDispersion < uppery):
+                lineArray.append([round(modpixel), round(crossDispersion)])
+                print("appended pixel successfully")
+    lineArrayn = np.array(lineArray)
+    sumArray = []
+    for element in lineArrayn:
+        rgbval = 0
+        for rgb in data[element[0]][element[1]]:
+            rgbval += rgb
+        sumArray.append(rgbval)
+    sumArrayn = np.array(sumArray)
+    print("sumArrayn:\n", sumArrayn)
+
+    #logging end
+    sys.stdout = sys.__stdout__
+    np.set_printoptions(threshold=1000)
+
+    return sumArrayn
+
+def intensityR(img, data, regArray):
+    """
+    intensityR is the third iteration of the intensity function which aims
+    to deal with the plotting of regressed non-orthogonal spectra given in
+    an open image img, the pixel data in data, and a regArray generated
+    using regression(). Returns a dictionary where key is x value and y
+    value is intensity.
+    """
+    #logging start
+    f = open('log_intensity.txt', 'w')
+    sys.stdout = f
+    np.set_printoptions(threshold=np.nan)
+    #//logging start
+
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    m, c = regArray[3], regArray[4]
+    n = -1 / m
+
+    #using dictionaries?!
+    intensities = {}
+
+    for xpixel in range(lowerx, upperx):
+        ypixel = m * xpixel + c
+        for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
+            #newx = modpixel from iQ, newy = crossDispersion from iQ
+            newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
+            if (newy > lowery) and (newy < uppery):
+                #anti-aliasing implementation from wiki-spatial-antialiasing.pdf
+                #section 2 or in http://is.gd/dnj08y
+                for newxRounded in (math.floor(newx), math.ceil(newx)):
+                    for newyRounded in (math.floor(newy), math.ceil(newy)):
+                        #we need to be sure that the rounded point is in our img
+                        if (newyRounded > lowery) and (newyRounded < uppery):
+                            percentNewX = 1 - abs(newx - newxRounded)
+                            percentNewY = 1 - abs(newy - newyRounded)
+                            percent = percentNewX * percentNewY
+                            #get antialiased intensity from pixel
+                            pixel = image.getpixel(newxRounded,newyRounded)
+                            newValue = percent * (pixel[0]+pixel[1]+pixel[2])
+                            #to ensure we don't reset a value instead of adding:
+                            if xpixel in intensities:
+                                intensities[p] = intensities[p] + newValue
+                            else:
+                                intensities[p] = newValue
+
+    #logging end
+    sys.stdout = sys.__stdout__
+    np.set_printoptions(threshold=1000)
+    #//logging end
+
+    return intensities
+    #rewritten for cleaner reading from intensityQ, regression_test.py provided
+    #by Scott and Wikipedia article on spatial antialiasing found at
+    #http://is.gd/dnj08y or wiki-spatial-antialiasing.pdf
+
+
+def plotIntensityQ(intensityQ):
+    x = []
+    y = []
+    for element in intensityQ:
+        x.append(element[0])
+        y.append(element[1])
+    plt.figure(1)
+    plt.clf() #clears figure
+    plt.plot(x, y,'b.',markersize=4)
+    plt.title("dispOne")
 
 def plotGraph(intensity):
     """
@@ -215,14 +318,6 @@ def absResponse(wavelength):
     """
     return 1*wavelength
 
-# def identifyTargetPixels(data):
-#     """
-#     Identifies target pixels much like the relevant/non-relevant indicator
-#     in the crop() function. Takes data as ndarray, uint8
-#     """
-#     for row in data:
-#         for pixel in row:
-
 def regression(img, threshold=127):
     """
     Performs least-squares regression fitting on a given intensityMatrix
@@ -240,7 +335,7 @@ def regression(img, threshold=127):
             pixel = img.getpixel((x,y))
             if pixel[0]+pixel[1]+pixel[2] > threshold: #intensitymatrix style sum
                 xvals.append(x)
-                yvals.append(uppery-y) #accounting for upperleft vs lowerleft 0,0
+                yvals.append(y) #accounting for upperleft vs lowerleft 0,0
     print(xvals)
     print(yvals)
     #regression code

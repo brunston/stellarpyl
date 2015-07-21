@@ -9,6 +9,7 @@ stellarPY
 import stellar as st
 import debug as de
 import numpy as np
+import scratch as sc
 from PIL import Image
 
 path = '127.tiff'
@@ -16,8 +17,10 @@ img = Image.open(path)
 regArray = st.regression(img)
 dataArray = st.converter(path)
 st.plotRegression(regArray)
-sumArray = st.intensityP(img,dataArray,regArray)
-st.plotGraph(sumArray)
+sumArray = st.intensityQ(img,dataArray,regArray)
+st.plotIntensityQ(sumArray)
+calcOne = sc.calcOne(img,dataArray,regArray)
+sc.dispOne(calcOne)
 
 toggle = False
 while toggle == True:
