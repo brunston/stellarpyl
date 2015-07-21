@@ -17,10 +17,9 @@ img = Image.open(path)
 regArray = st.regression(img)
 dataArray = st.converter(path)
 st.plotRegression(regArray)
-sumArray = st.intensityQ(img,dataArray,regArray)
-st.plotIntensityQ(sumArray)
-calcOne = sc.calcOne(img,dataArray,regArray)
-sc.dispOne(calcOne)
+sumArray = st.intensityR(img,dataArray,regArray)
+st.plotIntensityR(sumArray)
+
 
 toggle = False
 while toggle == True:

@@ -236,13 +236,15 @@ def intensityR(img, data, regArray):
                             percentNewY = 1 - abs(newy - newyRounded)
                             percent = percentNewX * percentNewY
                             #get antialiased intensity from pixel
-                            pixel = image.getpixel(newxRounded,newyRounded)
+                            pixel = img.getpixel((newxRounded,newyRounded))
                             newValue = percent * (pixel[0]+pixel[1]+pixel[2])
                             #to ensure we don't reset a value instead of adding:
                             if xpixel in intensities:
-                                intensities[p] = intensities[p] + newValue
+                                intensities[xpixel] = \
+                                                    intensities[xpixel] + \
+                                                    newValue
                             else:
-                                intensities[p] = newValue
+                                intensities[xpixel] = newValue
 
     #logging end
     sys.stdout = sys.__stdout__
@@ -265,6 +267,19 @@ def plotIntensityQ(intensityQ):
     plt.clf() #clears figure
     plt.plot(x, y,'b.',markersize=4)
     plt.title("dispOne")
+
+def plotIntensityR(intensityR):
+    plotx, ploty = [], []
+    for x in intensityR.keys():
+        plotx.append(x)
+        ploty.append(intensityR[x])
+    plotxn, plotyn = np.array(plotx), np.array(ploty)
+
+    plt.figure(1)
+    plt.clf()
+    plt.plot(plotx, ploty, 'b--', label='anti-aliased data')
+    plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
+    plt.show()
 
 def plotGraph(intensity):
     """
