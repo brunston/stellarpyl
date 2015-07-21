@@ -7,7 +7,7 @@ stellarPY
 """
 
 #where old code goes to. This file is a small farm up north
-
+#testestestestest
 def crop(image):
     #oldcode from before I decided to implement Evan's suggestions and Josh's debugging arrays.
     duplicate = np.copy(image)
