@@ -7,6 +7,169 @@ stellarPY
 """
 
 #where old code goes to. This file is a small farm up north
+
+def intensity(data,degreeOffset=0):
+    """
+    Creates an intensity array for the data given in a numpy array. Also allows
+    for the insertion of an absolute response function.
+    degreeOffset (float) refers to the offset of the data from the horizontal.
+    Counter-clockwise (i.e. 'above horizontal') is positive
+    Clockwise (i.e. 'below horizontal') is negative
+    """
+    intensity = []
+    if degreeOffset == 0: #i.e. we just want to add vertically
+        for k in range(len(data[0])): #goes by column
+            vertSlice = data[:,k] # a single column k with all rows
+            #print("vertSlice:\n", vertSlice)
+            runningTotal = 0
+            for pixel in vertSlice:
+                for color in pixel:
+                    runningTotal = color + runningTotal
+            intensity.append(runningTotal)
+    intensityNP = np.array(intensity)
+    return intensityNP
+
+def plotGraph(intensity):
+    """
+    Plots the intensity array generated and returns None
+    """
+    x = []
+    for i in range(len(intensity)):
+        #instead of pixel values as is by simply appending 0,1,2, this portion
+        #of the function can be set up to use a wavelength-to-pixel ratio.
+        x.append(i*1)
+    xNP = np.array(x)
+    plt.figure(1)
+    plt.clf() #clears figure
+    plt.plot(xNP, intensity,'b.',markersize=4)
+    plt.title("intensity plot, intensity vs wavelength")
+    # plt.xlbl("wavelength (nm)")
+    # plt.ylbl("intensity (8-bit pixel addition)")
+    return None
+
+def intensityP(img, data, regArray):
+    """
+    Creates a 'proper' intensity array for the data given in a numpy array and
+    using an open Image given in img. Degree offset is calculated by a
+    y = mx + c function as done in regression()
+    regArray = [xvals_n, yvals_n, A, m, c]
+    """
+    #logging begin
+    f = open('log_intensity.txt', 'w')
+    sys.stdout = f
+    np.set_printoptions(threshold=np.nan)
+
+    xvals_n, yvals_n = regArray[0], regArray[1]
+    A, m, c = regArray[2], regArray[3], regArray[4]
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    sumArray = []
+    for xpixel in range(lowerx, upperx):
+        #this loop should run across the image by pixel
+        sumPerX = 0
+        ypixel = math.floor(m * xpixel + c) #we need to floor this value to get a pixel value
+        #ypixelfi = uppery - math.floor(ypixel) #f=floor, i=inverted
+        n = -1/m
+        modpixel = xpixel
+        while True: #this is the loop which side-walks up
+            print("- a pixel from modpixel, value: ", modpixel)
+            modpixel -= 1
+            if (modpixel) >= 0: #b/c -1 is a valid index
+                try:
+                    print("doing crossDispersion calculations")
+                    crossDispersion = math.floor(n * (modpixel - xpixel) + ypixel)
+                    #taken from y - y1 = n(x - x1) which becomes
+                    #y = n(x - x1) + y1
+                    #crossDispersionfi = uppery - math.floor(crossDispersion)
+                    print("summing data")
+                    sumPerElement = 0
+                    for element in data[xpixel][crossDispersion]:
+                        sumPerElement += element
+                    sumPerX += sumPerElement
+                    #doing xpixel because the sum is per xpixel on the line...
+                except IndexError:
+                    print("reached end of image, breaking")
+                    break
+            else:
+                break
+        modpixel = xpixel
+        while True: #this is the loop which side-walks down
+            modpixel += 1
+            print("+ a pixel from modpixel, value: ", modpixel)
+            try:
+                print("doing crossDispersion calculations")
+                crossDispersion = math.floor(n * (modpixel - xpixel) + ypixel)
+                #taken from y - y1 = m(x - x1) which becomes
+                #y = m(x - x1) + y1
+                #crossDispersionfi = uppery - math.floor(crossDispersion)
+                print("summing data")
+                sumPerElement = 0
+                for element in data[xpixel][crossDispersion]:
+                    sumPerElement += element
+                sumPerX += sumPerElement
+            except IndexError:
+                print("reached end of image, breaking")
+                break
+        sumArray.append(sumPerX)
+    sumArrayn = np.array(sumArray)
+    print("sumArrayn:\n", sumArrayn)
+
+    #logging end
+    sys.stdout = sys.__stdout__
+    np.set_printoptions(threshold=1000)
+
+    return sumArrayn
+
+def intensityQ(img, data, regArray):
+    """
+    Creates a 'proper' intensity array for the data given in a numpy array and
+    using an open Image given in img. Degree offset is calculated by a
+    y = mx + c function as done in regression()
+    regArray = [xvals_n, yvals_n, A, m, c]
+    """
+    f = open('log_intensity.txt', 'w')
+    sys.stdout = f
+    np.set_printoptions(threshold=np.nan)
+    m, c = regArray[3], regArray[4]
+    
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    lineArray = []
+    for xpixel in range(lowerx, upperx):
+        ypixel = m * xpixel + c
+        n = -1/m
+        for modpixel in np.arange(lowerx, upperx, 0.1):
+            print("+ a pixel from modpixel, value: ", modpixel)
+            crossDispersion = n * (modpixel - xpixel) + ypixel
+            print("pixel (%.2f,%.2f)" %(modpixel, crossDispersion))
+            if (crossDispersion > lowery) and (crossDispersion < uppery):
+                lineArray.append([round(modpixel), round(crossDispersion)])
+                print("appended pixel successfully")
+    lineArrayn = np.array(lineArray)
+    sumArray = []
+    for element in lineArrayn:
+        rgbval = 0
+        for rgb in data[element[0]][element[1]]:
+            rgbval += rgb
+        sumArray.append(rgbval)
+    sumArrayn = np.array(sumArray)
+    print("sumArrayn:\n", sumArrayn)
+
+    #logging end
+    sys.stdout = sys.__stdout__
+    np.set_printoptions(threshold=1000)
+
+    return sumArrayn
+
+def plotIntensityQ(intensityQ):
+    x = []
+    y = []
+    for element in intensityQ:
+        x.append(element[0])
+        y.append(element[1])
+    plt.figure(1)
+    plt.clf() #clears figure
+    plt.plot(x, y,'b.',markersize=4)
+    plt.title("dispOne")
+
 #testestestestest
 def crop(image):
     #oldcode from before I decided to implement Evan's suggestions and Josh's debugging arrays.
