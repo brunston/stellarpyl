@@ -1,6 +1,7 @@
 #bp additions
 *.log
 /__pycache__/*
+foo.py
 
 # Windows image file caches
 Thumbs.db

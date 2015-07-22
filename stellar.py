@@ -10,119 +10,83 @@ stellarPY
 import numpy as np
 import math
 import statistics
-from scipy import ndimage
 from PIL import Image
 from matplotlib import pyplot as plt
 
 import pdb
 import sys
 
-
-"""
-figure 0: pixelDistribution
-figure 1: intensity
-figure 2: regression from spectrum against points
-"""
-
-def converter(imageToConvert):
+def backMedian(img, threshold):
     """
-    Converts image given in filepath format as tif to a numpy array and returns
+    calculates the median value of 'blackness' in an image under a specific
+    threshold
     """
-    #note- for some reason, Lightroom-cropped tif files do not play nice.
-    #Use original files.
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    back = []
+    for x in range(lowerx, upperx):
+        for y in range(lowery, uppery):
+            pixel = img.getpixel((x,y))
+            pixelSum = pixel[0]+pixel[1]+pixel[2]
+            if pixelSum < threshold:
+                back.append(pixelSum)
+    backMedian = statistics.median(back)
+    return backMedian
 
-    image = Image.open(imageToConvert)
-    imageArray = np.array(image)
-
-    #troubleshooting statements
-    # print("ndarray imageArray:\n", imageArray)
-    print("imageArray shape:", imageArray.shape)
-    print("imageArray dtype:", imageArray.dtype)
-
-    return imageArray
-
-def restorer(arrayToConvert):
-    """
-    Converts array given as ndarray to a tif and returns None
-    """
-    image = Image.fromarray(arrayToConvert)
-    image.save("image.tiff", "TIFF")
-    return None
-
-def pixelDistribution(data):
-    """
-    Creates a plot which shows the relative pixel distribution of data given
-    in ndarray format so that we can figure out how much "noise" is feasible
-    to get rid of without harming the rest of the data
-    """
-    numRow = len(data)
-    numCol = len(data[0])
-    distributionArray = np.zeros(766, dtype=np.uint8)
-    x = np.arange(765+1)
-    for row in range(numRow):
-        for col in range(numCol):
-            pixelSum = np.sum(data[row][col])
-            distributionArray[pixelSum] += 1
-
-    plt.figure(0)
-    plt.clf() #clears figure
-    plt.plot(x, distributionArray,'b.',markersize=4)
-    return distributionArray
-
-def intensityQ(img, data, regArray):
+def intensityN(img, data, reg, threshold = 127):
     """
     Creates a 'proper' intensity array for the data given in a numpy array and
     using an open Image given in img. Degree offset is calculated by a
     y = mx + c function as done in regression()
     regArray = [xvals_n, yvals_n, A, m, c]
     """
-    f = open('log_intensity.txt', 'w')
+    #logging start
+    f = open('log_intensity.log', 'w')
     sys.stdout = f
     np.set_printoptions(threshold=np.nan)
-    m, c = regArray[3], regArray[4]
-    
+    #//logging start
+
     lowerx, lowery, upperx, uppery = img.getbbox()
-    lineArray = []
+    m, c = reg[0:2]
+    n = -1 / m
+    #background subtraction median calculation
+    back = backMedian(img, threshold)
+
+    intensities = {} #this is a dictionary.
     for xpixel in range(lowerx, upperx):
         ypixel = m * xpixel + c
-        n = -1/m
-        for modpixel in np.arange(lowerx, upperx, 0.1):
-            print("+ a pixel from modpixel, value: ", modpixel)
-            crossDispersion = n * (modpixel - xpixel) + ypixel
-            print("pixel (%.2f,%.2f)" %(modpixel, crossDispersion))
-            if (crossDispersion > lowery) and (crossDispersion < uppery):
-                lineArray.append([round(modpixel), round(crossDispersion)])
-                print("appended pixel successfully")
-    lineArrayn = np.array(lineArray)
-    sumArray = []
-    for element in lineArrayn:
-        rgbval = 0
-        for rgb in data[element[0]][element[1]]:
-            rgbval += rgb
-        sumArray.append(rgbval)
-    sumArrayn = np.array(sumArray)
-    print("sumArrayn:\n", sumArrayn)
-
+        for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
+            #newx = modpixel from iQ, newy = crossDispersion from iQ
+            newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
+            if (newy > lowery) and (newy < uppery):
+                #anti-aliasing implementation http://is.gd/dnj08y
+                for newxRounded in (math.floor(newx), math.ceil(newx)):
+                    for newyRounded in (math.floor(newy), math.ceil(newy)):
+                        #we need to be sure that the rounded point is in our img
+                        if (newyRounded > lowery) and (newyRounded < uppery):
+                            pixel = img.getpixel((newxRounded,newyRounded))
+                            newValue = pixel[0]+pixel[1]+pixel[2]
+                            #to ensure we don't reset a value instead of adding:
+                            if xpixel in intensities:
+                                intensities[xpixel] = \
+                                                    intensities[xpixel] + \
+                                                    newValue
+                            else:
+                                intensities[xpixel] = newValue
+                                intensities[xpixel] -= back
     #logging end
     sys.stdout = sys.__stdout__
     np.set_printoptions(threshold=1000)
+    #//logging end
+    print("median background", backMedian)
 
-    return sumArrayn
+    return intensities
+    #rewritten for cleaner reading from intensityQ, regression_test.py provided
+    #by Scott and Wikipedia article on spatial antialiasing found at
+    #http://is.gd/dnj08y or wiki-spatial-antialiasing.pdf
 
-def plotIntensityQ(intensityQ):
-    x = []
-    y = []
-    for element in intensityQ:
-        x.append(element[0])
-        y.append(element[1])
-    plt.figure(1)
-    plt.clf() #clears figure
-    plt.plot(x, y,'b.',markersize=4)
-    plt.title("dispOne")
-
-def intensityR(img, data, regArray, threshold=127):
+def intensitySAA(img, data, reg, threshold=127):
     """
-    intensityR is the third iteration of the intensity function which aims
+    intensitySAA is the third iteration of the intensity function which aims
     to deal with the plotting of regressed non-orthogonal spectra given in
     an open image img, the pixel data in data, and a regArray generated
     using regression(). Returns a dictionary where key is x value and y
@@ -135,17 +99,10 @@ def intensityR(img, data, regArray, threshold=127):
     #//logging start
 
     lowerx, lowery, upperx, uppery = img.getbbox()
-    m, c = regArray[3], regArray[4]
+    m, c = reg[0:2]
     n = -1 / m
-    #background subtraction
-    back = []
-    for x in range(lowerx, upperx):
-        for y in range(lowery, uppery):
-            pixel = img.getpixel((x,y))
-            pixelSum = pixel[0]+pixel[1]+pixel[2]
-            if pixelSum < threshold:
-                back.append(pixelSum)
-    backMedian = statistics.median(back)
+    #background subtraction median calculation
+    back = backMedian(img, threshold)
 
     intensities = {} #this is a dictionary.
     for xpixel in range(lowerx, upperx):
@@ -154,8 +111,7 @@ def intensityR(img, data, regArray, threshold=127):
             #newx = modpixel from iQ, newy = crossDispersion from iQ
             newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
             if (newy > lowery) and (newy < uppery):
-                #anti-aliasing implementation from wiki-spatial-antialiasing.pdf
-                #section 2 or in http://is.gd/dnj08y
+                #anti-aliasing implementation http://is.gd/dnj08y
                 for newxRounded in (math.floor(newx), math.ceil(newx)):
                     for newyRounded in (math.floor(newy), math.ceil(newy)):
                         #we need to be sure that the rounded point is in our img
@@ -173,8 +129,8 @@ def intensityR(img, data, regArray, threshold=127):
                                                     newValue
                             else:
                                 intensities[xpixel] = newValue
-                            intensities[xpixel] -= percent * (backMedian)
-    print("back", back)
+                            intensities[xpixel] -= percent * back
+
     #logging end
     sys.stdout = sys.__stdout__
     np.set_printoptions(threshold=1000)
@@ -185,19 +141,6 @@ def intensityR(img, data, regArray, threshold=127):
     #rewritten for cleaner reading from intensityQ, regression_test.py provided
     #by Scott and Wikipedia article on spatial antialiasing found at
     #http://is.gd/dnj08y or wiki-spatial-antialiasing.pdf
-
-def plotIntensityR(intensityR):
-    plotx, ploty = [], []
-    for x in intensityR.keys():
-        plotx.append(x)
-        ploty.append(intensityR[x])
-    plotxn, plotyn = np.array(plotx), np.array(ploty)
-
-    plt.figure(1)
-    plt.clf()
-    plt.plot(plotx, ploty, 'b--', label='anti-aliased data')
-    plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
-    plt.show()
 
 def sumGenerator(data):
     """
@@ -216,14 +159,6 @@ def sumGenerator(data):
     newNP = np.array(new)
     return newNP
 
-def rotate(data, angle):
-    """
-    Rotates an ndarray data which has already gone through the sumGenerator
-    process at an angle (float) given.
-    """
-    #TODO needs work
-    return ndimage.interpolation.rotate(data, angle)
-
 def absResponse(wavelength):
     """
     Would normally have a response function that changes based on the
@@ -235,12 +170,8 @@ def absResponse(wavelength):
 
 def regression(img, threshold=127):
     """
-    Performs least-squares regression fitting on a given intensityMatrix
-    generated using sumGenerator()
-
-    ndarrays are top-left 0,0. To account for this in least-squares regression
-    fit, we will use a positional y-value of
-    (len of column i.e. numRows) - (y-value )
+    Performs least-squares regression fitting on a given image.
+    Returns a tuple: (m,c,xvals_n,yvals_n). tuple[0:2] for just (m,c)
     """
     #point-gathering code
     lowerx, lowery, upperx, uppery = img.getbbox()
@@ -256,25 +187,9 @@ def regression(img, threshold=127):
     #regression code
     xvals_n, yvals_n = np.array(xvals), np.array(yvals)
     A = np.vstack([xvals_n, np.ones(len(xvals_n))]).T
-    print("A:\n", A)
     m,c = np.linalg.lstsq(A, yvals_n)[0]
     print("M, C:", m,c)
-    return [xvals_n,yvals_n,A,m,c]
-
-def plotRegression(regArray):
-    """
-    Plots the regression provided against the points provided in the regArray
-    """
-    x, y, A = regArray[0], regArray[1], regArray[2]
-    m, c = regArray[3], regArray[4]
-
-
-    plt.figure(2)
-    plt.clf()
-    plt.plot(x, y,'o',label='original data',markersize=4)
-    plt.plot(x, m*x + c,'r',linestyle='-', label='fitted line')
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.show()
+    return (m,c,xvals_n, yvals_n)
 
 def crop(image,deletionThreshold=127):
     """

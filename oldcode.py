@@ -5,8 +5,122 @@ stellarPY
 @author: Brunston Poon
 @org: UH-IFA / SPS
 """
+from scipy import ndimage #for rotate
 
 #where old code goes to. This file is a small farm up north
+# path = '127.tiff'
+# img = Image.open(path)
+# regTup = st.regression(img)
+# dataArray = st.converter(path)
+# to.plotRegression(regTup)
+# intensity = st.intensityN(img,dataArray,regTup, 127)
+# to.plotIntensity(intensity)
+
+def intensityN(img, data, regArray):
+    """
+    Creates a 'proper' intensity array for the data given in a numpy array and
+    using an open Image given in img. Degree offset is calculated by a
+    y = mx + c function as done in regression()
+    regArray = [xvals_n, yvals_n, A, m, c]
+    """
+    f = open('log_intensity.log', 'w')
+    sys.stdout = f
+    np.set_printoptions(threshold=np.nan)
+    m, c = regArray[3], regArray[4]
+    
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    lineArray = []
+    for xpixel in range(lowerx, upperx):
+        ypixel = m * xpixel + c
+        n = -1/m
+        for modpixel in np.arange(lowerx, upperx, 0.1):
+            print("+ a pixel from modpixel, value: ", modpixel)
+            crossDispersion = n * (modpixel - xpixel) + ypixel
+            print("pixel (%.2f,%.2f)" %(modpixel, crossDispersion))
+            if (crossDispersion > lowery) and (crossDispersion < uppery):
+                lineArray.append([round(modpixel), round(crossDispersion)])
+                print("appended pixel successfully")
+    lineArrayn = np.array(lineArray)
+    sumArray = []
+    for element in lineArrayn:
+        rgbval = 0
+        for rgb in data[element[0]][element[1]]:
+            rgbval += rgb
+        sumArray.append(rgbval)
+    sumArrayn = np.array(sumArray)
+    print("sumArrayn:\n", sumArrayn)
+
+    #logging end
+    sys.stdout = sys.__stdout__
+    np.set_printoptions(threshold=1000)
+
+    return sumArrayn
+
+def intensitySAA(img, data, regArray, threshold=127):
+    """
+    intensitySAA is the third iteration of the intensity function which aims
+    to deal with the plotting of regressed non-orthogonal spectra given in
+    an open image img, the pixel data in data, and a regArray generated
+    using regression(). Returns a dictionary where key is x value and y
+    value is intensity.
+    """
+    #logging start
+    f = open('log_intensity.log', 'w')
+    sys.stdout = f
+    np.set_printoptions(threshold=np.nan)
+    #//logging start
+
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    m, c = regArray[3], regArray[4]
+    n = -1 / m
+    #background subtraction
+    back = []
+    for x in range(lowerx, upperx):
+        for y in range(lowery, uppery):
+            pixel = img.getpixel((x,y))
+            pixelSum = pixel[0]+pixel[1]+pixel[2]
+            if pixelSum < threshold:
+                back.append(pixelSum)
+    backMedian = statistics.median(back)
+
+    intensities = {} #this is a dictionary.
+    for xpixel in range(lowerx, upperx):
+        ypixel = m * xpixel + c
+        for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
+            #newx = modpixel from iQ, newy = crossDispersion from iQ
+            newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
+            if (newy > lowery) and (newy < uppery):
+                #anti-aliasing implementation from wiki-spatial-antialiasing.pdf
+                #section 2 or in http://is.gd/dnj08y
+                for newxRounded in (math.floor(newx), math.ceil(newx)):
+                    for newyRounded in (math.floor(newy), math.ceil(newy)):
+                        #we need to be sure that the rounded point is in our img
+                        if (newyRounded > lowery) and (newyRounded < uppery):
+                            percentNewX = 1 - abs(newx - newxRounded)
+                            percentNewY = 1 - abs(newy - newyRounded)
+                            percent = percentNewX * percentNewY
+                            #get antialiased intensity from pixel
+                            pixel = img.getpixel((newxRounded,newyRounded))
+                            newValue = percent * (pixel[0]+pixel[1]+pixel[2])
+                            #to ensure we don't reset a value instead of adding:
+                            if xpixel in intensities:
+                                intensities[xpixel] = \
+                                                    intensities[xpixel] + \
+                                                    newValue
+                            else:
+                                intensities[xpixel] = newValue
+                            intensities[xpixel] -= percent * (backMedian)
+    print("back", back)
+    #logging end
+    sys.stdout = sys.__stdout__
+    np.set_printoptions(threshold=1000)
+    #//logging end
+    print("median background", backMedian)
+
+    return intensities
+    #rewritten for cleaner reading from intensityQ, regression_test.py provided
+    #by Scott and Wikipedia article on spatial antialiasing found at
+    #http://is.gd/dnj08y or wiki-spatial-antialiasing.pdf
 
 def intensity(data):
     """
@@ -118,7 +232,137 @@ def intensityP(img, data, regArray):
 
     return sumArrayn
 
+def rotate(data, angle):
+    """
+    Rotates an ndarray data which has already gone through the sumGenerator
+    process at an angle (float) given.
+    """
+    #TODO needs work
+    return ndimage.interpolation.rotate(data, angle)
+#failed attempt at super-encapuslation
 
+def intensitySAA(importer, img, data, regArray, intensities, threshold=127):
+    """
+    intensitySAA is the third iteration of the intensity function which aims
+    to deal with the plotting of regressed non-orthogonal spectra given in
+    an open image img, the pixel data in data, and a regArray generated
+    using regression(). Returns a dictionary where key is x value and y
+    value is intensity.
+    """
+    xpixel, lowery, uppery, newx, newy, \
+    newxRounded, newyRounded, backMedian = importer
+    
+    if (newyRounded > lowery) and (newyRounded < uppery):
+        percentNewX = 1 - abs(newx - newxRounded)
+        percentNewY = 1 - abs(newy - newyRounded)
+        percent = percentNewX * percentNewY
+        #get antialiased intensity from pixel
+        pixel = img.getpixel((newxRounded,newyRounded))
+        newValue = percent * (pixel[0]+pixel[1]+pixel[2])
+        #to ensure we don't reset a value instead of adding:
+        if xpixel in intensities:
+            intensities[xpixel] = \
+                                intensities[xpixel] + \
+                                newValue
+        else:
+            intensities[xpixel] = newValue
+            intensities[xpixel] -= percent * (backMedian)
+
+def intensityN(importer, img, data, regArray, intensities, threshold=127):
+    """
+    Creates a 'proper' intensity array for the data given in a numpy array and
+    using an open Image given in img. Degree offset is calculated by a
+    y = mx + c function as done in regression()
+    regArray = [xvals_n, yvals_n, A, m, c]
+    """
+    if (newyRounded > lowery) and (newyRounded < uppery):
+        pixel = img.getpixel((newxRounded,newyRounded))
+        newValue = pixel[0]+pixel[1]+pixel[2]
+        #to ensure we don't reset a value instead of adding:
+        if xpixel in intensities:
+            intensities[xpixel] = \
+                                intensities[xpixel] + \
+                                newValue
+        else:
+            intensities[xpixel] = newValue
+            intensities[xpixel] -= backMedian
+
+def plotIntensityN(intensityN):
+    x = []
+    y = []
+    for element in intensityN:
+        x.append(element[0])
+        y.append(element[1])
+    plt.figure(1)
+    plt.clf() #clears figure
+    plt.plot(x, y,'b.',markersize=4)
+    plt.title("dispOne")
+
+def intensity(img, data, regArray, itype = 'saa', threshold = 127):
+    f = open('log_intensity.log', 'w')
+    sys.stdout = f
+    np.set_printoptions(threshold=np.nan)
+    #//logging start
+
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    m, c = regArray[3], regArray[4]
+    n = -1 / m
+    #background subtraction
+    back = []
+    for x in range(lowerx, upperx):
+        for y in range(lowery, uppery):
+            pixel = img.getpixel((x,y))
+            pixelSum = pixel[0]+pixel[1]+pixel[2]
+            if pixelSum < threshold:
+                back.append(pixelSum)
+    backMedian = statistics.median(back)
+
+    intensities = {} #this is a dictionary.
+    for xpixel in range(lowerx, upperx):
+        ypixel = m * xpixel + c
+        for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
+            #newx = modpixel from iQ, newy = crossDispersion from iQ
+            newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
+            if (newy > lowery) and (newy < uppery):
+                #anti-aliasing implementation from wiki-spatial-antialiasing.pdf
+                #section 2 or in http://is.gd/dnj08y
+                for newxRounded in (math.floor(newx), math.ceil(newx)):
+                    for newyRounded in (math.floor(newy), math.ceil(newy)):
+                        importer = (xpixel, lowery, uppery, newx, newy, \
+                                    newxRounded, newyRounded, backMedian)
+                        interpolation( \
+                                        itype, \
+                                        img, data, regArray, importer, \
+                                        intensities, threshold \
+                                        )
+    print("back", back)
+    #logging end
+    sys.stdout = sys.__stdout__
+    np.set_printoptions(threshold=1000)
+    #//logging end
+    print("median background", backMedian)
+
+    return intensities
+    #rewritten for cleaner reading from intensityQ, regression_test.py provided
+    #by Scott and Wikipedia article on spatial antialiasing found at
+    #http://is.gd/dnj08y or wiki-spatial-antialiasing.pdf
+
+def interpolation(func, img, data, regArray, importer, intensities, threshold=127):
+    """
+    Function which executes the interpolation type requested (as string)
+    as available in the below dictionary.
+    from http://stackoverflow.com/questions/2283210/python-function-pointer
+    """
+
+    funcDict = {
+        'naive':intensityN,
+        'saa':intensitySAA,
+    }
+    try:
+        funcDict[func](importer, img, data, regArray, threshold, intensities)
+    except KeyError:
+        raise Exception("The interpolation method you called does not exist!")
+#end failed attempt
 
 #testestestestest
 def crop(image):
@@ -210,3 +454,55 @@ def weird():
         # else:
         #     break
     return None #added after transfer to oldcode
+
+#old test toggle code
+toggle == False
+while toggle == True:
+    print("commands (shortnames are first two letters):")
+    print("'q', 'quit', 'exit', to exit")
+    print("'actual' for actual file, 'sample' for sample")
+    print("'regression' for regression test, 'rotate' for rotate test")
+    print("'simple' for the simple test")
+    blah = input("enter command> ")
+    if blah in ("simple","si"): #SIMPLE TEST
+        array = de.simpleArray()
+        #cropped = st.crop(array, 7)
+        #intensity = st.intensity(cropped)
+        #st.plotGraph(intensity)
+        summed = st.sumGenerator(array)
+        regArray = st.regression(summed, 7)
+        st.plotRegression(regArray)
+
+    elif blah in ("actual", "ac"): #ACTUAL
+        file = 'IMG_2860.tif'
+        fileArray = st.converter(file)
+        cropped = st.crop(fileArray, 110)
+        print("cropped.shape:", cropped.shape)
+        #st.restorer(cropped)
+        #distribution = st.pixelDistribution(cropped)
+        #intensity = st.intensity(cropped)
+        #st.plotGraph(intensity)
+        # writeLogToFile(fileArray,'log.log')
+
+    elif blah in ("sample", "sa"): #SAMPLE
+        test = de.testArray() #will print out the array generated.
+        # sums = st.sumGenerator(test)
+        # print(sums)
+        cropped = st.crop(test)
+        print("duplicate returned from crop():\n", cropped)
+
+    elif blah in ("reg", "regression", "re"): #REGRESSION TEST
+        testRotate = de.testRotate()
+        print("testRotate:\n", testRotate)
+        print("testRotate.shape:\n", testRotate.shape)
+        regArray = st.regression(testRotate, 0) #test matrix threshold is 0
+        st.plotRegression(regArray)
+
+    elif blah in ("rotate", "ro"): #ROTATE TEST
+        testRotate = de.testRotate()
+        print("testRotate:\n",testRotate)
+        rotated = st.rotate(testRotate,30.0)
+        print("rotated:\n",rotated)
+
+    elif blah in ("q", "quit", "exit"): break
+    else: print("please input a recognized command")
