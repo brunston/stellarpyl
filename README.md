@@ -36,20 +36,33 @@ correctly.
 
 You will be presented with a list of commands.
 
-'pixel_d' (short 'pd') takes an image and shows the pixel distribution of the
-image over the intensity of the pixels
-
-'image_regression' (short 'imgreg') takes an image and finds the line which goes
-through the spectrum in that image
-
-'intensity_n' (short 'n') takes an image of a spectrum and converts it into an
-intensity plot using the naive method of adding
-
-'intensity_saa' (short 'saa') takes an image of a spectrum and converts it into
-an intensity plot using spatial anti-aliasing at a sub-sampling rate of 1/10 of
-one pixel
-
-'crop' will take an image and crop it based on your selected threshold.
+<table border="1" style="width:100%">
+  <tr>
+    <td>'pixel_d' (short 'pd')</td>
+    <td>takes an image and shows the pixel distribution of the\
+	image over the intensity of the pixels</td>
+  </tr>
+  <tr>
+    <td>'image_regression' (short 'imgreg')</td>
+    <td>takes an image and finds the line which goes\
+	through the spectrum in that image</td>
+  </tr>
+  <tr>
+    <td>'intensity_n' (short 'n')</td>
+    <td>takes an image of a spectrum and converts it into an\
+	intensity plot using the naive method of adding</td>
+  </tr>
+  <tr>
+    <td>'intensity_saa' (short 'saa')</td>
+    <td>takes an image of a spectrum and converts it into\
+	an intensity plot using spatial anti-aliasing at a sub-sampling rate\
+	of one tenth of one pixel</td>
+  </tr>
+  <tr>
+    <td>'crop'</td>
+    <td>takes an image and crop it based on your selected threshold.</td>
+  </tr>
+</table>
 
 The threshold it asks you for is a threshold used throughout the program which
 determines what data is relevant and what parts of the image can be discarded
