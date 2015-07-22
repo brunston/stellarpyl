@@ -9,11 +9,14 @@ stellarPY
 
 import numpy as np
 import math
+import statistics
 from scipy import ndimage
 from PIL import Image
 from matplotlib import pyplot as plt
+
 import pdb
 import sys
+
 
 """
 figure 0: pixelDistribution
@@ -66,7 +69,58 @@ def pixelDistribution(data):
     plt.plot(x, distributionArray,'b.',markersize=4)
     return distributionArray
 
-def intensityR(img, data, regArray, threshold=110):
+def intensityQ(img, data, regArray):
+    """
+    Creates a 'proper' intensity array for the data given in a numpy array and
+    using an open Image given in img. Degree offset is calculated by a
+    y = mx + c function as done in regression()
+    regArray = [xvals_n, yvals_n, A, m, c]
+    """
+    f = open('log_intensity.txt', 'w')
+    sys.stdout = f
+    np.set_printoptions(threshold=np.nan)
+    m, c = regArray[3], regArray[4]
+    
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    lineArray = []
+    for xpixel in range(lowerx, upperx):
+        ypixel = m * xpixel + c
+        n = -1/m
+        for modpixel in np.arange(lowerx, upperx, 0.1):
+            print("+ a pixel from modpixel, value: ", modpixel)
+            crossDispersion = n * (modpixel - xpixel) + ypixel
+            print("pixel (%.2f,%.2f)" %(modpixel, crossDispersion))
+            if (crossDispersion > lowery) and (crossDispersion < uppery):
+                lineArray.append([round(modpixel), round(crossDispersion)])
+                print("appended pixel successfully")
+    lineArrayn = np.array(lineArray)
+    sumArray = []
+    for element in lineArrayn:
+        rgbval = 0
+        for rgb in data[element[0]][element[1]]:
+            rgbval += rgb
+        sumArray.append(rgbval)
+    sumArrayn = np.array(sumArray)
+    print("sumArrayn:\n", sumArrayn)
+
+    #logging end
+    sys.stdout = sys.__stdout__
+    np.set_printoptions(threshold=1000)
+
+    return sumArrayn
+
+def plotIntensityQ(intensityQ):
+    x = []
+    y = []
+    for element in intensityQ:
+        x.append(element[0])
+        y.append(element[1])
+    plt.figure(1)
+    plt.clf() #clears figure
+    plt.plot(x, y,'b.',markersize=4)
+    plt.title("dispOne")
+
+def intensityR(img, data, regArray, threshold=127):
     """
     intensityR is the third iteration of the intensity function which aims
     to deal with the plotting of regressed non-orthogonal spectra given in
@@ -75,7 +129,7 @@ def intensityR(img, data, regArray, threshold=110):
     value is intensity.
     """
     #logging start
-    f = open('log_intensity.txt', 'w')
+    f = open('log_intensity.log', 'w')
     sys.stdout = f
     np.set_printoptions(threshold=np.nan)
     #//logging start
@@ -84,13 +138,14 @@ def intensityR(img, data, regArray, threshold=110):
     m, c = regArray[3], regArray[4]
     n = -1 / m
     #background subtraction
-    backx = {}
+    back = []
     for x in range(lowerx, upperx):
         for y in range(lowery, uppery):
             pixel = img.getpixel((x,y))
-            if pixel[0]+pixel[1]+pixel[2] < threshold:
-                backx.append(x)
-                backy.append(y) 
+            pixelSum = pixel[0]+pixel[1]+pixel[2]
+            if pixelSum < threshold:
+                back.append(pixelSum)
+    backMedian = statistics.median(back)
 
     intensities = {} #this is a dictionary.
     for xpixel in range(lowerx, upperx):
@@ -111,7 +166,6 @@ def intensityR(img, data, regArray, threshold=110):
                             #get antialiased intensity from pixel
                             pixel = img.getpixel((newxRounded,newyRounded))
                             newValue = percent * (pixel[0]+pixel[1]+pixel[2])
-
                             #to ensure we don't reset a value instead of adding:
                             if xpixel in intensities:
                                 intensities[xpixel] = \
@@ -119,13 +173,13 @@ def intensityR(img, data, regArray, threshold=110):
                                                     newValue
                             else:
                                 intensities[xpixel] = newValue
-                            intensities[xpixel] -= percent * ()
-    for xpixel in intensities:
-        intensities[xpixel] -= percent
+                            intensities[xpixel] -= percent * (backMedian)
+    print("back", back)
     #logging end
     sys.stdout = sys.__stdout__
     np.set_printoptions(threshold=1000)
     #//logging end
+    print("median background", backMedian)
 
     return intensities
     #rewritten for cleaner reading from intensityQ, regression_test.py provided

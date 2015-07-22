@@ -8,7 +8,7 @@ stellarPY
 
 #where old code goes to. This file is a small farm up north
 
-def intensity(data,degreeOffset=0):
+def intensity(data):
     """
     Creates an intensity array for the data given in a numpy array. Also allows
     for the insertion of an absolute response function.
@@ -17,15 +17,14 @@ def intensity(data,degreeOffset=0):
     Clockwise (i.e. 'below horizontal') is negative
     """
     intensity = []
-    if degreeOffset == 0: #i.e. we just want to add vertically
-        for k in range(len(data[0])): #goes by column
-            vertSlice = data[:,k] # a single column k with all rows
-            #print("vertSlice:\n", vertSlice)
-            runningTotal = 0
-            for pixel in vertSlice:
-                for color in pixel:
-                    runningTotal = color + runningTotal
-            intensity.append(runningTotal)
+    for k in range(len(data[0])): #goes by column
+        vertSlice = data[:,k] # a single column k with all rows
+        #print("vertSlice:\n", vertSlice)
+        runningTotal = 0
+        for pixel in vertSlice:
+            for color in pixel:
+                runningTotal = color + runningTotal
+        intensity.append(runningTotal)
     intensityNP = np.array(intensity)
     return intensityNP
 
@@ -119,56 +118,7 @@ def intensityP(img, data, regArray):
 
     return sumArrayn
 
-def intensityQ(img, data, regArray):
-    """
-    Creates a 'proper' intensity array for the data given in a numpy array and
-    using an open Image given in img. Degree offset is calculated by a
-    y = mx + c function as done in regression()
-    regArray = [xvals_n, yvals_n, A, m, c]
-    """
-    f = open('log_intensity.txt', 'w')
-    sys.stdout = f
-    np.set_printoptions(threshold=np.nan)
-    m, c = regArray[3], regArray[4]
-    
-    lowerx, lowery, upperx, uppery = img.getbbox()
-    lineArray = []
-    for xpixel in range(lowerx, upperx):
-        ypixel = m * xpixel + c
-        n = -1/m
-        for modpixel in np.arange(lowerx, upperx, 0.1):
-            print("+ a pixel from modpixel, value: ", modpixel)
-            crossDispersion = n * (modpixel - xpixel) + ypixel
-            print("pixel (%.2f,%.2f)" %(modpixel, crossDispersion))
-            if (crossDispersion > lowery) and (crossDispersion < uppery):
-                lineArray.append([round(modpixel), round(crossDispersion)])
-                print("appended pixel successfully")
-    lineArrayn = np.array(lineArray)
-    sumArray = []
-    for element in lineArrayn:
-        rgbval = 0
-        for rgb in data[element[0]][element[1]]:
-            rgbval += rgb
-        sumArray.append(rgbval)
-    sumArrayn = np.array(sumArray)
-    print("sumArrayn:\n", sumArrayn)
 
-    #logging end
-    sys.stdout = sys.__stdout__
-    np.set_printoptions(threshold=1000)
-
-    return sumArrayn
-
-def plotIntensityQ(intensityQ):
-    x = []
-    y = []
-    for element in intensityQ:
-        x.append(element[0])
-        y.append(element[1])
-    plt.figure(1)
-    plt.clf() #clears figure
-    plt.plot(x, y,'b.',markersize=4)
-    plt.title("dispOne")
 
 #testestestestest
 def crop(image):
