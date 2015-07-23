@@ -1,6 +1,7 @@
 #bp additions
 *.log
 /__pycache__/*
+*.pyc
 foo.py
 .~lock.algorithmDescription.rtf\#
 
