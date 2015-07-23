@@ -7,7 +7,6 @@ stellarPY
 """
 
 import stellar as st
-import debug as de
 import tools as to
 import sys
 #Let's make sure that the user has all the dependencies installed and that

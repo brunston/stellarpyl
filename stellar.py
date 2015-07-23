@@ -39,7 +39,7 @@ def intensityN(img, data, reg, threshold = 127):
     y = mx + c function as done in regression()
     regArray = [xvals_n, yvals_n, A, m, c]
     """
-    #logging start
+    #logging start debug
     f = open('log_intensity.log', 'w')
     sys.stdout = f
     np.set_printoptions(threshold=np.nan)
@@ -73,7 +73,7 @@ def intensityN(img, data, reg, threshold = 127):
                             else:
                                 intensities[xpixel] = newValue
                                 intensities[xpixel] -= back
-    #logging end
+    #logging end debug
     sys.stdout = sys.__stdout__
     np.set_printoptions(threshold=1000)
     #//logging end
@@ -92,7 +92,7 @@ def intensitySAA(img, data, reg, threshold=127):
     using regression(). Returns a dictionary where key is x value and y
     value is intensity.
     """
-    #logging start
+    #logging start debug
     f = open('log_intensity.log', 'w')
     sys.stdout = f
     np.set_printoptions(threshold=np.nan)
@@ -131,7 +131,7 @@ def intensitySAA(img, data, reg, threshold=127):
                                 intensities[xpixel] = newValue
                             intensities[xpixel] -= percent * back
 
-    #logging end
+    #logging end debug
     sys.stdout = sys.__stdout__
     np.set_printoptions(threshold=1000)
     #//logging end
@@ -182,6 +182,8 @@ def regression(img, threshold=127):
             if pixel[0]+pixel[1]+pixel[2] > threshold:
                 xvals.append(x)
                 yvals.append(y) #accounting for upperleft vs lowerleft 0,0
+    #debug
+    print("regression:")
     print(xvals)
     print(yvals)
     #regression code
