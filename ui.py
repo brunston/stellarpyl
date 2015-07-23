@@ -37,7 +37,7 @@ if toggle == True:
 
 while toggle == True:
     validCommands = ("pixel_d", "image_regression", \
-                    "intensity_n", "intensity_saa" \
+                    "intensity_n", "intensity_saa", \
                     "pd", "imgreg", "saa", "n", "crop")
     userInput = input("enter command> ")
     if userInput in validCommands:
@@ -51,7 +51,7 @@ while toggle == True:
         print("Your answer to the following depends for all commands except\n \
                 'pixel_d'.")
         print("What threshold would you like to use as differentiator?")
-            thresh = input("enter threshold> ")
+        thresh = input("enter threshold> ")
         if userInput in ("intensity_saa", "saa"):
             intensity = st.intensitySAA(img,dataArray,regTup, int(thresh))
             to.plotIntensity(intensity)
