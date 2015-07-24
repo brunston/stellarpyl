@@ -142,6 +142,65 @@ def intensitySAA(img, data, reg, threshold=127):
     #by Scott and Wikipedia article on spatial antialiasing found at
     #http://is.gd/dnj08y or wiki-spatial-antialiasing.pdf
 
+def intensitySAAN(img, data, reg, threshold=127):
+    """
+    intensitySAAN is the fourth iteration of the intensity function which aims
+    to deal with the plotting of regressed non-orthogonal spectra given in
+    an open image img, the pixel data in data, and a regArray generated
+    using regression(). Returns a dictionary where key is x value and y
+    value is intensity.
+    """
+    #logging start debug
+    f = open('log_intensity.log', 'w')
+    sys.stdout = f
+    np.set_printoptions(threshold=np.nan)
+    #//logging start
+
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    m, c = reg[0:2]
+    n = -1 / m
+    #background subtraction median calculation
+    back = backMedian(img, threshold)
+
+    intensities = {} #this is a dictionary.
+    step = (math.sqrt(-(c**2) + (m**2) + 1) - (c * m)) / ((m**2) + 1)
+    for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
+        ypixel = m * xpixel + c
+        for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
+            #newx = modpixel from iQ, newy = crossDispersion from iQ
+            newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
+            if (newy > lowery) and (newy < uppery):
+                #anti-aliasing implementation http://is.gd/dnj08y
+                for newxRounded in (math.floor(newx), math.ceil(newx)):
+                    for newyRounded in (math.floor(newy), math.ceil(newy)):
+                        #we need to be sure that the rounded point is in our img
+                        if (newyRounded > lowery) and (newyRounded < uppery):
+                            percentNewX = 1 - abs(newx - newxRounded)
+                            percentNewY = 1 - abs(newy - newyRounded)
+                            percent = percentNewX * percentNewY
+                            #get antialiased intensity from pixel
+                            pixel = img.getpixel((newxRounded,newyRounded))
+                            newValue = percent * (pixel[0]+pixel[1]+pixel[2])
+                            #to ensure we don't reset a value instead of adding:
+                            if xpixel in intensities:
+                                intensities[xpixel] = \
+                                                    intensities[xpixel] + \
+                                                    newValue
+                            else:
+                                intensities[xpixel] = newValue
+                            intensities[xpixel] -= percent * back
+
+    #logging end debug
+    sys.stdout = sys.__stdout__
+    np.set_printoptions(threshold=1000)
+    #//logging end
+    print("median background", backMedian)
+
+    return intensities
+    #rewritten for cleaner reading from intensityQ, regression_test.py provided
+    #by Scott and Wikipedia article on spatial antialiasing found at
+    #http://is.gd/dnj08y or wiki-spatial-antialiasing.pdf
+
 def sumGenerator(data):
     """
     Creates a 2d matrix of intensity values from a given ndarray data which
