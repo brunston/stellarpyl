@@ -53,7 +53,7 @@ while toggle == True:
         print("What threshold would you like to use as differentiator?")
         thresh = input("enter threshold> ")
         if userInput in ("intensity_saa", "saa"):
-            intensity = st.intensitySAA(img,dataArray,regTup, int(thresh))
+            intensity = st.intensitySAAN(img,dataArray,regTup, int(thresh))
             to.plotIntensity(intensity)
         if userInput in ("intensity_n", "n"):
             intensity = st.intensityN(img,dataArray,regTup, int(thresh))

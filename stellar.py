@@ -163,6 +163,9 @@ def intensitySAAN(img, data, reg, threshold=127):
     back = backMedian(img, threshold)
 
     intensities = {} #this is a dictionary.
+    print("m: ", m)
+    print("c: ", c)
+    print("-(c^2)+(m^2) + 1: ",-(c**2) + (m**2) + 1)
     step = (math.sqrt(-(c**2) + (m**2) + 1) - (c * m)) / ((m**2) + 1)
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
