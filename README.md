@@ -23,7 +23,7 @@ orthogonal spectra); and to account for the use of a DSLR sensor by using either
 a relative response function or an absolute response function to normalize the 
 intensity plot.
 
-##Use:
+##Workflow:
 
 Run ui.py in the command line:
 
@@ -35,6 +35,35 @@ If you do not satisfy these prerequisites, the program will not function
 correctly.
 
 You will be presented with a list of commands.
+
+For a brand new image, run 'crop' first. Drag your file into the same directory
+and enter the filename including the file extension. This program will accept
+TIFF files, either in .tif or .tiff extension format. It will then ask you for a
+threshold.
+
+The threshold is used throughout the program to determine what data is relevant
+and what parts of the image can be discarded without damaging the value of the
+data. It needs to be an integer value between 0 and 765 as the threshold is
+measured as the sum of the R, G, and B bin values in a pixel, therefore, 
+each RGB value can be an integer from 0-255; total value can be from 0-765. If
+you do not have a value you are already using for all of your images, you can
+type 'pixel_d' at the command prompt to run a function that plots the
+distribution of binned pixel values in your image.
+
+The program will run the cropping algorithm and ask for a filename to give to
+the new file.
+
+The next command you should run is 'intensity_saa'. It will take an image file
+and a threshold and automatically perform linear regression to find the y=mx+b
+line on which the spectral trace lies. It will then step one pixel at a time
+along the spectral trace and add up all intensity values occuring along that
+line.
+
+The program will graph this intensity plot, which can be saved using the tools
+already provided by matplotlib.
+
+
+##Command list:
 
 <table border="1" style="width:100%">
   <tr>
@@ -64,8 +93,11 @@ You will be presented with a list of commands.
   </tr>
 </table>
 
-The threshold it asks you for is a threshold used throughout the program which
-determines what data is relevant and what parts of the image can be discarded
-without damaging the value of the data. It needs to be an integer value
-between 0 and 765 as the value of the threshold is measured in the sum of the
-R, G, and B bin values in a pixel; each RGB value can be an integer from 0-255.
+##Additional commands:
+
+<table border="1" style="width:100%">
+  <tr>
+    <td>'jellyfish'</td>
+    <td>who doesn't need a jellyfish?</td>
+  </tr>
+</table>
