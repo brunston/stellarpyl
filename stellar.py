@@ -33,21 +33,22 @@ def backMedian(img, threshold):
     backMedian = statistics.median(back)
     return backMedian
 
-def intensityN(img, data, reg, threshold = 127):
+def intensityN(img, data, reg, threshold = 127,r=1):
     """
     Creates a 'proper' intensity array for the data given in a numpy array and
     using an open Image given in img. Degree offset is calculated by a
     y = mx + c function as done in regression()
     regArray = [xvals_n, yvals_n, A, m, c]
     """
+    print("running intensityN")
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     n = -1 / m
     #background subtraction median calculation
     back = backMedian(img, threshold)
-    print("running intensityN")
     intensities = {} #this is a dictionary.
-    for xpixel in range(lowerx, upperx):
+    step = math.sqrt((r / (1 + m**2)))
+    for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
         for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
             #newx = modpixel from iQ, newy = crossDispersion from iQ
@@ -75,14 +76,16 @@ def intensityN(img, data, reg, threshold = 127):
     #by Scott and Wikipedia article on spatial antialiasing found at
     #http://is.gd/dnj08y or wiki-spatial-antialiasing.pdf
 
-def intensitySAAN(img, data, reg, threshold=127):
+def intensitySAAN(img, data, reg, threshold=127, r=1):
     """
     intensitySAAN is the fourth iteration of the intensity function which aims
     to deal with the plotting of regressed non-orthogonal spectra given in
     an open image img, the pixel data in data, and a regArray generated
     using regression(). Returns a dictionary where key is x value and y
     value is intensity.
+    r is the step rate along the spectral trace (default to size of one pixel)
     """
+    print("running intensitySAAN")
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     n = -1 / m
@@ -91,8 +94,7 @@ def intensitySAAN(img, data, reg, threshold=127):
 
     intensities = {} #this is a dictionary.
     angle = np.arctan(m)
-    step = math.sqrt((1 / (1 + m**2)))
-    print("running intensitySAA")
+    step = math.sqrt((r / (1 + m**2)))
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
         for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
@@ -176,11 +178,13 @@ def regression(img, threshold=127):
     to.pbar(1) #100%
     return (m,c,xvals_n, yvals_n)
 
-def crop(image,deletionThreshold=127):
+def crop(image,deletionThreshold=127,\
+         autostopTB=-1, autostopBT=-1, autostopRL=-1, autostopLR=-1):
     """
     Crops image based on the number of empty pixels [0,0,0]
     Crops top-to-bottom, bottom-to-top, right-to-left, and then left-to-right
     based on the way that the current set of data has been collected.
+    autostops will stop at a specific column if requested.
     """
     duplicate = np.copy(image)
     #print("duplicate:\n", duplicate)
@@ -189,6 +193,7 @@ def crop(image,deletionThreshold=127):
     numRow = len(duplicate) #number of rows in image
     #cropping from top
     toggleTop = True
+    autostopCounter = 0
     while toggleTop == True:
         numRow = len(duplicate)
         a = 0
@@ -197,21 +202,22 @@ def crop(image,deletionThreshold=127):
             if not (np.sum(duplicate[a][i]) <= deletionThreshold):
                 toggleTop = False
                 break
-            # if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
-            #     toggleTop = False
-            #     break
             else:
                 counterPerRow += 1
         if counterPerRow == len(duplicate[a]):
             #if the entire row of pixels is empty, delete row
             duplicate = np.delete(duplicate, a, 0)
             #print("cropping row:", a)
+        if autostopCounter == autostopTB:
+            toggleTop = False
+        autostopCounter += 1
 
     print("beginning bottom crop, top ran fine")
     to.pbar(.25)
 
     #cropping from bottom
     toggleBot = True
+    autostopCounter = 0
     while toggleBot == True:
         numRow = len(duplicate)
         a = numRow-1
@@ -220,21 +226,22 @@ def crop(image,deletionThreshold=127):
             if not (np.sum(duplicate[a][i]) <= deletionThreshold):
                 toggleBot = False
                 break
-            # if not np.array_equal(duplicate[a][i], np.array([0,0,0])):
-            #     toggleBot = False
-            #     break
             else:
                 counterPerRow += 1
         if counterPerRow == numCol:
             #if the entire row of pixels is empty, delete row
             duplicate = np.delete(duplicate, a, 0)
             #print("cropping row:", a)
+        if autostopCounter == autostopBT:
+            toggleBot = False
+        autostopCounter += 1
 
     print("\nbeginning right->left crop, bottom ran fine")
     to.pbar(.5)
 
     #cropping from right to left
     toggleRight = True
+    autostopCounter = 0
     while toggleRight == True:
         numRow = len(duplicate)
         numCol = len(duplicate[0]) #needs to be updated each time loop iterates
@@ -244,21 +251,21 @@ def crop(image,deletionThreshold=127):
             if not (np.sum(duplicate[i][a]) <= deletionThreshold):
                 toggleRight = False
                 break
-            # if not np.array_equal(duplicate[i][a], np.array([0,0,0])):
-            #     #note the reverse of the i and a ^^ for vertical crop
-            #     toggleRight = False
-            #     break
             else:
                 counterPerCol += 1
         if counterPerCol == numRow:
             #if the entire col of pixels is empty, delete col
             duplicate = np.delete(duplicate, a, 1)
             #print("cropping col:", a)
+        if autostopCounter == autostopRL:
+            toggleRight = False
+        autostopCounter += 1
 
     print("\nbeginning left->right crop, right->left ran fine")
     to.pbar(.75)
     #cropping from left to right
     toggleLeft = True
+    autostopCounter = 0
     while toggleLeft == True:
         numRow = len(duplicate)
         numCol = len(duplicate[0]) #needs to be updated each time loop iterates
@@ -268,16 +275,15 @@ def crop(image,deletionThreshold=127):
             if not (np.sum(duplicate[i][a]) <= deletionThreshold):
                 toggleLeft = False
                 break
-            # if not np.array_equal(duplicate[i][a], np.array([0,0,0])):
-            #     #note the reverse of the i and a ^^ for vertical crop
-            #     toggleLeft = False
-            #     break
             else:
                 counterPerCol += 1
         if counterPerCol == numRow:
             #if the entire col of pixels is empty, delete col
             duplicate = np.delete(duplicate, a, 1)
             #print("cropping col:", a)
+        if autostopCounter == autostopLR:
+            toggleLeft = False
+        autostopCounter += 1
 
     #troubleshooting
     #print("duplicate shape:", duplicate.shape)

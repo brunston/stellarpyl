@@ -10,6 +10,7 @@ from PIL import Image
 from matplotlib import pyplot as plt
 import time
 import sys
+import configparser
 
 """
 figure 0: pixelDistribution
@@ -17,6 +18,16 @@ figure 1: intensity
 figure 2: regression from spectrum against points
 """
 
+def configDefault():
+    config = configparser.ConfigParser()
+    config['CONTROL'] = {'defaultThreshold':'-1',
+                         'autoIntensity':'saa',
+                         'autoStopTB':'-1',
+                         'autoStopBT':'-1',
+                         'autoStopRL':'-1',
+                         'autoStopLR':'-1',}
+    with open('settings.ini','w') as cfile:
+        config.write(cfile)
 
 def pbar(progress):
     """
@@ -103,6 +114,7 @@ def plotIntensity(intensity):
     plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
     plt.show()
     plt.savefig('intensity.png', bbox_inches='tight')
+    print("\nfigure saved to intensity.png")
 
 def plotRegression(reg):
     """
