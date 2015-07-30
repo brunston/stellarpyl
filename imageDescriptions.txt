@@ -1,0 +1,4 @@
+name,exposure_secs,wb,obj,comment
+IMG_2860.tif,5,4000,pollux,none
+IMG_2881.tif,5,4000,arcturus,think a cloud moved in
+IMG_2653.tif,2.5,4000,sirius,none

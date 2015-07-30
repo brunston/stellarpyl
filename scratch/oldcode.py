@@ -565,3 +565,32 @@ while toggle == True:
 
     elif blah in ("q", "quit", "exit"): break
     else: print("please input a recognized command")
+
+
+<table border="1" style="width:100%">
+  <tr>
+    <td>'pixel_d' (short 'pd')</td>
+    <td>takes an image and shows the pixel distribution of the\
+    image over the intensity of the pixels</td>
+  </tr>
+  <tr>
+    <td>'image_regression' (short 'imgreg')</td>
+    <td>takes an image and finds the line which goes\
+    through the spectrum in that image</td>
+  </tr>
+  <tr>
+    <td>'intensity_n' (short 'n')</td>
+    <td>takes an image of a spectrum and converts it into an\
+    intensity plot using the naive method of adding</td>
+  </tr>
+  <tr>
+    <td>'intensity_saa' (short 'saa')</td>
+    <td>takes an image of a spectrum and converts it into\
+    an intensity plot using spatial anti-aliasing at a sub-sampling rate\
+    of one tenth of one pixel</td>
+  </tr>
+  <tr>
+    <td>'crop'</td>
+    <td>takes an image and crop it based on your selected threshold.</td>
+  </tr>
+</table>

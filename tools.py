@@ -109,6 +109,7 @@ def showThreshold(data, threshold):
     """
     numRow = len(data)
     numCol = len(data[0])
+    print("computing threshold")
     for row in range(numRow):
         for col in range(numCol):
             pixelSum = np.sum(data[row][col])

@@ -178,8 +178,8 @@ def regression(img, threshold=127):
     to.pbar(1) #100%
     return (m,c,xvals_n, yvals_n)
 
-def crop(image,deletionThreshold=127,\
-         autostopTB=-1, autostopBT=-1, autostopRL=-1, autostopLR=-1):
+def crop(image,deletionThreshold,\
+         autostopTB, autostopBT, autostopRL, autostopLR):
     """
     Crops image based on the number of empty pixels [0,0,0]
     Crops top-to-bottom, bottom-to-top, right-to-left, and then left-to-right
@@ -193,7 +193,7 @@ def crop(image,deletionThreshold=127,\
     numRow = len(duplicate) #number of rows in image
     #cropping from top
     toggleTop = True
-    autostopCounter = 0
+    autostopCounterT = 0
     while toggleTop == True:
         numRow = len(duplicate)
         a = 0
@@ -208,16 +208,17 @@ def crop(image,deletionThreshold=127,\
             #if the entire row of pixels is empty, delete row
             duplicate = np.delete(duplicate, a, 0)
             #print("cropping row:", a)
-        if autostopCounter == autostopTB:
+        if autostopCounterT == autostopTB:
             toggleTop = False
-        autostopCounter += 1
+            break
+        autostopCounterT += 1
 
     print("beginning bottom crop, top ran fine")
     to.pbar(.25)
 
     #cropping from bottom
     toggleBot = True
-    autostopCounter = 0
+    autostopCounterB = 0
     while toggleBot == True:
         numRow = len(duplicate)
         a = numRow-1
@@ -232,16 +233,17 @@ def crop(image,deletionThreshold=127,\
             #if the entire row of pixels is empty, delete row
             duplicate = np.delete(duplicate, a, 0)
             #print("cropping row:", a)
-        if autostopCounter == autostopBT:
+        if autostopCounterB == autostopBT:
             toggleBot = False
-        autostopCounter += 1
+            break
+        autostopCounterB += 1
 
     print("\nbeginning right->left crop, bottom ran fine")
     to.pbar(.5)
 
     #cropping from right to left
     toggleRight = True
-    autostopCounter = 0
+    autostopCounterR = 0
     while toggleRight == True:
         numRow = len(duplicate)
         numCol = len(duplicate[0]) #needs to be updated each time loop iterates
@@ -257,20 +259,24 @@ def crop(image,deletionThreshold=127,\
             #if the entire col of pixels is empty, delete col
             duplicate = np.delete(duplicate, a, 1)
             #print("cropping col:", a)
-        if autostopCounter == autostopRL:
+        if autostopCounterR == autostopRL:
             toggleRight = False
-        autostopCounter += 1
+            break
+        autostopCounterR += 1
 
     print("\nbeginning left->right crop, right->left ran fine")
     to.pbar(.75)
     #cropping from left to right
     toggleLeft = True
-    autostopCounter = 0
+    autostopCounterL = 0
     while toggleLeft == True:
         numRow = len(duplicate)
         numCol = len(duplicate[0]) #needs to be updated each time loop iterates
         a = 0
         counterPerCol = 0
+        if autostopCounterL == autostopLR:
+            toggleLeft = False
+            break
         for i in range(numRow):
             if not (np.sum(duplicate[i][a]) <= deletionThreshold):
                 toggleLeft = False
@@ -280,10 +286,8 @@ def crop(image,deletionThreshold=127,\
         if counterPerCol == numRow:
             #if the entire col of pixels is empty, delete col
             duplicate = np.delete(duplicate, a, 1)
+            autostopCounterL += 1
             #print("cropping col:", a)
-        if autostopCounter == autostopLR:
-            toggleLeft = False
-        autostopCounter += 1
 
     #troubleshooting
     #print("duplicate shape:", duplicate.shape)

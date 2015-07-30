@@ -65,33 +65,75 @@ already provided by matplotlib.
 
 ##Command list:
 
-<table border="1" style="width:100%">
-  <tr>
-    <td>'pixel_d' (short 'pd')</td>
-    <td>takes an image and shows the pixel distribution of the\
-	image over the intensity of the pixels</td>
-  </tr>
-  <tr>
-    <td>'image_regression' (short 'imgreg')</td>
-    <td>takes an image and finds the line which goes\
-	through the spectrum in that image</td>
-  </tr>
-  <tr>
-    <td>'intensity_n' (short 'n')</td>
-    <td>takes an image of a spectrum and converts it into an\
-	intensity plot using the naive method of adding</td>
-  </tr>
-  <tr>
-    <td>'intensity_saa' (short 'saa')</td>
-    <td>takes an image of a spectrum and converts it into\
-	an intensity plot using spatial anti-aliasing at a sub-sampling rate\
-	of one tenth of one pixel</td>
-  </tr>
-  <tr>
-    <td>'crop'</td>
-    <td>takes an image and crop it based on your selected threshold.</td>
-  </tr>
-</table>
+IMAGE PROCESSING
+- 'autoProcess' (short 'auto') -
+autoProcess will take care of cropping and doing intensity plotting for you.
+just provide a filename. In order to use this feature you must first set
+a default threshold to use by using the 'settings_threshold' command.
+
+- 'pixel_d' (short 'pd') -
+takes an image and shows the pixel distribution of the image over the intensity
+of the pixels.
+
+- 'crop' - 
+takes an image and crop it based on your selected threshold.
+
+- 'image_regression' (short 'imgreg') -
+takes an image and finds the line which goes through the spectrum in that image.
+
+- 'intensity_n' (short 'n') -
+takes an image of a spectrum and converts it into an intensity plot using the
+naive method of adding.
+
+- 'intensity_saa' (short 'saa') -
+takes an image of a spectrum and converts it into an intensity plot using
+spatial anti-aliasing at a sub-sampling rate of one tenth of one pixel.
+
+- 'show_threshold' -
+see exactly what could be removed (assuming no crop stop has been set) using the
+threshold that is currently set.
+
+- 'show_regression' -
+shows regressed line overlayed on the original (cropped) image.
+
+- 'show_walks' -
+shows walking lines overlayed on the original (cropped) image.
+
+PROGRAM
+
+- 'about' -
+displays information about this program
+
+- 'functions' -
+where you are now
+
+- 'help' -
+brings up sample workflow
+
+- 'settings_default' -
+returns ALL settings back to default:
+    defaultThreshold = -1
+    autoIntensity = saa
+
+- 'settings_intensity' -
+sets default intensity processing method for the autoProcess feature.
+The default setting is saa (for spatial anti-aliasing).
+
+- 'settings_step'
+sets default step value along the spectral trace (and thus resolution of
+resulting intensity plot). default is 1 pixel-equivalence.
+
+- 'settings_stop' -
+stops crop at a specific column set here. use the TB (top to bottom) BT, RL, or
+LR settings to cut off the auto-crop at a certain column in a certain direction.
+The default is -1 for all values (no autostop).
+
+- 'settings_threshold' -
+sets default threshold. Set to -1 if you would like the program to always ask.
+The default setting is -1 (always asks).
+
+- 'view_settings' -
+view your current settings
 
 ##Additional commands:
 
