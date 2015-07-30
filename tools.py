@@ -10,6 +10,7 @@ from PIL import Image
 from matplotlib import pyplot as plt
 import time
 import sys
+import math
 import configparser
 
 """
@@ -25,7 +26,8 @@ def configDefault():
                          'autoStopTB':'-1',
                          'autoStopBT':'-1',
                          'autoStopRL':'-1',
-                         'autoStopLR':'-1',}
+                         'autoStopLR':'-1',
+                         'r':'1'}
     with open('settings.ini','w') as cfile:
         config.write(cfile)
 
@@ -47,7 +49,7 @@ def pbar(progress):
         progress = 0
         status = "Halt.\r\n"
     block = int(round(barlen*progress))
-    text = "\rProgress: [{0}] {1}% {2}".format( "#"*block + "-"*(barlen-block),\
+    text = "\rProgress: [{0}] {1}% {2}".format( "A"*block + "h"*(barlen-block),\
                                                 progress*100, status)
     sys.stdout.write(text)
     sys.stdout.flush()
@@ -101,7 +103,70 @@ def pixelDistribution(data):
     plt.show()
     return distributionArray
 
+def showThreshold(data, threshold):
+    """
+    shows what exactly counts in the threshold when applying to data
+    """
+    numRow = len(data)
+    numCol = len(data[0])
+    for row in range(numRow):
+        for col in range(numCol):
+            pixelSum = np.sum(data[row][col])
+            if pixelSum <= threshold:
+                data[row][col] = [255, 153, 102]
+        pbar(row/numRow)
+    img = Image.fromarray(data)
+    img.save("showThreshold.tiff", "TIFF")
+    pbar(1)
+    print("You can see what has been selected by viewing showThreshold.tiff")
+    return None
+
+def showRegression(img, reg):
+    """
+    shows regressed line overlayed on the original (cropped) image.
+    """
+    print("running showRegression")
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    m, c, x, y = reg
+    plt.figure(2)
+    plt.imshow(img)
+    plt.plot(x, m*x + c,'r',linestyle='-', label='fitted line, y = {0}x + {1}'.format(m,c))
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.axis('off')
+    plt.savefig('regression.png', bbox_inches='tight')
+    plt.show()
+    print("figure saved to regression.png")
+    return None
+
+def showWalks(img, reg, r=1):
+    """
+    shows walking lines overlayed on the original (cropped) image.
+    """
+    print("running showRegression")
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    m, c, x, y = reg
+    n = -1/m
+    plt.figure(2)
+    plt.imshow(img)
+    step = math.sqrt((r**2) / (1+m**2))
+    counter = 0
+    for xpixel in np.linspace(lowerx, upperx, num = math.ceil((upperx/step)+1)):
+        ypixel = m * xpixel + c
+        if (counter % 2) == 1:
+            plt.plot(x, n * (x - xpixel) + ypixel,'r',linestyle='-')
+        else:
+            plt.plot(x, n * (x - xpixel) + ypixel,'b',linestyle='-')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.axis('off')
+    plt.savefig('walks.png', bbox_inches='tight')
+    plt.show()
+    print("figure saved to walks.png")
+    return None
+    
 def plotIntensity(intensity):
+    """
+    Plots an intensity graph with connected points
+    """
     plotx, ploty = [], []
     for x in intensity.keys():
         plotx.append(x)
@@ -112,8 +177,9 @@ def plotIntensity(intensity):
     plt.clf()
     plt.plot(plotx, ploty, 'b-', label='anti-aliased data')
     plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
-    plt.show()
     plt.savefig('intensity.png', bbox_inches='tight')
+    plt.show()
+    
     print("\nfigure saved to intensity.png")
 
 def plotRegression(reg):

@@ -9,7 +9,18 @@ stellarPY
 #Let's make sure that the user has all the dependencies installed and that
 #they are running the correct version of Python
 import os
+import sys
+import configparser
+import time
+
 toggle = True
+version = sys.version_info[0]
+
+if version != 3:
+    print("Please upgrade to Python3, preferably 3.4.* or greater")
+    toggle = False
+    os._exit(1)
+
 try:
     import numpy as np
     from PIL import Image
@@ -18,17 +29,9 @@ except ImportError:
     toggle = False
     os._exit(1)
 
-import sys
-version = sys.version_info[0]
-if version != 3:
-    print("Please upgrade to Python3, preferably 3.4.* or greater")
-    toggle = False
-    os._exit(1)
-
 #import the rest
 import stellar as st
 import tools as to
-import configparser
 
 if toggle == True:
     config = configparser.ConfigParser()
@@ -55,15 +58,17 @@ while toggle == True:
     BT = config['CONTROL']['autoStopBT']
     RL = config['CONTROL']['autoStopRL']
     LR = config['CONTROL']['autoStopLR']
+    step = float(config['CONTROL']['r'])
 
     prgmCommands = ("pixel_d", "image_regression", \
                     "intensity_n", "intensity_saa", \
-                    "pd", "imgreg", "saa", "n", "crop")
+                    "pd", "imgreg", "saa", "n", "crop", "show_threshold",\
+                    "show_regression", "show_walks")
 
     userInput = input("enter command> ")
 
     #TEXT COMMANDS NEXT
-    if userInput in ("about"):
+    if userInput in ["about"]:
         print("""
 This is stellar spectra reduction and analysis command-line software written
 using the Python 3.4 version of the Anaconda Scientific Python distribution. It 
@@ -78,7 +83,7 @@ orthogonal spectra); and to account for the use of a DSLR sensor by using either
 a relative response function or an absolute response function to normalize the 
 intensity plot.
             """)
-    if userInput in ("help"):
+    if userInput in ["help"]:
         print("""
 You will be presented with a list of commands.
 
@@ -109,7 +114,7 @@ The program will graph this intensity plot, which can be saved using the tools
 already provided by matplotlib.
             """)
 
-    if userInput in ("commands"):
+    if userInput in ["commands"]:
         print("""
             ---IMAGE PROCESSING---
 - 'autoProcess' (short 'auto') -
@@ -135,6 +140,16 @@ naive method of adding.
 takes an image of a spectrum and converts it into an intensity plot using
 spatial anti-aliasing at a sub-sampling rate of one tenth of one pixel.
 
+- 'show_threshold' -
+see exactly what could be removed (assuming no crop stop has been set) using the
+threshold that is currently set.
+
+- 'show_regression' -
+shows regressed line overlayed on the original (cropped) image.
+
+- 'show_walks' -
+shows walking lines overlayed on the original (cropped) image.
+
             ---PROGRAM---
 
 - 'about' -
@@ -146,11 +161,6 @@ where you are now
 - 'help' -
 brings up sample workflow
 
-- 'settings_stop' -
-stops crop at a specific column set here. use the TB (top to bottom) BT, RL, or
-LR settings to cut off the auto-crop at a certain column in a certain direction.
-The default is -1 for all values (no autostop).
-
 - 'settings_default' -
 returns ALL settings back to default:
     defaultThreshold = -1
@@ -159,6 +169,15 @@ returns ALL settings back to default:
 - 'settings_intensity' -
 sets default intensity processing method for the autoProcess feature.
 The default setting is saa (for spatial anti-aliasing).
+
+- 'settings_step'
+sets default step value along the spectral trace (and thus resolution of
+resulting intensity plot). default is 1 pixel-equivalence.
+
+- 'settings_stop' -
+stops crop at a specific column set here. use the TB (top to bottom) BT, RL, or
+LR settings to cut off the auto-crop at a certain column in a certain direction.
+The default is -1 for all values (no autostop).
 
 - 'settings_threshold' -
 sets default threshold. Set to -1 if you would like the program to always ask.
@@ -171,55 +190,68 @@ view your current settings
     
 
     #AUTOPROCESS
-    if userInput in ('autoProcess', 'auto'):
-        print("\
-                We need a file. Place it in the same directory\n \
-                as this script and give the name.")
+    if userInput in ['autoProcess', 'auto']:
+        print("""
+We need a file. Place it in the same directory as this script and give the name.
+            """)
         path = input("enter filename> ")
+        timeStart = time.time()
         threshI = int(defThresh)
         if threshI >= 0:
             print("converting. please wait...")
             img = Image.open(path)
             dataArray = to.converter(path)
+            print("working on crop. please wait...")
             cropped = st.crop(img, threshI, TB, BT, RL, LR)
             to.restorer(cropped, 'cropped')
             croppedimg = Image.open('cropped.tiff')
+            print("converting cropped image. please wait...")
             dataArray = to.converter('cropped.tiff')
             regTup = st.regression(croppedimg)
-            if autoIntensity in ('saa'):
+            timePause1 = time.time()
+            to.showRegression(croppedimg,regTup)
+            timePause1s = time.time()
+            if autoIntensity in ['saa']:
                 print("working on intensity_saa. please wait...")
-                intensity = st.intensitySAAN(croppedimg,dataArray,regTup,threshI)
+                intensity = st.intensitySAAN(croppedimg,dataArray,regTup,threshI,step)
+                timePause2 = time.time()
                 to.plotIntensity(intensity)
-            if autoIntensity in ('n'):
+                timePause2s = time.time()
+            if autoIntensity in ['n']:
                 print("working on intensity_n. please wait...")
-                intensity = st.intensityN(croppedimg,dataArray,regTup,threshI)
+                intensity = st.intensityN(croppedimg,dataArray,regTup,threshI,step)
+                timePause2 = time.time()
                 to.plotIntensity(intensity)
+                timePause2s = time.time()
+            timeEnd = time.time()
+            print("Total time required:", timeEnd-(timePause1s-timePause1)\
+                                          -(timePause2s-timePause2)-timeStart)
         else:
             print("defaultThreshold not set. aborting.")
 
 
     #HOUSEKEEPING COMMANDS NEXT
-    if userInput in ("settings_default"):
+    if userInput in ["settings_default"]:
         while True:
             print("ARE YOU SURE YOU WANT TO RESET SETTINGS? CANNOT BE UNDONE!")
             query = input("type 'yes'/'no'> ")
-            if query in ('yes'):
+            if query in ['yes']:
                 to.configDefault()
                 print("Set settings to default.")
                 break
-            elif query in ('no'):
+            elif query in ['no']:
                 print("Keeping settings as is.")
                 break
             else:
                 print("please type 'yes' or 'no'")
 
-    if userInput in ("settings_intensity"):
+    if userInput in ["settings_intensity"]:
         print("""
 sets default intensity processing method for the autoProcess feature.
 AVAILABLE OPTIONS: 'saa' (spatial anti-aliasing), 'n' (naive). Default is 'saa'.
             """)
         query = input("Set default autoProcess intensity> ")
-        if query in ('saa', 'n'):
+        if query in ['saa', 'n']:
             config['CONTROL']['autoIntensity'] = query
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
@@ -227,7 +259,7 @@ AVAILABLE OPTIONS: 'saa' (spatial anti-aliasing), 'n' (naive). Default is 'saa'.
         else:
             print("not an acceptable value. no value set.")
 
-    if userInput in ("settings_threshold"):
+    if userInput in ["settings_threshold"]:
         print("""
 sets a default threshold for any function of this program requiring a threshold.
 If you would like the program to ask each time, set threshold as -1.
@@ -242,7 +274,21 @@ Else, set as an integer between 0 and 765.
         else:
             print("not an acceptable value. no value set.")
 
-    if userInput in ("settings_stop"):
+    if userInput in ['settings_step']:
+        print("""
+sets default step value along the spectral trace (and thus resolution of
+resulting intensity plot). default is 1 pixel-equivalence.
+            """)
+        query = input("Set step value> ")
+        if float(query) > 0:
+            config['CONTROL']['r'] = query
+            with open('settings.ini', 'w') as cfile:
+                config.write(cfile)
+            print("Set new setting of: ", query)
+        else:
+            print("value must be greater than zero. no value set.")
+
+    if userInput in ["settings_stop"]:
         print("""
 If crop is cutting off data in a certain direction, use the TB (top to bottom)
 BT, RL, or LR settings to cut off the auto-crop at a certain column. The default
@@ -252,22 +298,22 @@ is -1 for all values.
         value = query
         print("Answer using 'tb','bt','rl', or 'lr'.")
         query = input("Set which? T to B, B to T, R to L, L to R?> ")
-        if query in ('tb'):
+        if query in ['tb']:
             config['CONTROL']['autoStopTB'] = value
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
             print("Set new setting of: ",value, "to ", query)
-        if query in ('bt'):
+        if query in ['bt']:
             config['CONTROL']['autoStopBT'] = value
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
             print("Set new setting of: ",value, "to ", query)
-        if query in ('rl'):
+        if query in ['rl']:
             config['CONTROL']['autoStopRL'] = value
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
             print("Set new setting of: ",value, "to ", query)
-        if query in ('lr'):
+        if query in ['lr']:
             config['CONTROL']['autoStopLR'] = value
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
@@ -275,7 +321,7 @@ is -1 for all values.
         else:
             print("not an acceptable value. no value set.")
 
-    if userInput in ('view_settings'):
+    if userInput in ['view_settings']:
         print("Current settings:")
         print("default threshold: ", config['CONTROL']['defaultThreshold'])
         print("autoIntensity: ", config['CONTROL']['autoIntensity'])
@@ -283,18 +329,19 @@ is -1 for all values.
         print("autoStopBT:", config['CONTROL']['autoStopBT'])
         print("autoStopRL:", config['CONTROL']['autoStopRL'])
         print("autoStopLR:", config['CONTROL']['autoStopLR'])
+        print("step:", config['CONTROL']['r'])
 
     #PROGRAM COMMANDS NEXT
     if userInput in prgmCommands:
-        print("\
-                We need a file. Place it in the same directory\n \
-                as this script and give the name.")
+        print("""
+We need a file. Place it in the same directory as this script and give the name.
+            """)
         path = input("enter filename> ")
         print("converting. please wait...")
         img = Image.open(path)
         dataArray = to.converter(path)
         
-        if defThresh in ('-1'):
+        if defThresh in ['-1']:
             print("""
 Your answer to the following depends for all commands except 'pixel_d'.
 What threshold would you like to use as differentiator?
@@ -304,33 +351,47 @@ What threshold would you like to use as differentiator?
         else:
             threshI = int(defThresh)
 
-        if userInput in ("intensity_saa", "saa"):
+        if userInput in ["intensity_saa", "saa"]:
             print("working on intensity_saa. please wait...")
             regTup = st.regression(img)
-            intensity = st.intensitySAAN(img,dataArray,regTup, threshI)
+            intensity = st.intensitySAAN(img,dataArray,regTup, threshI,step)
             to.plotIntensity(intensity)
 
-        if userInput in ("intensity_n", "n"):
+        if userInput in ["intensity_n", "n"]:
             print("working on intensity_n. please wait...")
             regTup = st.regression(img)
-            intensity = st.intensityN(img,dataArray,regTup, threshI)
+            intensity = st.intensityN(img,dataArray,regTup, threshI,step)
             to.plotIntensity(intensity)
 
-        if userInput in ("image_regression", "imgreg"):
+        if userInput in ["image_regression", "imgreg"]:
             print("working on image_regression. please wait...")
             regTup = st.regression(img)
             to.plotRegression(regTup)
 
-        if userInput in ("pixel_d", "pd"):
+        if userInput in ["pixel_d", "pd"]:
             print("working on pixel_distribution. please wait...")
             to.pixelDistribution(dataArray)
 
-        if userInput in ("crop"):
+        if userInput in ["crop"]:
             print("working on crop. please wait...")
             cropped = st.crop(img, threshI, TB, BT, RL, LR)
             filename = input("filename for cropped? DO NOT ADD EXTENSION> ")
             to.restorer(cropped, filename)
             print("file has been created at: ", filename + ".tiff")
+
+        if userInput in ["show_threshold"]:
+            print("working on show_threshold")
+            to.showThreshold(dataArray, threshI)
+
+        if userInput in ["show_regression"]:
+            print("working on show_regression")
+            regTup = st.regression(img)
+            to.showRegression(img,regTup)
+
+        if userInput in ["show_walks"]:
+            print("working on show_walks")
+            regTup = st.regression(img)
+            to.showWalks(img,regTup,step)
 
         #rehashing of command lists
         print("""
@@ -339,10 +400,10 @@ ctrl-c to force-interrupt at any time. Type 'help' for sample workflow,
 'commands' for a list of functions and commands, and 'about' for more info.
             """)
 
-    elif userInput in ("q", "quit", "exit"):
+    elif userInput in ["q", "quit", "exit"]:
         break
 
-    elif userInput in ("jellyfish"):
+    elif userInput in ["jellyfish"]:
             print("""
                 
                                         (hello!)
@@ -369,4 +430,4 @@ ctrl-c to force-interrupt at any time. Type 'help' for sample workflow,
                 """)
 
     else:
-        print("Please input a command :)")
+        print(":)")

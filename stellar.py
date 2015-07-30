@@ -47,7 +47,7 @@ def intensityN(img, data, reg, threshold = 127,r=1):
     #background subtraction median calculation
     back = backMedian(img, threshold)
     intensities = {} #this is a dictionary.
-    step = math.sqrt((r / (1 + m**2)))
+    step = math.sqrt((r**2) / (1 + m**2))
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
         for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
@@ -94,7 +94,7 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
 
     intensities = {} #this is a dictionary.
     angle = np.arctan(m)
-    step = math.sqrt((r / (1 + m**2)))
+    step = math.sqrt((r**2) / (1 + m**2))
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
         for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
