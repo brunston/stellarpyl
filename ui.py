@@ -85,6 +85,11 @@ intensity plot.
             """)
     if userInput in ["help"]:
         print("""
+
+AS AN ALTERNATIVE TO THE BELOW, make sure you set a default threshold using
+'settings_threshold', and then simply type 'auto' to have the program do
+the majority of the work.
+
 You will be presented with a list of commands.
 
 For a brand new image, run 'crop' first. Drag your file into the same directory
@@ -112,6 +117,7 @@ line.
 
 The program will graph this intensity plot, which can be saved using the tools
 already provided by matplotlib.
+
             """)
 
     if userInput in ["commands"]:
@@ -201,6 +207,9 @@ We need a file. Place it in the same directory as this script and give the name.
             print("converting. please wait...")
             img = Image.open(path)
             dataArray = to.converter(path)
+            timePause0 = time.time()
+            to.show_threshold(data, threshI)
+            timePause0s = time.time()
             print("working on crop. please wait...")
             cropped = st.crop(img, threshI, TB, BT, RL, LR)
             to.restorer(cropped, 'cropped')
@@ -224,7 +233,8 @@ We need a file. Place it in the same directory as this script and give the name.
                 to.plotIntensity(intensity)
                 timePause2s = time.time()
             timeEnd = time.time()
-            print("Total time required:", timeEnd-(timePause1s-timePause1)\
+            print("Total time required:", timeEnd-(timePause0s-timePause0)\
+                                          -(timePause1s-timePause1)\
                                           -(timePause2s-timePause2)-timeStart)
         else:
             print("defaultThreshold not set. aborting.")
