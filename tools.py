@@ -8,26 +8,34 @@ stellarPY
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
-import time
+
 import sys
-import math
 import configparser
+
+import time
+import math
+
 
 """
 figure 0: pixelDistribution
 figure 1: intensity
 figure 2: regression from spectrum against points
 """
+config = configparser.ConfigParser()
+config.read('settings.ini')
+v = config['CONTROL']['verbose'] #enables or disables printing of debug
 
 def configDefault():
     config = configparser.ConfigParser()
-    config['CONTROL'] = {'defaultThreshold':'-1',
-                         'autoIntensity':'saa',
-                         'autoStopTB':'-1',
-                         'autoStopBT':'-1',
-                         'autoStopRL':'-1',
-                         'autoStopLR':'-1',
-                         'r':'1'}
+    config['CONTROL'] = {'defaultthreshold':'-1',
+                         'autointensity':'saa',
+                         'manualtop':'-1',
+                         'manualbot':'-1',
+                         'manualleft':'-1',
+                         'manualright':'-1',
+                         'r':'1',
+                         'verbose':'no',
+                         'showthresh':'yes'}
     with open('settings.ini','w') as cfile:
         config.write(cfile)
 
@@ -65,9 +73,10 @@ def converter(imageToConvert):
     imageArray = np.array(image)
 
     #troubleshooting statements
-    # print("ndarray imageArray:\n", imageArray)
-    #print("imageArray shape:", imageArray.shape)
-    #print("imageArray dtype:", imageArray.dtype)
+    if v=='yes':
+        print("ndarray imageArray:\n", imageArray)
+        print("imageArray shape:", imageArray.shape)
+        print("imageArray dtype:", imageArray.dtype)
 
     return imageArray
 
@@ -109,17 +118,20 @@ def showThreshold(data, threshold):
     """
     numRow = len(data)
     numCol = len(data[0])
-    print("computing threshold")
+    print("running showThreshold")
+    numPixels = 0
     for row in range(numRow):
         for col in range(numCol):
             pixelSum = np.sum(data[row][col])
             if pixelSum <= threshold:
                 data[row][col] = [255, 153, 102]
+                numPixels += 1
         pbar(row/numRow)
     img = Image.fromarray(data)
     img.save("showThreshold.tiff", "TIFF")
     pbar(1)
     print("You can see what has been selected by viewing showThreshold.tiff")
+    if v=='yes': print("Number of pixels under threshold: ",numPixels)
     return None
 
 def showRegression(img, reg):
@@ -131,7 +143,8 @@ def showRegression(img, reg):
     m, c, x, y = reg
     plt.figure(2)
     plt.imshow(img)
-    plt.plot(x, m*x + c,'r',linestyle='-', label='fitted line, y = {0}x + {1}'.format(m,c))
+    plt.plot(x, m*x + c,'r',linestyle='-', \
+             label='fitted line, y = {0}x + {1}'.format(m,c))
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.axis('off')
     plt.savefig('regression.png', bbox_inches='tight')
@@ -143,26 +156,11 @@ def showWalks(img, reg, r=1):
     """
     shows walking lines overlayed on the original (cropped) image.
     """
-    print("running showRegression")
+    print("running showWalks")
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c, x, y = reg
     n = -1/m
-    plt.figure(2)
-    plt.imshow(img)
-    step = math.sqrt((r**2) / (1+m**2))
-    counter = 0
-    for xpixel in np.linspace(lowerx, upperx, num = math.ceil((upperx/step)+1)):
-        ypixel = m * xpixel + c
-        if (counter % 2) == 1:
-            plt.plot(x, n * (x - xpixel) + ypixel,'r',linestyle='-')
-        else:
-            plt.plot(x, n * (x - xpixel) + ypixel,'b',linestyle='-')
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.axis('off')
-    plt.savefig('walks.png', bbox_inches='tight')
-    plt.show()
-    print("figure saved to walks.png")
-    return None
+    
     
 def plotIntensity(intensity):
     """

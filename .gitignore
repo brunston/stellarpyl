@@ -6,6 +6,10 @@ __pycache__/*
 foo.py
 .~lock.algorithmDescription.rtf\#
 20150723.png
+cropped.tiff
+showThreshold.tiff
+regression.png
+intensity.png
 
 # Windows image file caches
 Thumbs.db

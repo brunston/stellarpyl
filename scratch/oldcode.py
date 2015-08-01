@@ -15,7 +15,30 @@ from scipy import ndimage #for rotate
 # to.plotRegression(regTup)
 # intensity = st.intensityN(img,dataArray,regTup, 127)
 # to.plotIntensity(intensity)
-
+def showWalks(img, reg, r=1):
+    """
+    shows walking lines overlayed on the original (cropped) image.
+    """
+    print("running showRegression")
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    m, c, x, y = reg
+    n = -1/m
+    plt.figure(2)
+    plt.imshow(img)
+    step = math.sqrt((r**2) / (1+m**2))
+    counter = 0
+    for xpixel in np.linspace(lowerx, upperx, num = math.ceil((upperx/step)+1)):
+        ypixel = m * xpixel + c
+        if (counter % 2) == 1:
+            plt.plot(x, n * (x - xpixel) + ypixel,'r',linestyle='-')
+        else:
+            plt.plot(x, n * (x - xpixel) + ypixel,'b',linestyle='-')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.axis('off')
+    plt.savefig('walks.png', bbox_inches='tight')
+    plt.show()
+    print("figure saved to walks.png")
+    return None
 #wrong stepping method and also still has logging
 def intensitySAA(img, data, reg, threshold=127):
     """

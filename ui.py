@@ -6,6 +6,7 @@ stellarPY
 @org: UH-IFA / SPS
 """
 
+#IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT
 #Let's make sure that the user has all the dependencies installed and that
 #they are running the correct version of Python
 import os
@@ -32,33 +33,39 @@ except ImportError:
 #import the rest
 import stellar as st
 import tools as to
+#END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT
+
 
 if toggle == True:
     config = configparser.ConfigParser()
     config.read('settings.ini')
     print("""
 Type 'q', 'quit', or 'exit' to leave this program. Alternately, you may use
-ctrl-c to force-interrupt at any time. This text is also available online at
-http://st.brunston.net/ or by viewing README.md
+ctrl-c to force-interrupt at any time.
 
-TO VIEW HELP, WHICH WILL RUN THROUGH A TYPICAL WORKFLOW SCENARIO, TYPE 'help'.
+TO VIEW HELP, WHICH WILL DESCRIBE A TYPICAL WORKFLOW SCENARIO, TYPE 'help'.
 
 TO VIEW A LIST OF AVAILABLE FUNCTIONS & COMMANDS, TYPE 'commands'.
 
 TO LEARN MORE ABOUT THIS PROGRAM, TYPE 'about'.
+
+Help and information is also available online at
+http://st.brunston.net/ or by viewing README.md
 
             """)
 
 while toggle == True:
     #update settings
     config.read('settings.ini')
-    defThresh = config['CONTROL']['defaultThreshold']
-    autoIntensity = config['CONTROL']['autoIntensity']
-    TB = config['CONTROL']['autoStopTB']
-    BT = config['CONTROL']['autoStopBT']
-    RL = config['CONTROL']['autoStopRL']
-    LR = config['CONTROL']['autoStopLR']
+    defThresh = config['CONTROL']['defaultthreshold']
+    autoIntensity = config['CONTROL']['autointensity']
+    top = int(config['CONTROL']['manualtop'])
+    bottom = int(config['CONTROL']['manualbot'])
+    right = int(config['CONTROL']['manualright'])
+    left = int(config['CONTROL']['manualleft'])
     step = float(config['CONTROL']['r'])
+    verbose = config['CONTROL']['verbose']
+    showthresh = config['CONTROL']['showthresh']
 
     prgmCommands = ("pixel_d", "image_regression", \
                     "intensity_n", "intensity_saa", \
@@ -75,7 +82,7 @@ using the Python 3.4 version of the Anaconda Scientific Python distribution. It
 is work done for an internship at the Unversity of Hawaii in conjunction with 
 the St. Paul's School Engineering Honors program.
 
-It aims to provide a one-click workflow for analyzing uncompressed TIFF stellar
+It aims to provide a simplified workflow for analyzing uncompressed TIFF stellar
 spectra images obtained from a DSLR through a diffraction grating. The goals of
 the project are: to automatically crop the image; to perform background 
 subtraction; to create an intensity plot of the spectrum (accounting for non-
@@ -105,6 +112,8 @@ each RGB value can be an integer from 0-255; total value can be from 0-765. If
 you do not have a value you are already using for all of your images, you can
 type 'pixel_d' at the command prompt to run a function that plots the
 distribution of binned pixel values in your image.
+
+A typical threshold may be in the range from 100-130.
 
 The program will run the cropping algorithm and ask for a filename to give to
 the new file.
@@ -167,27 +176,38 @@ where you are now
 - 'help' -
 brings up sample workflow
 
+- 'settings_cropoverride' -
+sets manual overrides for automatic cropping on the top, bottom, and sides
+of an image. The default value is -1 (which is equivalent to no override)
+for all values.
+
 - 'settings_default' -
 returns ALL settings back to default:
     defaultThreshold = -1
     autoIntensity = saa
+    manual overrides all to -1
+    step = 1
+    verbose = yes
+    showthresh = yes
 
 - 'settings_intensity' -
 sets default intensity processing method for the autoProcess feature.
 The default setting is saa (for spatial anti-aliasing).
 
+- 'settings_showthreshold' -
+showThreshold takes a while to run. Set to 'no' for a faster autoProcess
+run time. Default is 'yes'
+
 - 'settings_step'
 sets default step value along the spectral trace (and thus resolution of
 resulting intensity plot). default is 1 pixel-equivalence.
 
-- 'settings_stop' -
-stops crop at a specific column set here. use the TB (top to bottom) BT, RL, or
-LR settings to cut off the auto-crop at a certain column in a certain direction.
-The default is -1 for all values (no autostop).
-
 - 'settings_threshold' -
 sets default threshold. Set to -1 if you would like the program to always ask.
 The default setting is -1 (always asks).
+
+- 'settings_verbose' -
+sets verboseness. 'yes' to include debug statements, 'no' is default.
 
 - 'view_settings' -
 view your current settings
@@ -208,10 +228,11 @@ We need a file. Place it in the same directory as this script and give the name.
             img = Image.open(path)
             dataArray = to.converter(path)
             timePause0 = time.time()
-            to.showThreshold(dataArray, threshI)
+            if showthresh == "yes":
+                to.showThreshold(dataArray, threshI)
             timePause0s = time.time()
             print("working on crop. please wait...")
-            cropped = st.crop(img, threshI, TB, BT, RL, LR)
+            cropped = st.cropN(img, threshI, top, bottom, left, right)
             to.restorer(cropped, 'cropped')
             print("cropped image saved to cropped.tiff")
             croppedimg = Image.open('cropped.tiff')
@@ -263,7 +284,7 @@ AVAILABLE OPTIONS: 'saa' (spatial anti-aliasing), 'n' (naive). Default is 'saa'.
             """)
         query = input("Set default autoProcess intensity> ")
         if query in ['saa', 'n']:
-            config['CONTROL']['autoIntensity'] = query
+            config['CONTROL']['autointensity'] = query
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
             print("Set new setting of: ",query)
@@ -274,11 +295,11 @@ AVAILABLE OPTIONS: 'saa' (spatial anti-aliasing), 'n' (naive). Default is 'saa'.
         print("""
 sets a default threshold for any function of this program requiring a threshold.
 If you would like the program to ask each time, set threshold as -1.
-Else, set as an integer between 0 and 765.
+Else, set as an integer between 0 and 765. Defaults to -1 (ask every time)
             """)
         query = input("Set default threshold> ")
         if (int(query) >= -1) and (int(query) <= 765):
-            config['CONTROL']['defaultThreshold'] = query
+            config['CONTROL']['defaultthreshold'] = query
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
             print("Set new setting of: ",query)
@@ -299,48 +320,78 @@ resulting intensity plot). default is 1 pixel-equivalence.
         else:
             print("value must be greater than zero. no value set.")
 
-    if userInput in ["settings_stop"]:
+    if userInput in ["settings_cropoverride"]:
         print("""
-If crop is cutting off data in a certain direction, use the TB (top to bottom)
-BT, RL, or LR settings to cut off the auto-crop at a certain column. The default
-is -1 for all values.
+sets manual overrides for automatic cropping on the top, bottom, and sides
+of an image. The default value is -1 (which is equivalent to no override)
+for all values.
             """)
         query = input("value to set (integer)?> ")
         value = query
-        print("Answer using 'tb','bt','rl', or 'lr'.")
-        query = input("Set which? T to B, B to T, R to L, L to R?> ")
-        if query in ['tb']:
-            config['CONTROL']['autoStopTB'] = value
+        print("Answer using 'top','bottom','left', or 'right'.")
+        query = input("Set override for which side?> ")
+        if query in ['top']:
+            config['CONTROL']['manualtop'] = value
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
             print("Set new setting of: ",value, "to ", query)
-        if query in ['bt']:
-            config['CONTROL']['autoStopBT'] = value
+        elif query in ['bottom']:
+            config['CONTROL']['manualbot'] = value
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
             print("Set new setting of: ",value, "to ", query)
-        if query in ['rl']:
-            config['CONTROL']['autoStopRL'] = value
+        elif query in ['left']:
+            config['CONTROL']['manualleft'] = value
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
             print("Set new setting of: ",value, "to ", query)
-        if query in ['lr']:
-            config['CONTROL']['autoStopLR'] = value
+        elif query in ['right']:
+            config['CONTROL']['manualright'] = value
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
             print("Set new setting of: ",value, "to ", query)
         else:
+            print("not an understood side name. no value set.")
+
+    if userInput in ['settings_verbose']:
+        print("""
+sets verbose printing of debug statements. default is 'no'
+            """)
+        query = input("Set verbose 'yes'/'no'> ")
+        if query in ['yes', 'no']:
+            config['CONTROL']['verbose'] = query
+            with open('settings.ini', 'w') as cfile:
+                config.write(cfile)
+            print("Set new setting of: ", query)
+        else:
             print("not an acceptable value. no value set.")
+
+    if userInput in ['settings_showthreshold']:
+        print("""
+showThreshold takes a while to run. Set to 'no' for a faster autoProcess
+run time. Default is 'yes'
+            """)
+        query = input("Set verbose 'yes'/'no'> ")
+        if query in ['yes', 'no']:
+            config['CONTROL']['showthresh'] = query
+            with open('settings.ini', 'w') as cfile:
+                config.write(cfile)
+            print("Set new setting of: ", query)
+        else:
+            print("not an acceptable value. no value set.")
+
 
     if userInput in ['view_settings']:
         print("Current settings:")
-        print("default threshold: ", config['CONTROL']['defaultThreshold'])
-        print("autoIntensity: ", config['CONTROL']['autoIntensity'])
-        print("autoStopTB:", config['CONTROL']['autoStopTB'])
-        print("autoStopBT:", config['CONTROL']['autoStopBT'])
-        print("autoStopRL:", config['CONTROL']['autoStopRL'])
-        print("autoStopLR:", config['CONTROL']['autoStopLR'])
+        print("default threshold: ", config['CONTROL']['defaultthreshold'])
+        print("autoIntensity: ", config['CONTROL']['autointensity'])
+        print("manual override top crop:", config['CONTROL']['manualtop'])
+        print("manual override bottom crop:", config['CONTROL']['manualbot'])
+        print("manual override left crop:", config['CONTROL']['manualleft'])
+        print("manual override right crop:", config['CONTROL']['manualright'])
         print("step:", config['CONTROL']['r'])
+        print("verbose:", config['CONTROL']['verbose'])
+        print("showthresh:", config['CONTROL']['showthresh'])
 
     #PROGRAM COMMANDS NEXT
     if userInput in prgmCommands:
@@ -385,7 +436,7 @@ What threshold would you like to use as differentiator?
 
         if userInput in ["crop"]:
             print("working on crop. please wait...")
-            cropped = st.crop(img, threshI, TB, BT, RL, LR)
+            cropped = st.cropN(img, threshI, top, bottom, left, right)
             filename = input("filename for cropped? DO NOT ADD EXTENSION> ")
             to.restorer(cropped, filename)
             print("file has been created at: ", filename + ".tiff")

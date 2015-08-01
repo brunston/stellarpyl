@@ -8,14 +8,21 @@ stellarPY
 """
 
 import numpy as np
-import math
-import statistics
 from PIL import Image
 from matplotlib import pyplot as plt
+
 import tools as to
 
 import pdb
 import sys
+import configparser
+
+import math
+import statistics
+
+config = configparser.ConfigParser()
+config.read('settings.ini')
+v = config['CONTROL']['verbose'] #enables or disables printing of debug
 
 def backMedian(img, threshold):
     """
@@ -24,12 +31,15 @@ def backMedian(img, threshold):
     """
     lowerx, lowery, upperx, uppery = img.getbbox()
     back = []
+    print("calculating backMedian")
     for x in range(lowerx, upperx):
         for y in range(lowery, uppery):
             pixel = img.getpixel((x,y))
             pixelSum = pixel[0]+pixel[1]+pixel[2]
             if pixelSum < threshold:
                 back.append(pixelSum)
+        to.pbar(x/upperx)
+    to.pbar(1)
     backMedian = statistics.median(back)
     return backMedian
 
@@ -40,12 +50,13 @@ def intensityN(img, data, reg, threshold = 127,r=1):
     y = mx + c function as done in regression()
     regArray = [xvals_n, yvals_n, A, m, c]
     """
-    print("running intensityN")
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     n = -1 / m
     #background subtraction median calculation
     back = backMedian(img, threshold)
+    if v=='yes': print("backMedian:", back)
+    print("running intensityN")
     intensities = {} #this is a dictionary.
     step = math.sqrt((r**2) / (1 + m**2))
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
@@ -60,6 +71,8 @@ def intensityN(img, data, reg, threshold = 127,r=1):
                         #we need to be sure that the rounded point is in our img
                         if (newyRounded > lowery) and (newyRounded < uppery):
                             pixel = img.getpixel((newxRounded,newyRounded))
+                            if v=='yes': print("using pixel {0},{1}".format(\
+                                                newxRounded,newyRounded))
                             newValue = pixel[0]+pixel[1]+pixel[2]
                             #to ensure we don't reset a value instead of adding:
                             if xpixel in intensities:
@@ -70,7 +83,8 @@ def intensityN(img, data, reg, threshold = 127,r=1):
                                 intensities[xpixel] = newValue
                                 intensities[xpixel] -= back
         to.pbar(xpixel/upperx) #progress bar
-
+    
+    if v=='yes': print("intensities:", intensities)
     return intensities
     #rewritten for cleaner reading from intensityQ, regression_test.py provided
     #by Scott and Wikipedia article on spatial antialiasing found at
@@ -85,13 +99,14 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
     value is intensity.
     r is the step rate along the spectral trace (default to size of one pixel)
     """
-    print("running intensitySAAN")
+    
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     n = -1 / m
     #background subtraction median calculation
     back = backMedian(img, threshold)
-
+    if v=='yes': print("backMedian:", back)
+    print("running intensitySAAN")
     intensities = {} #this is a dictionary.
     angle = np.arctan(m)
     step = math.sqrt((r**2) / (1 + m**2))
@@ -111,7 +126,10 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
                             percent = percentNewX * percentNewY
                             #get antialiased intensity from pixel
                             pixel = img.getpixel((newxRounded,newyRounded))
+                            if v=='yes': print("using pixel {0},{1}".format(\
+                                                newxRounded,newyRounded))
                             newValue = percent * (pixel[0]+pixel[1]+pixel[2])
+                            if v=='yes': print("value being added:",newValue)
                             #to ensure we don't reset a value instead of adding:
                             if xpixel in intensities:
                                 intensities[xpixel] = \
@@ -122,7 +140,7 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
                             intensities[xpixel] -= percent * back
         to.pbar(xpixel/upperx) #progress bar
 
-
+    if v=='yes': print("intensities:", intensities)
     return intensities
     #rewritten for cleaner reading from intensityQ, regression_test.py provided
     #by Scott and Wikipedia article on spatial antialiasing found at
@@ -134,6 +152,8 @@ def sumGenerator(data):
     has values in uint8 RGB form
     """
     new = []
+    print("creating 2d array from 3d tiff RGB array")
+    pbarCounter = 0
     for row in data:
         rowArray = []
         for pixel in row:
@@ -142,6 +162,9 @@ def sumGenerator(data):
                 pixelSum += value
             rowArray.append(pixelSum)
         new.append(rowArray)
+        to.pbar(pbarCounter/len(data))
+        pbarCounter += 1
+    to.pbar(1)
     newNP = np.array(new)
     return newNP
 
@@ -174,13 +197,65 @@ def regression(img, threshold=127):
     xvals_n, yvals_n = np.array(xvals), np.array(yvals)
     A = np.vstack([xvals_n, np.ones(len(xvals_n))]).T
     m,c = np.linalg.lstsq(A, yvals_n)[0]
-    #print("M, C:", m,c)
     to.pbar(1) #100%
+    if v=='yes': print("M, C:", m,c)
     return (m,c,xvals_n, yvals_n)
 
-def crop(image,deletionThreshold,\
-         autostopTB, autostopBT, autostopRL, autostopLR):
+def cropN(image, threshold,\
+          manualTop, manualBot, manualLeft, manualRight, margin=5):
     """
+    Crops image data based on pixels falling below or above a certain threshold.
+    This is an updated version of crop which uses the np.where() command.
+    Crops while considering manual overrides for the cropping limits.
+    """
+    print("cropping image")
+    data = np.array(image)
+    simplifiedData = sumGenerator(data)
+    yAboveThreshold, xAboveThreshold = np.where(simplifiedData > threshold)
+    #setting the bounds of the image to be min and max of where the image has
+    #pertinent data. Also, adds a margin.
+    lowerx, upperx = np.amin(xAboveThreshold), np.amax(xAboveThreshold)
+    lowery, uppery = np.amin(yAboveThreshold,), np.amax(yAboveThreshold)
+    manualTop, manualBot = manualTop, manualBot
+    manualLeft, manualRight = manualLeft, manualRight
+    if v=='yes':
+        print("lx,ux,ly,uy:{0},{1},{2},{3}".format(lowerx,upperx,lowery,uppery))
+    #making sure we will not go out of bounds
+    for thing in (lowerx, lowery):
+        if not ((thing - margin) < 0):
+            if v=='yes': print("{0} margin clear! incl margin".format(thing))
+            thing -= margin
+        else:
+            if v=='yes': print("{0} margin not clear! using orig".format(thing))
+    for thing in (upperx, uppery):
+        if not ((thing + margin) > (len(simplifiedData) - 1)):
+            if v=='yes': print("{0} margin clear! incl margin".format(thing))
+            thing += margin
+        else:
+            if v=='yes': print("{0} margin not clear! using orig".format(thing))
+    #let's check to see if we need to override using the manual selection
+    if (lowerx > manualLeft) and (manualLeft != -1):
+        if v=='yes': print("overriding left")
+        lowerx = manualLeft
+    if (upperx < manualRight) and (manualRight != -1):
+        if v=='yes': print("overriding right")
+        upperx = manualRight
+    if (lowery > manualTop) and (manualTop != -1):
+        if v=='yes': print("overriding top")
+        lowery = manualTop
+    if (uppery < manualBot) and (manualBot != -1):
+        if v=='yes': print("overriding bot")
+        uppery = manualBot
+    finalSelection = data[lowery:(uppery+1),lowerx:(upperx+1)]
+    if v=='yes': print("Final selection from {0} to {1} in x, \
+                        from {2} to {3} in y.".format(\
+                        lowerx, upperx, lowery, uppery))
+    return finalSelection
+
+
+def crop(image,deletionThreshold,autostopTB, autostopBT, autostopRL, autostopLR):
+    """
+    (deprecated)
     Crops image based on the number of empty pixels [0,0,0]
     Crops top-to-bottom, bottom-to-top, right-to-left, and then left-to-right
     based on the way that the current set of data has been collected.
@@ -195,7 +270,6 @@ def crop(image,deletionThreshold,\
     toggleTop = True
     autostopCounterT = 0
     while toggleTop == True:
-        numRow = len(duplicate)
         a = 0
         counterPerRow = 0
         for i in range(numCol):
@@ -274,21 +348,20 @@ def crop(image,deletionThreshold,\
         numCol = len(duplicate[0]) #needs to be updated each time loop iterates
         a = 0
         counterPerCol = 0
-        if autostopCounterL == autostopLR:
-            toggleLeft = False
-            break
         for i in range(numRow):
             if not (np.sum(duplicate[i][a]) <= deletionThreshold):
                 toggleLeft = False
                 break
             else:
                 counterPerCol += 1
+        if autostopCounterL == autostopLR:
+            toggleLeft = False
+            break
         if counterPerCol == numRow:
             #if the entire col of pixels is empty, delete col
             duplicate = np.delete(duplicate, a, 1)
-            autostopCounterL += 1
             #print("cropping col:", a)
-
+        autostopCounterL += 1
     #troubleshooting
     #print("duplicate shape:", duplicate.shape)
     #print("duplicate dtype:", duplicate.dtype)

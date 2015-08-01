@@ -1,11 +1,7 @@
 project: stellarPY
-
 file: README
-
 author: Brunston Poon
-
 org: UH-IFA and SPS
-
 For licensing information see LICENCE.txt.
 
 ##Summary:
@@ -65,7 +61,7 @@ already provided by matplotlib.
 
 ##Command list:
 
-IMAGE PROCESSING
+###IMAGE PROCESSING
 - 'autoProcess' (short 'auto') -
 autoProcess will take care of cropping and doing intensity plotting for you.
 just provide a filename. In order to use this feature you must first set
@@ -99,7 +95,7 @@ shows regressed line overlayed on the original (cropped) image.
 - 'show_walks' -
 shows walking lines overlayed on the original (cropped) image.
 
-PROGRAM
+###PROGRAM
 
 - 'about' -
 displays information about this program
@@ -110,10 +106,18 @@ where you are now
 - 'help' -
 brings up sample workflow
 
+- 'settings_cropoverride' -
+sets manual overrides for automatic cropping on the top, bottom, and sides
+of an image. The default value is -1 (which is equivalent to no override)
+for all values.
+
 - 'settings_default' -
 returns ALL settings back to default:
     defaultThreshold = -1
     autoIntensity = saa
+    manual overrides all to -1
+    step = 1
+    verbose = yes
 
 - 'settings_intensity' -
 sets default intensity processing method for the autoProcess feature.
@@ -123,14 +127,12 @@ The default setting is saa (for spatial anti-aliasing).
 sets default step value along the spectral trace (and thus resolution of
 resulting intensity plot). default is 1 pixel-equivalence.
 
-- 'settings_stop' -
-stops crop at a specific column set here. use the TB (top to bottom) BT, RL, or
-LR settings to cut off the auto-crop at a certain column in a certain direction.
-The default is -1 for all values (no autostop).
-
 - 'settings_threshold' -
 sets default threshold. Set to -1 if you would like the program to always ask.
 The default setting is -1 (always asks).
+
+- 'settings_verbose' -
+sets verboseness. 'yes' to include debug statements, 'no' is default.
 
 - 'view_settings' -
 view your current settings
