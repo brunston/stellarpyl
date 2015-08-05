@@ -161,36 +161,29 @@ def showWalks(img, reg, centerpoint=70, r=1):
     """
     print("running showWalks")
     lowerx, lowery, upperx, uppery = img.getbbox()
-    centerX, centerY = 544, 12
-    box = (centerX-10,centerY-10,centerX+10,centerY+10)
+    centerX, centerY = 554, 50
+    box = (centerX-10,centerY-10,centerX+10,centerY+10) #creates a 21x21 image
     boximg = img.crop(box)
     boximg.load()
     bigbox = boximg.resize((210,210))
+    imgpixels = bigbox.load()
     m, c, x, y = st.regression(bigbox)
+    plt.plot(x, m*x + c,'r',linestyle='-', label='fitted line')
+    plt.imshow(bigbox)
+    plt.show()
+    print("m: {0} c: {1} ".format(m,c))
     n = -1/m
     step = math.sqrt((r**2) / (1 + m**2))
-
     lowerx, lowery, upperx, uppery = bigbox.getbbox()
+    colors = [(155, 89, 182), (241, 196, 15), (231, 76, 60),\
+              (26, 188, 156), (46, 204, 113), (230, 126, 34), (52, 152, 219)]
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
-        for newx in np.arange(lowerx, upperx - 1, 1):
+        for newx in np.arange(lowerx, upperx - 1, 4):
             newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
             if (newy > lowery) and (newy < uppery):
-                #anti-aliasing implementation http://is.gd/dnj08y
-                for newxRounded in (math.floor(newx), math.ceil(newx)):
-                    for newyRounded in (math.floor(newy), math.ceil(newy)):
-                        #we need to be sure that the rounded point is in our img
-                        if (newyRounded > lowery) and (newyRounded < uppery):
-                            percentNewX = 1 - abs(newx - newxRounded)
-                            percentNewY = 1 - abs(newy - newyRounded)
-                            percent = percentNewX * percentNewY
-                            #get antialiased intensity from pixel
-                            pixel = img.getpixel((newxRounded,newyRounded))
-                            if v=='yes': print("using pixel {0},{1}".format(\
-                                                newxRounded,newyRounded))
-                            #dotted line?
-                            if (newxRounded % 2) == 0:
-                                imgpixels[newxRounded, newyRounded] = (88,252,238)
+                imgpixels[math.floor(newx), \
+                          math.floor(newy)] = colors[math.floor(newx)%6]
         pbar(xpixel/upperx) #progress bar
     plt.imshow(bigbox)
     plt.show()
