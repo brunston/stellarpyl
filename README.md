@@ -1,7 +1,5 @@
-project: stellarPY
-file: README
-author: Brunston Poon
-org: UH-IFA and SPS
+project: stellarPY // file: README // author: Brunston Poon // org: UH-IFA and SPS
+
 For licensing information see LICENCE.txt.
 
 ##Summary:
@@ -45,6 +43,8 @@ each RGB value can be an integer from 0-255; total value can be from 0-765. If
 you do not have a value you are already using for all of your images, you can
 type 'pixel_d' at the command prompt to run a function that plots the
 distribution of binned pixel values in your image.
+
+A typical threshold may be in the range from 100-130.
 
 The program will run the cropping algorithm and ask for a filename to give to
 the new file.
@@ -113,15 +113,19 @@ for all values.
 
 - 'settings_default' -
 returns ALL settings back to default:
-    defaultThreshold = -1
-    autoIntensity = saa
-    manual overrides all to -1
-    step = 1
-    verbose = yes
+    -defaultThreshold = -1
+    -autoIntensity = saa
+    -manual overrides all to -1
+    -step = 1
+    -verbose = yes
+    -showthresh = yes
 
 - 'settings_intensity' -
 sets default intensity processing method for the autoProcess feature.
 The default setting is saa (for spatial anti-aliasing).
+
+- 'settings_margin' -
+sets margin for cropping. default is 5 pixels.
 
 - 'settings_step'
 sets default step value along the spectral trace (and thus resolution of

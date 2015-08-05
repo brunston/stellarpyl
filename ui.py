@@ -66,6 +66,7 @@ while toggle == True:
     step = float(config['CONTROL']['r'])
     verbose = config['CONTROL']['verbose']
     showthresh = config['CONTROL']['showthresh']
+    margin = int(config['CONTROL']['margin'])
 
     prgmCommands = ("pixel_d", "image_regression", \
                     "intensity_n", "intensity_saa", \
@@ -194,6 +195,9 @@ returns ALL settings back to default:
 sets default intensity processing method for the autoProcess feature.
 The default setting is saa (for spatial anti-aliasing).
 
+- 'settings_margin' -
+sets margin for cropping. default is 5 pixels.
+
 - 'settings_showthreshold' -
 showThreshold takes a while to run. Set to 'no' for a faster autoProcess
 run time. Default is 'yes'
@@ -232,7 +236,7 @@ We need a file. Place it in the same directory as this script and give the name.
                 to.showThreshold(dataArray, threshI)
             timePause0s = time.time()
             print("working on crop. please wait...")
-            cropped = st.cropN(img, threshI, top, bottom, left, right)
+            cropped = st.cropN(img, threshI, top, bottom, left, right, margin)
             to.restorer(cropped, 'cropped')
             print("cropped image saved to cropped.tiff")
             croppedimg = Image.open('cropped.tiff')
@@ -244,13 +248,15 @@ We need a file. Place it in the same directory as this script and give the name.
             timePause1s = time.time()
             if autoIntensity in ['saa']:
                 print("working on intensity_saa. please wait...")
-                intensity = st.intensitySAAN(croppedimg,dataArray,regTup,threshI,step)
+                intensity = st.intensitySAAN(croppedimg,dataArray,regTup,\
+                                             threshI,step)
                 timePause2 = time.time()
                 to.plotIntensity(intensity)
                 timePause2s = time.time()
             if autoIntensity in ['n']:
                 print("working on intensity_n. please wait...")
-                intensity = st.intensityN(croppedimg,dataArray,regTup,threshI,step)
+                intensity = st.intensityN(croppedimg,dataArray,regTup,\
+                                          threshI,step)
                 timePause2 = time.time()
                 to.plotIntensity(intensity)
                 timePause2s = time.time()
@@ -380,6 +386,18 @@ run time. Default is 'yes'
         else:
             print("not an acceptable value. no value set.")
 
+    if userInput in ['settings_margin']:
+        print("""
+sets margin for cropping. default margin is 5 pixels
+            """)
+        query = input("Set margin (integer)> ")
+        if int(query) >= 0:
+            config['CONTROL']['margin'] = query
+            with open('settings.ini', 'w') as cfile:
+                config.write(cfile)
+            print("Set new setting of: ", query)
+        else:
+            print("not an acceptable value. no value set.")
 
     if userInput in ['view_settings']:
         print("Current settings:")
@@ -392,6 +410,7 @@ run time. Default is 'yes'
         print("step:", config['CONTROL']['r'])
         print("verbose:", config['CONTROL']['verbose'])
         print("showthresh:", config['CONTROL']['showthresh'])
+        print("margin:",config['CONTROL']['margin'])
 
     #PROGRAM COMMANDS NEXT
     if userInput in prgmCommands:
@@ -436,7 +455,7 @@ What threshold would you like to use as differentiator?
 
         if userInput in ["crop"]:
             print("working on crop. please wait...")
-            cropped = st.cropN(img, threshI, top, bottom, left, right)
+            cropped = st.cropN(img, threshI, top, bottom, left, right, margin)
             filename = input("filename for cropped? DO NOT ADD EXTENSION> ")
             to.restorer(cropped, filename)
             print("file has been created at: ", filename + ".tiff")
@@ -453,7 +472,7 @@ What threshold would you like to use as differentiator?
         if userInput in ["show_walks"]:
             print("working on show_walks")
             regTup = st.regression(img)
-            to.showWalks(img,regTup,step)
+            to.showWalks(img,regTup,r=step)
 
         #rehashing of command lists
         print("""
@@ -492,4 +511,4 @@ ctrl-c to force-interrupt at any time. Type 'help' for sample workflow,
                 """)
 
     else:
-        print(":)")
+        print("Please enter a command :).")

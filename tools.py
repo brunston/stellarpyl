@@ -15,6 +15,8 @@ import configparser
 import time
 import math
 
+import stellar as st
+
 
 """
 figure 0: pixelDistribution
@@ -35,7 +37,8 @@ def configDefault():
                          'manualright':'-1',
                          'r':'1',
                          'verbose':'no',
-                         'showthresh':'yes'}
+                         'showthresh':'yes',
+                         'margin':'5'}
     with open('settings.ini','w') as cfile:
         config.write(cfile)
 
@@ -152,15 +155,46 @@ def showRegression(img, reg):
     print("figure saved to regression.png")
     return None
 
-def showWalks(img, reg, r=1):
+def showWalks(img, reg, centerpoint=70, r=1):
     """
     shows walking lines overlayed on the original (cropped) image.
     """
     print("running showWalks")
     lowerx, lowery, upperx, uppery = img.getbbox()
-    m, c, x, y = reg
+    centerX, centerY = 544, 12
+    box = (centerX-10,centerY-10,centerX+10,centerY+10)
+    boximg = img.crop(box)
+    boximg.load()
+    bigbox = boximg.resize((210,210))
+    m, c, x, y = st.regression(bigbox)
     n = -1/m
-    
+    step = math.sqrt((r**2) / (1 + m**2))
+
+    lowerx, lowery, upperx, uppery = bigbox.getbbox()
+    for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
+        ypixel = m * xpixel + c
+        for newx in np.arange(lowerx, upperx - 1, 1):
+            newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
+            if (newy > lowery) and (newy < uppery):
+                #anti-aliasing implementation http://is.gd/dnj08y
+                for newxRounded in (math.floor(newx), math.ceil(newx)):
+                    for newyRounded in (math.floor(newy), math.ceil(newy)):
+                        #we need to be sure that the rounded point is in our img
+                        if (newyRounded > lowery) and (newyRounded < uppery):
+                            percentNewX = 1 - abs(newx - newxRounded)
+                            percentNewY = 1 - abs(newy - newyRounded)
+                            percent = percentNewX * percentNewY
+                            #get antialiased intensity from pixel
+                            pixel = img.getpixel((newxRounded,newyRounded))
+                            if v=='yes': print("using pixel {0},{1}".format(\
+                                                newxRounded,newyRounded))
+                            #dotted line?
+                            if (newxRounded % 2) == 0:
+                                imgpixels[newxRounded, newyRounded] = (88,252,238)
+        pbar(xpixel/upperx) #progress bar
+    plt.imshow(bigbox)
+    plt.show()
+    return None
     
 def plotIntensity(intensity):
     """

@@ -61,8 +61,7 @@ def intensityN(img, data, reg, threshold = 127,r=1):
     step = math.sqrt((r**2) / (1 + m**2))
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
-        for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
-            #newx = modpixel from iQ, newy = crossDispersion from iQ
+        for newx in np.arange(lowerx, upperx - 1, 0.1):
             newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
             if (newy > lowery) and (newy < uppery):
                 #anti-aliasing implementation http://is.gd/dnj08y
@@ -112,8 +111,7 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
     step = math.sqrt((r**2) / (1 + m**2))
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
-        for newx in np.arange(lowerx, upperx - 1, 0.1): #I missed the -1 in iQ
-            #newx = modpixel from iQ, newy = crossDispersion from iQ
+        for newx in np.arange(lowerx, upperx - 1, 0.1):
             newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
             if (newy > lowery) and (newy < uppery):
                 #anti-aliasing implementation http://is.gd/dnj08y
@@ -189,9 +187,9 @@ def regression(img, threshold=127):
     for x in range(lowerx, upperx):
         for y in range(lowery, uppery):
             pixel = img.getpixel((x,y))
-            if pixel[0]+pixel[1]+pixel[2] > threshold:
+            if (pixel[0]+pixel[1]+pixel[2]) > threshold:
                 xvals.append(x)
-                yvals.append(y) #accounting for upperleft vs lowerleft 0,0
+                yvals.append(y)
         to.pbar(x/(upperx+1)) #not 100%
     #regression code
     xvals_n, yvals_n = np.array(xvals), np.array(yvals)
@@ -202,7 +200,7 @@ def regression(img, threshold=127):
     return (m,c,xvals_n, yvals_n)
 
 def cropN(image, threshold,\
-          manualTop, manualBot, manualLeft, manualRight, margin=5):
+          manualTop, manualBot, manualLeft, manualRight, margin):
     """
     Crops image data based on pixels falling below or above a certain threshold.
     This is an updated version of crop which uses the np.where() command.
