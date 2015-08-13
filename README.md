@@ -1,4 +1,4 @@
-project: stellarPY // file: README // author: Brunston Poon // org: UH-IFA and SPS
+project: stellarPYL // file: README // author: Brunston Poon // org: UH-IFA and SPS
 
 For licensing information see LICENCE.txt.
 
@@ -6,7 +6,7 @@ For licensing information see LICENCE.txt.
 
 This is stellar spectra reduction and analysis command-line software written
 using the Python 3.4 version of the Anaconda Scientific Python distribution. It 
-is work done for an internship at the Unversity of Hawaii in conjunction with 
+is work done for an internship at the University of Hawaii in conjunction with 
 the St. Paul's School Engineering Honors program.
 
 It aims to provide a one-click workflow for analyzing uncompressed TIFF stellar
@@ -14,8 +14,8 @@ spectra images obtained from a DSLR through a diffraction grating. The goals of
 the project are: to automatically crop the image; to perform background 
 subtraction; to create an intensity plot of the spectrum (accounting for non-
 orthogonal spectra); and to account for the use of a DSLR sensor by using either 
-a relative response function or an absolute response function to normalize the 
-intensity plot.
+a relative response function or an absolute response function to negate the 
+effects of sensor response on the intensity plot.
 
 ##Workflow:
 
@@ -27,6 +27,10 @@ Be sure you are using Python3 and installed numpy and Python Imaging Library.
 Alternatively, you can run this using the Python3 version of Anaconda.
 If you do not satisfy these prerequisites, the program will not function
 correctly.
+
+AS AN ALTERNATIVE TO THE BELOW, make sure you set a default threshold using
+'settings_threshold', and then simply type 'auto' to have the program do
+the majority of the work.
 
 You will be presented with a list of commands.
 
@@ -141,7 +145,7 @@ sets verboseness. 'yes' to include debug statements, 'no' is default.
 - 'view_settings' -
 view your current settings
 
-##Additional commands:
+###Additional commands:
 
 <table border="1" style="width:100%">
   <tr>
@@ -149,3 +153,11 @@ view your current settings
     <td>who doesn't need a jellyfish?</td>
   </tr>
 </table>
+
+##Name
+The name stellarPYL is derived from three things: 'stellar' from its purpose
+as stellar spectra reduction software, 'PY' from its codebase written in Python,
+and the 'L' from 'libre' in reference to the license under which it is released,
+namely the GNU General Public License v3.
+
+Pronounciation: "stellar pile"

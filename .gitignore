@@ -10,6 +10,8 @@ cropped.tiff
 showThreshold.tiff
 regression.png
 intensity.png
+img/
+img/*
 
 # Windows image file caches
 Thumbs.db

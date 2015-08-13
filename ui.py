@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-stellarPY
+stellarPYL - python stellar spectra processing software
+Copyright (c) 2015 Brunston Poon
 @file: ui
-@author: Brunston Poon
-@org: UH-IFA / SPS
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Full license in LICENCE.txt
 """
 
 #IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT
 #Let's make sure that the user has all the dependencies installed and that
 #they are running the correct version of Python
-import os
 import sys
 import configparser
 import time
@@ -18,41 +20,42 @@ toggle = True
 version = sys.version_info[0]
 
 if version != 3:
-    print("Please upgrade to Python3, preferably 3.4.* or greater")
+    print("""
+Please upgrade to Python3, preferably 3.4.* or greater, before continuing""")
     toggle = False
-    os._exit(1)
+    sys.exit()
 
 try:
     import numpy as np
     from PIL import Image
+    from matplotlib import pyplot
 except ImportError:
-    print("numpy and PIL are not installed. Please install before continuing.")
+    print("""
+numpy, PIL, and/or matplotlib are not installed.
+Please install before continuing.""")
     toggle = False
-    os._exit(1)
+    sys.exit()
 
 #import the rest
 import stellar as st
 import tools as to
+import text as txt
 #END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT
 
 
 if toggle == True:
     config = configparser.ConfigParser()
     config.read('settings.ini')
-    print("""
-Type 'q', 'quit', or 'exit' to leave this program. Alternately, you may use
-ctrl-c to force-interrupt at any time.
+    firstrun = config['CONTROL']['firstrun']
+    txt.welcome()
 
-TO VIEW HELP, WHICH WILL DESCRIBE A TYPICAL WORKFLOW SCENARIO, TYPE 'help'.
-
-TO VIEW A LIST OF AVAILABLE FUNCTIONS & COMMANDS, TYPE 'commands'.
-
-TO LEARN MORE ABOUT THIS PROGRAM, TYPE 'about'.
-
-Help and information is also available online at
-http://st.brunston.net/ or by viewing README.md
-
-            """)
+    if firstrun in ["yes"]:
+        txt.firstrun()
+        time.sleep(15)
+        txt.commands()
+        config['CONTROL']['firstrun'] = "no"
+        with open('settings.ini', 'w') as cfile:
+                config.write(cfile)
 
 while toggle == True:
     #update settings
@@ -71,154 +74,20 @@ while toggle == True:
     prgmCommands = ("pixel_d", "image_regression", \
                     "intensity_n", "intensity_saa", \
                     "pd", "imgreg", "saa", "n", "crop", "show_threshold",\
-                    "show_regression", "show_walks")
+                    "show_regression", "show_walks", "dev_cgrowth")
 
     userInput = input("enter command> ")
 
     #TEXT COMMANDS NEXT
     if userInput in ["about"]:
-        print("""
-This is stellar spectra reduction and analysis command-line software written
-using the Python 3.4 version of the Anaconda Scientific Python distribution. It 
-is work done for an internship at the Unversity of Hawaii in conjunction with 
-the St. Paul's School Engineering Honors program.
-
-It aims to provide a simplified workflow for analyzing uncompressed TIFF stellar
-spectra images obtained from a DSLR through a diffraction grating. The goals of
-the project are: to automatically crop the image; to perform background 
-subtraction; to create an intensity plot of the spectrum (accounting for non-
-orthogonal spectra); and to account for the use of a DSLR sensor by using either
-a relative response function or an absolute response function to normalize the 
-intensity plot.
-            """)
+        txt.about()
     if userInput in ["help"]:
-        print("""
-
-AS AN ALTERNATIVE TO THE BELOW, make sure you set a default threshold using
-'settings_threshold', and then simply type 'auto' to have the program do
-the majority of the work.
-
-You will be presented with a list of commands.
-
-For a brand new image, run 'crop' first. Drag your file into the same directory
-and enter the filename including the file extension. This program will accept
-TIFF files, either in .tif or .tiff extension format. It will then ask you for a
-threshold.
-
-The threshold is used throughout the program to determine what data is relevant
-and what parts of the image can be discarded without damaging the value of the
-data. It needs to be an integer value between 0 and 765 as the threshold is
-measured as the sum of the R, G, and B bin values in a pixel, therefore, 
-each RGB value can be an integer from 0-255; total value can be from 0-765. If
-you do not have a value you are already using for all of your images, you can
-type 'pixel_d' at the command prompt to run a function that plots the
-distribution of binned pixel values in your image.
-
-A typical threshold may be in the range from 100-130.
-
-The program will run the cropping algorithm and ask for a filename to give to
-the new file.
-
-The next command you should run is 'intensity_saa'. It will take an image file
-and a threshold and automatically perform linear regression to find the y=mx+b
-line on which the spectral trace lies. It will then step one pixel at a time
-along the spectral trace and add up all intensity values occuring along that
-line.
-
-The program will graph this intensity plot, which can be saved using the tools
-already provided by matplotlib.
-
-            """)
-
+        txt.help()
     if userInput in ["commands"]:
-        print("""
-            ---IMAGE PROCESSING---
-- 'autoProcess' (short 'auto') -
-autoProcess will take care of cropping and doing intensity plotting for you.
-just provide a filename. In order to use this feature you must first set
-a default threshold to use by using the 'settings_threshold' command.
-
-- 'pixel_d' (short 'pd') -
-takes an image and shows the pixel distribution of the image over the intensity
-of the pixels.
-
-- 'crop' - 
-takes an image and crop it based on your selected threshold.
-
-- 'image_regression' (short 'imgreg') -
-takes an image and finds the line which goes through the spectrum in that image.
-
-- 'intensity_n' (short 'n') -
-takes an image of a spectrum and converts it into an intensity plot using the
-naive method of adding.
-
-- 'intensity_saa' (short 'saa') -
-takes an image of a spectrum and converts it into an intensity plot using
-spatial anti-aliasing at a sub-sampling rate of one tenth of one pixel.
-
-- 'show_threshold' -
-see exactly what could be removed (assuming no crop stop has been set) using the
-threshold that is currently set.
-
-- 'show_regression' -
-shows regressed line overlayed on the original (cropped) image.
-
-- 'show_walks' -
-shows walking lines overlayed on the original (cropped) image.
-
-            ---PROGRAM---
-
-- 'about' -
-displays information about this program
-
-- 'functions' -
-where you are now
-
-- 'help' -
-brings up sample workflow
-
-- 'settings_cropoverride' -
-sets manual overrides for automatic cropping on the top, bottom, and sides
-of an image. The default value is -1 (which is equivalent to no override)
-for all values.
-
-- 'settings_default' -
-returns ALL settings back to default:
-    defaultThreshold = -1
-    autoIntensity = saa
-    manual overrides all to -1
-    step = 1
-    verbose = yes
-    showthresh = yes
-
-- 'settings_intensity' -
-sets default intensity processing method for the autoProcess feature.
-The default setting is saa (for spatial anti-aliasing).
-
-- 'settings_margin' -
-sets margin for cropping. default is 5 pixels.
-
-- 'settings_showthreshold' -
-showThreshold takes a while to run. Set to 'no' for a faster autoProcess
-run time. Default is 'yes'
-
-- 'settings_step'
-sets default step value along the spectral trace (and thus resolution of
-resulting intensity plot). default is 1 pixel-equivalence.
-
-- 'settings_threshold' -
-sets default threshold. Set to -1 if you would like the program to always ask.
-The default setting is -1 (always asks).
-
-- 'settings_verbose' -
-sets verboseness. 'yes' to include debug statements, 'no' is default.
-
-- 'view_settings' -
-view your current settings
-
-            """)
+        txt.commands()
+    if userInput in ["licence", "license"]:
+        txt.licence()
     
-
     #AUTOPROCESS
     if userInput in ['autoProcess', 'auto']:
         print("""
@@ -400,17 +269,7 @@ sets margin for cropping. default margin is 5 pixels
             print("not an acceptable value. no value set.")
 
     if userInput in ['view_settings']:
-        print("Current settings:")
-        print("default threshold: ", config['CONTROL']['defaultthreshold'])
-        print("autoIntensity: ", config['CONTROL']['autointensity'])
-        print("manual override top crop:", config['CONTROL']['manualtop'])
-        print("manual override bottom crop:", config['CONTROL']['manualbot'])
-        print("manual override left crop:", config['CONTROL']['manualleft'])
-        print("manual override right crop:", config['CONTROL']['manualright'])
-        print("step:", config['CONTROL']['r'])
-        print("verbose:", config['CONTROL']['verbose'])
-        print("showthresh:", config['CONTROL']['showthresh'])
-        print("margin:",config['CONTROL']['margin'])
+        txt.viewSettings(config)
 
     #PROGRAM COMMANDS NEXT
     if userInput in prgmCommands:
@@ -435,13 +294,13 @@ What threshold would you like to use as differentiator?
         if userInput in ["intensity_saa", "saa"]:
             print("working on intensity_saa. please wait...")
             regTup = st.regression(img)
-            intensity = st.intensitySAAN(img,dataArray,regTup, threshI,step)
+            intensity = st.intensitySAAN(img,dataArray,regTup,threshI,step)
             to.plotIntensity(intensity)
 
         if userInput in ["intensity_n", "n"]:
             print("working on intensity_n. please wait...")
             regTup = st.regression(img)
-            intensity = st.intensityN(img,dataArray,regTup, threshI,step)
+            intensity = st.intensityN(img,dataArray,regTup,threshI,step)
             to.plotIntensity(intensity)
 
         if userInput in ["image_regression", "imgreg"]:
@@ -474,41 +333,18 @@ What threshold would you like to use as differentiator?
             regTup = st.regression(img)
             to.showWalks(img,regTup,r=step)
 
+        if userInput in ["dev_cgrowth"]:
+            print("devmode: curve of growth")
+            regTup = st.regression(img)
+            intensity = st.intensitySAAN(img,dataArray,regTup,threshI,step,cg=1)
         #rehashing of command lists
-        print("""
-Type 'q', 'quit', or 'exit' to leave this program. Alternately, you may use
-ctrl-c to force-interrupt at any time. Type 'help' for sample workflow,
-'commands' for a list of functions and commands, and 'about' for more info.
-            """)
+        txt.rehash()
 
     elif userInput in ["q", "quit", "exit"]:
-        break
+        sys.exit()
 
     elif userInput in ["jellyfish"]:
-            print("""
-                
-                                        (hello!)
-                                      .'
-                                     '
-                      _ -- ~~~ -- _      _______
-                  .-~               ~-.{__-----. :
-                /                       \      | |
-               :         O     O         :     | |
-               /\                       /------' j
-              { {/~-.      \__/      .-~\~~~~~~~~~
-               \/ /  |~:- .___. -.~\  \  \.
-              / /\ \ | | { { \ \  } }  \  \.
-             { {   \ \ |  \ \  \ \ /    } }
-              \ \   /\ \   \ \  /\ \   { {
-               } } { { \ \  \ \/ / \ \  \ \.
-              / /   } }  \ \ }{ {    \ \ } }
-             / /   { {     \ \{\ \    } { {
-            / /     } }     } } \  / / \ \ \.
-           `-'     { {     `-'\ \`-'/ /   `-'
-                    `-'        `-' `-'
-
-                    unknown artist
-                """)
+        txt.jellyfish()
 
     else:
         print("Please enter a command :).")

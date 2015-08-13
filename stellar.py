@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-stellarPY
+stellarPYL - python stellar spectra processing software
+Copyright (c) 2015 Brunston Poon
 @file: primary
-@author: Brunston Poon
-@org: UH-IFA / SPS
-@namingConvention: lowerCamelCase
+This program comes with absolutely no warranty.
 """
 
 import numpy as np
@@ -85,11 +84,8 @@ def intensityN(img, data, reg, threshold = 127,r=1):
     
     if v=='yes': print("intensities:", intensities)
     return intensities
-    #rewritten for cleaner reading from intensityQ, regression_test.py provided
-    #by Scott and Wikipedia article on spatial antialiasing found at
-    #http://is.gd/dnj08y or wiki-spatial-antialiasing.pdf
 
-def intensitySAAN(img, data, reg, threshold=127, r=1):
+def intensitySAAN(img, data, reg, threshold=127, r=1, cg=-1):
     """
     intensitySAAN is the fourth iteration of the intensity function which aims
     to deal with the plotting of regressed non-orthogonal spectra given in
@@ -109,6 +105,7 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
     intensities = {} #this is a dictionary.
     angle = np.arctan(m)
     step = math.sqrt((r**2) / (1 + m**2))
+    cgCounter = 0
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
         for newx in np.arange(lowerx, upperx - 1, 0.1):
@@ -136,13 +133,13 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
                             else:
                                 intensities[xpixel] = newValue
                             intensities[xpixel] -= percent * back
+            cgCounter += 1
+            if (cgCounter / 10) == cg:
+                break
         to.pbar(xpixel/upperx) #progress bar
 
     if v=='yes': print("intensities:", intensities)
     return intensities
-    #rewritten for cleaner reading from intensityQ, regression_test.py provided
-    #by Scott and Wikipedia article on spatial antialiasing found at
-    #http://is.gd/dnj08y or wiki-spatial-antialiasing.pdf
 
 def sumGenerator(data):
     """

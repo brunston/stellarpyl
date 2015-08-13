@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-stellarPY
+stellarPYL - python stellar spectra processing software
+Copyright (c) 2015 Brunston Poon
 @file: tools
-@author: Brunston Poon
-@org: UH-IFA / SPS
+This program comes with absolutely no warranty.
 """
 import numpy as np
 from PIL import Image
@@ -29,7 +29,7 @@ v = config['CONTROL']['verbose'] #enables or disables printing of debug
 
 def configDefault():
     config = configparser.ConfigParser()
-    config['CONTROL'] = {'defaultthreshold':'-1',
+    config['CONTROL'] = {'defaultthreshold':'127',
                          'autointensity':'saa',
                          'manualtop':'-1',
                          'manualbot':'-1',
@@ -38,7 +38,8 @@ def configDefault():
                          'r':'1',
                          'verbose':'no',
                          'showthresh':'yes',
-                         'margin':'5'}
+                         'margin':'5',
+                         'firstrun':'yes'}
     with open('settings.ini','w') as cfile:
         config.write(cfile)
 
@@ -169,8 +170,6 @@ def showWalks(img, reg, centerpoint=70, r=1):
     imgpixels = bigbox.load()
     m, c, x, y = st.regression(bigbox)
     plt.plot(x, m*x + c,'r',linestyle='-', label='fitted line')
-    plt.imshow(bigbox)
-    plt.show()
     print("m: {0} c: {1} ".format(m,c))
     n = -1/m
     step = math.sqrt((r**2) / (1 + m**2))
@@ -186,10 +185,11 @@ def showWalks(img, reg, centerpoint=70, r=1):
                           math.floor(newy)] = colors[math.floor(newx)%6]
         pbar(xpixel/upperx) #progress bar
     plt.imshow(bigbox)
+    plt.savefig('walks.png', bbox_inches='tight')
     plt.show()
     return None
     
-def plotIntensity(intensity):
+def plotIntensity(intensity, linetype='b-'):
     """
     Plots an intensity graph with connected points
     """
@@ -201,7 +201,7 @@ def plotIntensity(intensity):
 
     plt.figure(1)
     plt.clf()
-    plt.plot(plotx, ploty, 'b-', label='anti-aliased data')
+    plt.plot(plotx, ploty, linetype)
     plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
     plt.savefig('intensity.png', bbox_inches='tight')
     plt.show()
