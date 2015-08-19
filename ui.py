@@ -336,7 +336,7 @@ What threshold would you like to use as differentiator?
         if userInput in ["dev_cgrowth"]:
             print("devmode: curve of growth")
             regTup = st.regression(img)
-            intensity = st.intensitySAAN(img,dataArray,regTup,threshI,step,cg=1)
+            intensity = st.intensitySAAN(img,dataArray,regTup,threshI,step)
         #rehashing of command lists
         txt.rehash()
 
