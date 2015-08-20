@@ -140,7 +140,7 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
     if v=='yes': print("intensities:", intensities)
     return intensities
 
-def intensitySAANB(img, data, reg, threshold=127, r=1):
+def intensitySAANB(img, data, reg, threshold=127, r=1,tracewidth=10):
     """
     intensitySAAN is the fourth iteration of the intensity function which aims
     to deal with the plotting of regressed non-orthogonal spectra given in
@@ -160,37 +160,21 @@ def intensitySAANB(img, data, reg, threshold=127, r=1):
     if v=='yes': print("backMedian:", back)
     print("running intensitySAAN")
     intensities = {} #this is a dictionary.
-    angle = np.arctan(m)
     step = math.sqrt((r**2) / (1 + m**2))
-    cgCounter = 0
-    for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
-        ypixel = m * xpixel + c
-        for newx in np.arange(lowerx, upperx - 1, 0.1):
-            newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
-            if (newy > lowery) and (newy < uppery):
-                #anti-aliasing implementation http://is.gd/dnj08y
-                for newxRounded in (math.floor(newx), math.ceil(newx)):
-                    for newyRounded in (math.floor(newy), math.ceil(newy)):
-                        #we need to be sure that the rounded point is in our img
-                        if (newyRounded > lowery) and (newyRounded < uppery):
-                            percentNewX = 1 - abs(newx - newxRounded)
-                            percentNewY = 1 - abs(newy - newyRounded)
-                            percent = percentNewX * percentNewY
-                            #get antialiased intensity from pixel
-                            pixel = img.getpixel((newxRounded,newyRounded))
-                            if v=='yes': print("using pixel {0},{1}".format(\
-                                                newxRounded,newyRounded))
-                            newValue = percent * (pixel[0]+pixel[1]+pixel[2])
-                            if v=='yes': print("value being added:",newValue)
-                            #to ensure we don't reset a value instead of adding:
-                            if xpixel in intensities:
-                                intensities[xpixel] = \
-                                                    intensities[xpixel] + \
-                                                    newValue
-                            else:
-                                intensities[xpixel] = newValue
-                            intensities[xpixel] -= percent * back
-        to.pbar(xpixel/upperx) #progress bar
+    #generate the coordinate arrays for our image
+    xArr = np.arange(upperx+1)
+    yArr = np.arange(uppery+1)
+    lineM = np.multiply(m, xArr), np.add(c, lineM)
+    r = 0.5 * r
+    for pointX in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
+        #pointY = n * (pointX - 
+        pointIndices = np.where((yArr <= (m * xArr + tracewidth)) &\
+                                (yArr >= (m * xArr - tracewidth)) &\
+                                (xArr <= (n * xArr + r)) &\
+                                (xArr >= (n * xArr - r)))
+        for i in 
+
+    to.pbar(xpixel/upperx) #progress bar
 
     if v=='yes': print("intensities:", intensities)
     return intensities
