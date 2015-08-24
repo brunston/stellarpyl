@@ -170,10 +170,11 @@ def intensitySAANB(img, data, reg, threshold=127, r=1,tracewidth=10):
     for pointX in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         #pointY = n * (pointX - 
         for y in range(uppery+1):
-            pointIndices = np.where((yArr[y] <= (m * xArr[y] + tracewidth)) &\
-                                    (yArr[y] >= (m * xArr[y] - tracewidth)) &\
-                                    (xArr[y] <= (n * xArr[y] + r)) &\
-                                    (xArr[y] >= (n * xArr[y] - r)))
+
+            pointIndices = np.where((yArr[y] <= (m * xArr + tracewidth)) &\
+                                    (yArr[y] >= (m * xArr - tracewidth)) &\
+                                    (xArr[y] <= (n * xArr + r)) &\
+                                    (xArr[y] >= (n * xArr - r)))
             for point in pointIndices:
                 if pointX in intensities:
                     intensities[pointX] = intensities[pointX] + point
