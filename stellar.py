@@ -169,18 +169,19 @@ def intensitySAANB(img, data, reg, threshold=127, r=1,tracewidth=10):
     r = 0.5 * r
     for pointX in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         #pointY = n * (pointX - 
-        pointIndices = np.where((yArr <= (m * xArr + tracewidth)) &\
-                                (yArr >= (m * xArr - tracewidth)) &\
-                                (xArr <= (n * xArr + r)) &\
-                                (xArr >= (n * xArr - r)))
-        for point in pointIndices:
-            if pointX in intensities:
-                intensities[pointX] = intensities[pointX] + point
-            else:
-                intensities[pointX] = point
-            #todo intensities[pointX] -= percent * back DEAL WITH THIS
+        for y in range(uppery+1):
+            pointIndices = np.where((yArr[y] <= (m * xArr[y] + tracewidth)) &\
+                                    (yArr[y] >= (m * xArr[y] - tracewidth)) &\
+                                    (xArr[y] <= (n * xArr[y] + r)) &\
+                                    (xArr[y] >= (n * xArr[y] - r)))
+            for point in pointIndices:
+                if pointX in intensities:
+                    intensities[pointX] = intensities[pointX] + point
+                else:
+                    intensities[pointX] = point
+                #todo intensities[pointX] -= percent * back DEAL WITH THIS
 
-    to.pbar(xpixel/upperx) #progress bar
+        to.pbar(pointX/upperx) #progress bar
     if v=='yes': print("intensities:", intensities)
     return intensities
 
