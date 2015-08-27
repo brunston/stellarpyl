@@ -164,7 +164,7 @@ def intensitySAANB(img, data, reg, threshold=127, r=1, twidth=10):
     intensities = {} #this is a dictionary.
     angle = np.arctan(m)
     step = math.sqrt((r**2) / (1 + m**2))
-    cgCounter = 0
+
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
         for newx in np.arange(lowerx, upperx - 1, 0.1):
