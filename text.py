@@ -209,8 +209,8 @@ and you are welcome to redistribute it under certain conditions.
   time.sleep(3)
   print("""
 
-      -stellarPYL is copyright (c) 2015 Brunston Poon-
-                  -
+      stellarPYL is copyright (c) 2015 Brunston Poon
+
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
@@ -282,6 +282,7 @@ patents cannot be used to render the program non-free.
 modification follow.
 
   THE REST OF THE LICENCE TEXT IS VIEWABLE IN LICENCE.txt
+  stellarPYL is copyright (c) 2015 Brunston Poon.
     """)
 
   return None
