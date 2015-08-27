@@ -172,7 +172,9 @@ def intensitySAANB(img, data, reg, threshold=127, r=1, twidth=10):
             #We want to add spectral trace width functionality
             if (newy > (ypixel-twidth)) or (newy < (ypixel+twidth)):
                 #anti-aliasing implementation http://is.gd/dnj08y
-                for newxRounded in (math.floor(newx), math.ceil(newx+r)):
+                foo = 
+                for newxRounded in \
+                np.linspace(math.floor(newx), math.ceil(newx+r),foo):
                     for newyRounded in (math.floor(newy), math.ceil(newy)):
                         #we need to be sure that the rounded point is in our img
                         if (newyRounded > lowery) and (newyRounded < uppery)\
