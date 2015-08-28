@@ -5,7 +5,7 @@ def saanb(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
 			if x2 is within the end-line x value and within end-line y value:
 				add pixel to dictionary
 			if x2 is on end-line x value or on end-line y value:
-				for subpixels in image:
+				for subpixels in x2:
 					if they are within the end-line boundaries:
 					add to someCounter
 				percentage to antialias = someCounter/(total possible)
