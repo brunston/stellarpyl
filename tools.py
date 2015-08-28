@@ -88,9 +88,11 @@ def restorer(arrayToConvert, fname):
     """
     Converts array given as ndarray to a tif and returns None
     """
+
     image = Image.fromarray(arrayToConvert)
     fnameWithExtension = fname + ".tiff"
     image.save(fnameWithExtension, "TIFF")
+
     return None
 
 def pixelDistribution(data):
@@ -99,11 +101,13 @@ def pixelDistribution(data):
     in ndarray format so that we can figure out how much "noise" is feasible
     to get rid of without harming the rest of the data
     """
+
     numRow = len(data)
     numCol = len(data[0])
     distributionArray = np.zeros(766, dtype=np.uint8)
     x = np.arange(765+1)
     print("generating pixelDistribution")
+
     for row in range(numRow):
         for col in range(numCol):
             pixelSum = np.sum(data[row][col])
@@ -114,16 +118,19 @@ def pixelDistribution(data):
     plt.clf() #clears figure
     plt.plot(x, distributionArray,'b.',title="pixel distribution", markersize=4)
     plt.show()
+
     return distributionArray
 
 def showThreshold(data, threshold):
     """
     shows what exactly counts in the threshold when applying to data
     """
+
     numRow = len(data)
     numCol = len(data[0])
     print("running showThreshold")
     numPixels = 0
+
     for row in range(numRow):
         for col in range(numCol):
             pixelSum = np.sum(data[row][col])
@@ -134,8 +141,10 @@ def showThreshold(data, threshold):
     img = Image.fromarray(data)
     img.save("showThreshold.tiff", "TIFF")
     pbar(1)
+
     print("You can see what has been selected by viewing showThreshold.tiff")
     if v=='yes': print("Number of pixels under threshold: ",numPixels)
+
     return None
 
 def showRegression(img, reg):
@@ -143,8 +152,10 @@ def showRegression(img, reg):
     shows regressed line overlayed on the original (cropped) image.
     """
     print("running showRegression")
+
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c, x, y = reg
+
     plt.figure(2)
     plt.imshow(img)
     plt.plot(x, m*x + c,'r',linestyle='-', \
@@ -154,6 +165,7 @@ def showRegression(img, reg):
     plt.savefig('regression.png', bbox_inches='tight')
     plt.show()
     print("figure saved to regression.png")
+
     return None
 
 def showWalks(img, reg, centerpoint=70, r=1):
@@ -161,6 +173,7 @@ def showWalks(img, reg, centerpoint=70, r=1):
     shows walking lines overlayed on the original (cropped) image.
     """
     print("running showWalks")
+
     lowerx, lowery, upperx, uppery = img.getbbox()
     centerX, centerY = 554, 50
     box = (centerX-10,centerY-10,centerX+10,centerY+10) #creates a 21x21 image
@@ -168,14 +181,18 @@ def showWalks(img, reg, centerpoint=70, r=1):
     boximg.load()
     bigbox = boximg.resize((210,210))
     imgpixels = bigbox.load()
+
     m, c, x, y = st.regression(bigbox)
     plt.plot(x, m*x + c,'r',linestyle='-', label='fitted line')
+
     print("m: {0} c: {1} ".format(m,c))
+
     n = -1/m
     step = math.sqrt((r**2) / (1 + m**2))
     lowerx, lowery, upperx, uppery = bigbox.getbbox()
     colors = [(155, 89, 182), (241, 196, 15), (231, 76, 60),\
               (26, 188, 156), (46, 204, 113), (230, 126, 34), (52, 152, 219)]
+
     for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
         ypixel = m * xpixel + c
         for newx in np.arange(lowerx, upperx - 1, 4):
@@ -187,6 +204,7 @@ def showWalks(img, reg, centerpoint=70, r=1):
     plt.imshow(bigbox)
     plt.savefig('walks.png', bbox_inches='tight')
     plt.show()
+
     return None
     
 def plotIntensity(intensity, linetype='b-'):
@@ -207,6 +225,7 @@ def plotIntensity(intensity, linetype='b-'):
     plt.show()
     
     print("\nfigure saved to intensity.png")
+    return None
 
 def plotRegression(reg):
     """
@@ -220,3 +239,5 @@ def plotRegression(reg):
     plt.plot(x, m*x + c,'r',linestyle='-', label='fitted line')
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.show()
+
+    return None

@@ -28,18 +28,24 @@ def backMedian(img, threshold):
     calculates the median value of 'blackness' in an image under a specific
     threshold
     """
+
     lowerx, lowery, upperx, uppery = img.getbbox()
     back = []
     print("calculating backMedian")
+
     for x in range(lowerx, upperx):
         for y in range(lowery, uppery):
             pixel = img.getpixel((x,y))
             pixelSum = pixel[0]+pixel[1]+pixel[2]
+
             if pixelSum < threshold:
                 back.append(pixelSum)
+
         to.pbar(x/upperx)
+
     to.pbar(1)
     backMedian = statistics.median(back)
+
     return backMedian
 
 def intensityN(img, data, reg, threshold = 127,r=1):
@@ -49,28 +55,35 @@ def intensityN(img, data, reg, threshold = 127,r=1):
     y = mx + c function as done in regression()
     regArray = [xvals_n, yvals_n, A, m, c]
     """
+
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     n = -1 / m
+
     #background subtraction median calculation
     back = backMedian(img, threshold)
     if v=='yes': print("backMedian:", back)
     print("running intensityN")
     intensities = {} #this is a dictionary.
     step = math.sqrt((r**2) / (1 + m**2))
+
     for xpixel in np.arange(lowerx, upperx, step):
         ypixel = m * xpixel + c
         for newx in np.arange(lowerx, upperx - 1, 0.1):
             newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
+
             if (newy > lowery) and (newy < uppery):
                 #anti-aliasing implementation http://is.gd/dnj08y
+
                 for newxRounded in (math.floor(newx), math.ceil(newx)):
                     for newyRounded in (math.floor(newy), math.ceil(newy)):
                         #we need to be sure that the rounded point is in our img
                         if (newyRounded > lowery) and (newyRounded < uppery):
                             pixel = img.getpixel((newxRounded,newyRounded))
+
                             if v=='yes': print("using pixel {0},{1}".format(\
                                                 newxRounded,newyRounded))
+
                             newValue = pixel[0]+pixel[1]+pixel[2]
                             #to ensure we don't reset a value instead of adding:
                             if xpixel in intensities:
@@ -83,6 +96,7 @@ def intensityN(img, data, reg, threshold = 127,r=1):
         to.pbar(xpixel/upperx) #progress bar
     
     if v=='yes': print("intensities:", intensities)
+
     return intensities
 
 def intensitySAAN(img, data, reg, threshold=127, r=1):
@@ -108,12 +122,15 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
     angle = np.arctan(m)
     step = math.sqrt((r**2) / (1 + m**2))
     #for xpixel in np.linspace(lowerx, upperx,num=math.ceil((upperx/step)+1)):
+
     for xpixel in np.arange(lowerx, upperx, step):
         ypixel = m * xpixel + c
         for newx in np.arange(lowerx, upperx - 1, 0.1):
             newy = n * (newx - xpixel) + ypixel #point-slope, add ypixel ea.side
+
             if (newy > lowery) and (newy < uppery):
                 #anti-aliasing implementation http://is.gd/dnj08y
+
                 for newxRounded in (math.floor(newx), math.ceil(newx)):
                     for newyRounded in (math.floor(newy), math.ceil(newy)):
                         #we need to be sure that the rounded point is in our img
@@ -121,12 +138,15 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
                             percentNewX = 1 - abs(newx - newxRounded)
                             percentNewY = 1 - abs(newy - newyRounded)
                             percent = percentNewX * percentNewY
+
                             #get antialiased intensity from pixel
                             pixel = img.getpixel((newxRounded,newyRounded))
+                            newValue = percent * (pixel[0]+pixel[1]+pixel[2])
+
                             if v=='yes': print("using pixel {0},{1}".format(\
                                                 newxRounded,newyRounded))
-                            newValue = percent * (pixel[0]+pixel[1]+pixel[2])
                             if v=='yes': print("value being added:",newValue)
+
                             #to ensure we don't reset a value instead of adding:
                             if xpixel in intensities:
                                 intensities[xpixel] = \
@@ -134,10 +154,12 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
                                                     newValue
                             else:
                                 intensities[xpixel] = newValue
+
                             intensities[xpixel] -= percent * back
         to.pbar(xpixel/upperx) #progress bar
 
     if v=='yes': print("intensities:", intensities)
+
     return intensities
 
 def intensitySAANB(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
@@ -166,21 +188,29 @@ def intensitySAANB(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     step = math.sqrt((r**2) / (1 + m**2))
 
     for x in np.arange(lowerx, upperx, step):
-        upperLineX, lowerLineX = x + (r/2), x - (r/2)
         y = m * x + c
-        if upperLineX < upperx:
-            upperLineY = m * (x+(r/2)) + c
-        if lowerLineX > lowerx:
-            lowerLineY = m * (x-(r/2)) + c
-        for subX in np.arange(lowerx, upperx, spss):
-            subY = n * (subX - x) + y #from point-slope form
-            if (subX > lowerlineX) and (subX < upperLineY)\
-                and (subY )
+
+        #we want the xvalues for the other points on the trace
+        upperLimitX, lowerLimitX = x + (step/2), x - (step/2)
+        
+
+    # for x in np.arange(lowerx, upperx, step):
+    #     upperLineX, lowerLineX = x + (r/2), x - (r/2)
+    #     y = m * x + c
+    #     if upperLineX < upperx:
+    #         upperLineY = m * (x+(r/2)) + c
+    #     if lowerLineX > lowerx:
+    #         lowerLineY = m * (x-(r/2)) + c
+    #     for subX in np.arange(lowerx, upperx, spss):
+    #         subY = n * (subX - x) + y #from point-slope form
+    #         if (subX > lowerlineX) and (subX < upperLineY)\
+    #             and (subY )
 
 
         to.pbar(xpixel/upperx) #progress bar
 
     if v=='yes': print("intensities:", intensities)
+
     return intensities
 
 def sumGenerator(data):
@@ -203,6 +233,7 @@ def sumGenerator(data):
         pbarCounter += 1
     to.pbar(1)
     newNP = np.array(new)
+
     return newNP
 
 def absResponse(wavelength):
@@ -223,6 +254,7 @@ def regression(img, threshold=127):
     lowerx, lowery, upperx, uppery = img.getbbox()
     xvals, yvals = [], []
     print("running regression")
+
     for x in range(lowerx, upperx):
         for y in range(lowery, uppery):
             pixel = img.getpixel((x,y))
@@ -231,9 +263,11 @@ def regression(img, threshold=127):
                 yvals.append(y)
         to.pbar(x/(upperx+1)) #not 100%
     #regression code
+
     xvals_n, yvals_n = np.array(xvals), np.array(yvals)
     A = np.vstack([xvals_n, np.ones(len(xvals_n))]).T
     m,c = np.linalg.lstsq(A, yvals_n)[0]
+
     to.pbar(1) #100%
     if v=='yes': print("M, C:", m,c)
     return (m,c,xvals_n, yvals_n)
@@ -253,10 +287,13 @@ def cropN(image, threshold,\
     #pertinent data. Also, adds a margin.
     lowerx, upperx = np.amin(xAboveThreshold), np.amax(xAboveThreshold)
     lowery, uppery = np.amin(yAboveThreshold,), np.amax(yAboveThreshold)
+
     manualTop, manualBot = manualTop, manualBot
     manualLeft, manualRight = manualLeft, manualRight
+
     if v=='yes':
         print("lx,ux,ly,uy:{0},{1},{2},{3}".format(lowerx,upperx,lowery,uppery))
+    
     #making sure we will not go out of bounds
     for thing in (lowerx, lowery):
         if not ((thing - margin) < 0):
@@ -264,29 +301,36 @@ def cropN(image, threshold,\
             thing -= margin
         else:
             if v=='yes': print("{0} margin not clear! using orig".format(thing))
+
     for thing in (upperx, uppery):
         if not ((thing + margin) > (len(simplifiedData) - 1)):
             if v=='yes': print("{0} margin clear! incl margin".format(thing))
             thing += margin
         else:
             if v=='yes': print("{0} margin not clear! using orig".format(thing))
+
     #let's check to see if we need to override using the manual selection
     if (lowerx > manualLeft) and (manualLeft != -1):
         if v=='yes': print("overriding left")
         lowerx = manualLeft
+
     if (upperx < manualRight) and (manualRight != -1):
         if v=='yes': print("overriding right")
         upperx = manualRight
+
     if (lowery > manualTop) and (manualTop != -1):
         if v=='yes': print("overriding top")
         lowery = manualTop
+
     if (uppery < manualBot) and (manualBot != -1):
         if v=='yes': print("overriding bot")
         uppery = manualBot
+
     finalSelection = data[lowery:(uppery+1),lowerx:(upperx+1)]
     if v=='yes': print("Final selection from {0} to {1} in x, \
                         from {2} to {3} in y.".format(\
                         lowerx, upperx, lowery, uppery))
+    
     return finalSelection
 
 
