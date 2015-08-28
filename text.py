@@ -11,13 +11,13 @@ def welcome():
 	print("""
 Welcome to stellarPYL, Copyright (C) 2015 Brunston Poon, type 'licence' for info
 
-Type 'q', 'quit', or 'exit' to leave the program. Use ctrl-c to force-interrupt.
+Type 'quit' or 'exit' to leave the program. Use ctrl-c to force-interrupt.
 
 TO VIEW HELP, WHICH WILL DESCRIBE A TYPICAL WORKFLOW SCENARIO, TYPE 'help'.
 TO VIEW A LIST OF AVAILABLE FUNCTIONS & COMMANDS, TYPE 'commands'.
 TO LEARN MORE ABOUT THIS PROGRAM, TYPE 'about'.
 
-Help and information is also available online at http://st.brunston.net/
+Help and information is also available online at http://st.bpbp.xyz/
 or by viewing README.md
             """)
 	return None
@@ -44,6 +44,8 @@ subtraction; to create an intensity plot of the spectrum (accounting for non-
 orthogonal spectra); and to account for the use of a DSLR sensor by using either
 a relative response function or an absolute response function to normalize the 
 intensity plot.
+
+It is written by Brunston Poon. 
             """)
 	return None
 
@@ -181,7 +183,7 @@ view your current settings
 
 def rehash():
 	print("""
-Type 'q', 'quit', or 'exit' to leave this program. Alternately, you may use
+Type 'quit' or 'exit' to leave this program. Alternately, you may use
 ctrl-c to force-interrupt at any time. Type 'help' for sample workflow,
 'commands' for a list of functions and commands, and 'about' for more info.
             """)

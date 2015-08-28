@@ -179,33 +179,58 @@ def intensitySAANB(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     n = -1 / m
-    #background subtraction median calculation
     back = backMedian(img, threshold)
+
     if v=='yes': print("backMedian:", back)
     print("running intensitySAAN")
+
     intensities = {} #this is a dictionary.
     angle = np.arctan(m)
-    step = math.sqrt((r**2) / (1 + m**2))
+    step = r * np.cos(angle)
 
     for x in np.arange(lowerx, upperx, step):
         y = m * x + c
-
-        #we want the xvalues for the other points on the trace
         upperLimitX, lowerLimitX = x + (step/2), x - (step/2)
-        
 
-    # for x in np.arange(lowerx, upperx, step):
-    #     upperLineX, lowerLineX = x + (r/2), x - (r/2)
-    #     y = m * x + c
-    #     if upperLineX < upperx:
-    #         upperLineY = m * (x+(r/2)) + c
-    #     if lowerLineX > lowerx:
-    #         lowerLineY = m * (x-(r/2)) + c
-    #     for subX in np.arange(lowerx, upperx, spss):
-    #         subY = n * (subX - x) + y #from point-slope form
-    #         if (subX > lowerlineX) and (subX < upperLineY)\
-    #             and (subY )
+        for y2 in np.arange(lowery,uppery,1):
+            a = ((y2 - y) / n) + x
+            ulima, llima = math.floor(a + (step/2)), math.ceil(a - (step/2))
+            ulimaNR,llimaNR = a + (step/2), a - (step/2) #NR = No Rounding
 
+            for x2 in np.arange(lowerx,upperx,1):
+
+                if (x2 < ulima) and (x2 > llima):
+                    pixel = img.getpixel((x2,y2))
+
+                    if x2 in intensities:
+                        intensities[x2] = intensities[x2] + pixel
+                    else:
+                        intensities[x2] = pixel
+
+                if (x2 == ulima) or (x2 == llima):
+                    pixel = img.getpixel((x2,y2))
+                    subpixelCounter = 0
+                    totalPossibleSubpixels = (1/spss)**2
+
+                    if x2 == ulima:
+                        for subpixely in np.arange(x2, x2+1,spss):
+                            for subpixelx in np.arange(x2,x2+1,spss):
+                                if subpixelx <= ulimaNR:
+                                    subpixelCounter += 1
+
+                    if x2 == llima:
+                        for subpixely in np.arange(x2, x2+1,spss):
+                            for subpixelx in np.arange(x2,x2+1,spss):
+                                if subpixelx >= llimaNR:
+                                    subpixelCounter += 1
+
+                    percentage = subpixelCounter / totalPossibleSubpixels
+                    newValue = pixel * percentage
+
+                    if x2 in intensities:
+                        intensities[x2] = intensities[x2] + pixel
+                    else:
+                        intensities[x2] = pixel
 
         to.pbar(xpixel/upperx) #progress bar
 
@@ -330,7 +355,7 @@ def cropN(image, threshold,\
     if v=='yes': print("Final selection from {0} to {1} in x, \
                         from {2} to {3} in y.".format(\
                         lowerx, upperx, lowery, uppery))
-    
+
     return finalSelection
 
 

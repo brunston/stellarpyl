@@ -81,7 +81,7 @@ while toggle == True:
                     "pd", "imgreg", "saa", "n", "crop", "show_threshold",\
                     "show_regression", "show_walks", "dev_cgrowth")
 
-    userInput = input("enter command> ")
+    userInput = input(">> ")
 
     #TEXT COMMANDS NEXT
     if userInput in ["about"]:
@@ -405,7 +405,7 @@ What threshold would you like to use as differentiator?
         #rehashing of command lists
         txt.rehash()
 
-    elif userInput in ["q", "quit", "exit"]:
+    elif userInput in ["quit", "exit"]:
         sys.exit()
 
     elif userInput in ["jellyfish"]:
