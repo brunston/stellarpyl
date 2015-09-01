@@ -86,13 +86,8 @@ def intensityN(img, data, reg, threshold = 127,r=1):
 
                             newValue = pixel[0]+pixel[1]+pixel[2]
                             #to ensure we don't reset a value instead of adding:
-                            if xpixel in intensities:
-                                intensities[xpixel] = \
-                                                    intensities[xpixel] + \
-                                                    newValue
-                            else:
-                                intensities[xpixel] = newValue
-                                intensities[xpixel] -= back
+                            to.addElement(intensities, xpixel, newValue)
+                            intensities[xpixel] -= back
         to.pbar(xpixel/upperx) #progress bar
     
     if v=='yes': print("intensities:", intensities)
@@ -148,12 +143,7 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
                             if v=='yes': print("value being added:",newValue)
 
                             #to ensure we don't reset a value instead of adding:
-                            if xpixel in intensities:
-                                intensities[xpixel] = \
-                                                    intensities[xpixel] + \
-                                                    newValue
-                            else:
-                                intensities[xpixel] = newValue
+                            to.addElement(intensities, xpixel, newValue)
 
                             intensities[xpixel] -= percent * back
         to.pbar(xpixel/upperx) #progress bar
@@ -193,19 +183,17 @@ def intensitySAANB(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
         upperLimitX, lowerLimitX = x + (step/2), x - (step/2)
 
         for y2 in np.arange(lowery,uppery,1):
+            #a refers to a point (a,b) on the perp line to mx+c passing thru
+            #both x and y2
             a = ((y2 - y) / n) + x
             ulima, llima = math.floor(a + (step/2)), math.ceil(a - (step/2))
-            ulimaNR,llimaNR = a + (step/2), a - (step/2) #NR = No Rounding
+            ulimaNR, llimaNR = a + (step/2), a - (step/2) #NR = No Rounding
 
             for x2 in np.arange(lowerx,upperx,1):
 
                 if (x2 < ulima) and (x2 > llima):
                     pixel = img.getpixel((x2,y2))
-
-                    if x2 in intensities:
-                        intensities[x2] = intensities[x2] + pixel
-                    else:
-                        intensities[x2] = pixel
+                    to.addElement(intensities, x2, pixel)
 
                 if (x2 == ulima) or (x2 == llima):
                     pixel = img.getpixel((x2,y2))
@@ -226,11 +214,7 @@ def intensitySAANB(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
 
                     percentage = subpixelCounter / totalPossibleSubpixels
                     newValue = pixel * percentage
-
-                    if x2 in intensities:
-                        intensities[x2] = intensities[x2] + pixel
-                    else:
-                        intensities[x2] = pixel
+                    to.addElement(intensities, x2, newValue)
 
         to.pbar(xpixel/upperx) #progress bar
 

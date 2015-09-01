@@ -8,7 +8,7 @@ This program comes with absolutely no warranty.
 import time
 
 def welcome():
-	print("""
+    print("""
 Welcome to stellarPYL, Copyright (C) 2015 Brunston Poon, type 'licence' for info
 
 Type 'quit' or 'exit' to leave the program. Use ctrl-c to force-interrupt.
@@ -20,18 +20,18 @@ TO LEARN MORE ABOUT THIS PROGRAM, TYPE 'about'.
 Help and information is also available online at http://st.bpbp.xyz/
 or by viewing README.md
             """)
-	return None
+    return None
 
 def firstrun():
-	print("""
+    print("""
 SINCE this is your first time running the program, please take the time to read
 the about, help, and commands documentation to familiarize yourself with this
-program. For your convenience, I'm loading the commands below.
+program. For your convenience, press enter to view the commands now.
         """)
-	return None
+    return None
 
 def about():
-	print("""
+    print("""
 This is stellar spectra reduction and analysis command-line software written
 using the Python 3.4 version of the Anaconda Scientific Python distribution. It 
 is work done for an internship at the Unversity of Hawaii in conjunction with 
@@ -47,10 +47,10 @@ intensity plot.
 
 It is written by Brunston Poon. 
             """)
-	return None
+    return None
 
 def help():
-	print("""
+    print("""
 
 AS AN ALTERNATIVE TO THE BELOW, make sure you set a default threshold using
 'settings_threshold', and then simply type 'auto' to have the program do
@@ -87,10 +87,10 @@ The program will graph this intensity plot, which can be saved using the tools
 already provided by matplotlib.
 
             """)
-	return None
+    return None
 
 def commands():
-	print("""
+    print("""
             ---IMAGE PROCESSING---
 - 'autoProcess' (short 'auto') -
 autoProcess will take care of cropping and doing intensity plotting for you.
@@ -179,29 +179,29 @@ sets verboseness. 'yes' to include debug statements, 'no' is default.
 view your current settings
 
             """)
-	return None
+    return None
 
 def rehash():
-	print("""
+    print("""
 Type 'quit' or 'exit' to leave this program. Alternately, you may use
 ctrl-c to force-interrupt at any time. Type 'help' for sample workflow,
 'commands' for a list of functions and commands, and 'about' for more info.
             """)
-	return None
+    return None
 
 def viewSettings(config):
-	print("Current settings:")
-	print("default threshold: ", config['CONTROL']['defaultthreshold'])
-	print("autoIntensity: ", config['CONTROL']['autointensity'])
-	print("manual override top crop:", config['CONTROL']['manualtop'])
-	print("manual override bottom crop:", config['CONTROL']['manualbot'])
-	print("manual override left crop:", config['CONTROL']['manualleft'])
-	print("manual override right crop:", config['CONTROL']['manualright'])
-	print("step:", config['CONTROL']['r'])
-	print("verbose:", config['CONTROL']['verbose'])
-	print("showthresh:", config['CONTROL']['showthresh'])
-	print("margin:",config['CONTROL']['margin'])
-	return None
+    print("Current settings:")
+    print("default threshold: ", config['CONTROL']['defaultthreshold'])
+    print("autoIntensity: ", config['CONTROL']['autointensity'])
+    print("manual override top crop:", config['CONTROL']['manualtop'])
+    print("manual override bottom crop:", config['CONTROL']['manualbot'])
+    print("manual override left crop:", config['CONTROL']['manualleft'])
+    print("manual override right crop:", config['CONTROL']['manualright'])
+    print("step:", config['CONTROL']['r'])
+    print("verbose:", config['CONTROL']['verbose'])
+    print("showthresh:", config['CONTROL']['showthresh'])
+    print("margin:",config['CONTROL']['margin'])
+    return None
 
 def licence():
   print("""
@@ -290,7 +290,7 @@ modification follow.
   return None
 
 def jellyfish():
-	print("""
+    print("""
                 
                                         (hello!)
                                       .'
@@ -307,11 +307,11 @@ def jellyfish():
               \ \   /\ \   \ \  /\ \   { {
                } } { { \ \  \ \/ / \ \  \ \.
               / /   } }  \ \ }{ {    \ \ } }
-             / /   { {     \ \{\ \    } { {
-            / /     } }     } } \  / / \ \ \.
+             / /   { {    \ \{\ \    } { {
+            / /     } }     } \ \  / / \ \ \.
            `-'     { {     `-'\ \`-'/ /   `-'
                     `-'        `-' `-'
 
                     unknown artist
                 """)
-	return "jellyfish"
+    return "jellyfish"

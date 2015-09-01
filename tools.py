@@ -95,6 +95,16 @@ def restorer(arrayToConvert, fname):
 
     return None
 
+def addElement(dictn, element, value):
+    """
+    adds value to element in dictionary dictn. if already present, adds value
+    to existing value of element
+    """
+    if element in dictn:
+        dictn[element] = dictn[element] + value
+    else:
+        dictn[element] = value
+
 def pixelDistribution(data):
     """
     Creates a plot which shows the relative pixel distribution of data given

@@ -56,7 +56,7 @@ if toggle == True:
 
     if firstrun in ["yes"]:
         txt.firstrun()
-        time.sleep(15)
+        userInput = input(">> ")
         txt.commands()
         config['CONTROL']['firstrun'] = "no"
         with open('settings.ini', 'w') as cfile:
