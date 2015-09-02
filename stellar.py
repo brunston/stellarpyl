@@ -172,7 +172,7 @@ def intensitySAANB(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     back = backMedian(img, threshold)
 
     if v=='yes': print("backMedian:", back)
-    print("running intensitySAAN")
+    print("running intensitySAANB")
 
     intensities = {} #this is a dictionary.
     angle = np.arctan(m)

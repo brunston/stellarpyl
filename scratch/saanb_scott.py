@@ -47,20 +47,20 @@ SAMPLING_FACTOR = 0.50
 # For all the pixels in our image... 
 for x in np.arange(x1, x2, SAMPLING_FACTOR):
     for y in np.arange(y1, y2, SAMPLING_FACTOR):
-       # For all the perpendiculars to our long axis.
-       for perp in perpendiculars:   
-           # Determine if x is between the lines around the perpendicular.
-           if x > inverseF(n, y, perp[2]) and x < inverseF(n, y, perp[3]):
-              pixel = image.getpixel((math.floor(x), math.floor(y)))
-              intensity = (pixel[0] + pixel[1] + pixel[2]) * SAMPLING_FACTOR
-              p = perp[0]
-              
-              # If we have a value for this x value (known as p) on our long axis, then add it to what we've got.
-              # Remember that the same p value will be picked for multiple intensities since we are using fractional nx's.
-              if p in intensities:
-                 intensities[p] = intensities[p] + intensity
-              else:
-                 intensities[p] = intensity
+        # For all the perpendiculars to our long axis.
+        for perp in perpendiculars:   
+            # Determine if x is between the lines around the perpendicular.
+            if x > inverseF(n, y, perp[2]) and x < inverseF(n, y, perp[3]):
+                pixel = image.getpixel((math.floor(x), math.floor(y)))
+                intensity = (pixel[0] + pixel[1] + pixel[2]) * SAMPLING_FACTOR
+                p = perp[0]
+
+                # If we have a value for this x value (known as p) on our long axis, then add it to what we've got.
+                # Remember that the same p value will be picked for multiple intensities since we are using fractional nx's.
+                if p in intensities:
+                    intensities[p] = intensities[p] + intensity
+                else:
+                    intensities[p] = intensity
 
 # Graph our intensity plot.
 for graphx in intensities.keys():
