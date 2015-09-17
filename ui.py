@@ -146,6 +146,13 @@ We need a file. Place it in the same directory as this script and give the name.
                 timePause2s = time.time()
                 sys.stdout = sys.__stdout__
 
+            if autoIntensity in ['saans']:
+                print("working on intensity_saans. please wait...")
+                sys.stdout = open("foo.log", "w")
+                intensity = st.intensitySAANS(croppedimg,dataArray,regTup,\
+                                             threshI,step,10)
+                sys.stdout = sys.__stdout__
+
             if autoIntensity in ['n']:
                 print("working on intensity_n. please wait...")
                 intensity = st.intensityN(croppedimg,dataArray,regTup,\
@@ -189,7 +196,7 @@ AVAILABLE OPTIONS: 'saa' (spatial anti-aliasing), 'n' (naive). Default is 'saa'.
 
         query = input("Set default autoProcess intensity> ")
 
-        if query in ['saa', 'n', 'saanb']:
+        if query in ['saa', 'n', 'saanb','saans']:
             config['CONTROL']['autointensity'] = query
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
