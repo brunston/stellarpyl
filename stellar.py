@@ -231,14 +231,20 @@ def intensitySAANS(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     """
     temp imp SAANB
     """
+    x1, y1, x2, y2 = img.getbbox()
+    m, c = reg[0:2]
+    n = -1 / m
+    back = backMedian(img, threshold)
+    WIDTH = 3
+    perpendiculars = []    
     for p in np.arange(x1, x2, 0.1):
     # Calculate the corresponding y coordinate to p (called q) on our long axis, from our regression, where y = mx + b.
     # (p, q) is a point on our long axis.
-    q = m * p + c
-    # Slope of perpendicular is -1 / m, it's Y intercept is the value of the function at p.
-    perp_m = -1 / m
-    perp_c = q
-    perpendiculars.append((p, perp_c, parallel(perp_m, perp_c, -WIDTH), parallel(perp_m, perp_c, WIDTH)))
+        q = m * p + c
+        # Slope of perpendicular is -1 / m, it's Y intercept is the value of the function at p.
+        perp_m = -1 / m
+        perp_c = q
+        perpendiculars.append((p, perp_c, parallel(perp_m, perp_c, -WIDTH), parallel(perp_m, perp_c, WIDTH)))
     SAMPLING_FACTOR = 0.50
     for x in np.arange(x1, x2, SAMPLING_FACTOR):
         for y in np.arange(y1, y2, SAMPLING_FACTOR):
