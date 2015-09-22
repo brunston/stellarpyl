@@ -229,7 +229,16 @@ def inverseF(m, y, b):
 
 def intensitySAANS(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     """
-    temp imp SAANB
+    intensitySAANS is the seventh iteration of the intensity function which aims
+    to deal with the plotting of regressed non-orthogonal spectra given in
+    an open image img, the pixel data in data, and a regArray generated
+    using regression().
+    SAA - spatial antialiasing; Ns - new, scott method
+    Returns a dictionary where key is x value and y value is intensity.
+    r is the step rate along the spectral trace (default to size of one pixel)
+    twidth is the width of the trace on each side of the line y = mx + c
+    so the total will be double
+    spss is the subpixel sampling size
     """
     x1, y1, x2, y2 = img.getbbox()
     m, c = reg[0:2]
@@ -263,8 +272,8 @@ def intensitySAANS(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
                     else:
                         intensities[p] = intensity
     for graphx in intensities.keys():
-    a.append(graphx)
-    b.append(intensities[graphx])
+        a.append(graphx)
+        b.append(intensities[graphx])
 
 
     x, y = np.array(a), np.array(b)
@@ -272,6 +281,46 @@ def intensitySAANS(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     plt.show()
     return None
 
+def intensitySAAW(img, data, reg, threshold=127, r=1,\
+                  twidth=10, binwidth=1, spss=0.5):
+    """
+    intensitySAANB is the sixth iteration of the intensity function which aims
+    to deal with the plotting of regressed non-orthogonal spectra given in
+    an open image img, the pixel data in data, and a regArray generated
+    using regression().
+    SAA - spatial antialiasing; W - np.where method
+    Returns a dictionary where key is x value and y value is intensity.
+    r is the step rate along the spectral trace (default to size of one pixel)
+    twidth is the width of the trace on each side of the line y = mx + c
+    so the total will be double
+    spss is the subpixel sampling size
+    """
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    m, c = reg[0:2]
+    n = -1 / m
+    back = backMedian(img, threshold)
+
+    xvals = np.arange(lowerx, upperx, spss)
+    #we want processing to begin in the lower-left corner.
+    yvals = np.arange(-uppery, lowery, -1.0*spss)
+
+    #map generation - 1st dimension in 2d ndarray is y, explaining weird tuple
+    xMap = np.ones((len(yvals),len(xvals)))
+    yMap = np.ones((len(yvals),len(xvals)))
+    for i in range(len(yvals)):
+        xMap[i,:] = xMap[i,:] * xvals
+    for i in range(len(xvals)):
+        yMap[:,i] = yMap[:,i] * yvals
+
+    #map pixels in sub-pixel step size to their respective large pixel
+    #i.e. 1.2, 1.3, 1.9 map to pixels 1, 1, and 2 respectively
+    xMapOnto = xMap.astype(int)
+    yMapOnto = yMap.astype(int)
+
+    offsetTrace = binwidth * np.sqrt(m**2 + 1) / m
+    offsetVertical = twidth * np.sqrt(m**2 + 1)
+
+    binwidthAdjusted = binwidth / np.sqrt(m**2+1)
 
 def sumGenerator(data):
     """

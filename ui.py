@@ -112,6 +112,12 @@ We need a file. Place it in the same directory as this script and give the name.
             if showthresh == "yes":
                 to.showThreshold(dataArray, threshI)
 
+            #TESTFORGEOFFCODE
+            # test = Image.open("cropped.tiff")
+            # tdataArray = to.converter("cropped.tiff")
+            # tregTup = st.regression(test)
+            # intensity = st.intensityWHERE(test,tdataArray,tregTup,\
+            #                               threshI,step)
             timePause0s = time.time()
 
             print("working on crop. please wait...")
