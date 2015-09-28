@@ -321,6 +321,23 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
     offsetVertical = twidth * np.sqrt(m**2 + 1)
 
     binwidthAdjusted = binwidth / np.sqrt(m**2+1)
+    testXSize = upperx
+
+    #I fixed the bin calculation requiremnts (added np.ceil)
+    pArray = np.zeros(np.ceil((testXsize+1-binWidth/2.0)/binWidth))
+    qArray = np.zeros(np.ceil((testXsize+1-binWidth/2.0)/binWidth))
+    spec1D = np.zeros(np.ceil((testXsize+1-binWidth/2.0)/binWidth))
+
+    i = 0
+    for p in np.arange(0.0 + binwidth/2.0, testXSize + 1, binwidth):
+        #calculate the y coord of p using our regression y=mx+c
+        q = m * p + c
+        # Slope of perp is -1 / m, Y intercept is the value of the function at p
+        perp_m = -1 / m
+        perp_c = q + p/m
+
+
+        i += 1
 
 def sumGenerator(data):
     """
