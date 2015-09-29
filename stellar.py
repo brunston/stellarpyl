@@ -5,7 +5,7 @@ Copyright (c) 2015 Brunston Poon
 @file: stellar
 This program comes with absolutely no warranty.
 """
-
+#TODO box apprx 15x5x5 or larger for emission lamp work
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
@@ -89,7 +89,7 @@ def intensityN(img, data, reg, threshold = 127,r=1):
                             to.addElement(intensities, xpixel, newValue)
                             intensities[xpixel] -= back
         to.pbar(xpixel/upperx) #progress bar
-    
+
     if v=='yes': print("intensities:", intensities)
 
     return intensities
@@ -105,7 +105,7 @@ def intensitySAAN(img, data, reg, threshold=127, r=1):
     value is intensity.
     r is the step rate along the spectral trace (default to size of one pixel)
     """
-    
+
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     n = -1 / m
@@ -165,7 +165,7 @@ def intensitySAANB(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     so the total will be double
     spss is the subpixel sampling size
     """
-    
+
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     n = -1 / m
@@ -245,7 +245,7 @@ def intensitySAANS(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     n = -1 / m
     back = backMedian(img, threshold)
     WIDTH = 3
-    perpendiculars = []    
+    perpendiculars = []
     for p in np.arange(x1, x2, 0.1):
     # Calculate the corresponding y coordinate to p (called q) on our long axis, from our regression, where y = mx + b.
     # (p, q) is a point on our long axis.
@@ -258,7 +258,7 @@ def intensitySAANS(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     for x in np.arange(x1, x2, SAMPLING_FACTOR):
         for y in np.arange(y1, y2, SAMPLING_FACTOR):
             # For all the perpendiculars to our long axis.
-            for perp in perpendiculars:   
+            for perp in perpendiculars:
                 # Determine if x is between the lines around the perpendicular.
                 if x > inverseF(n, y, perp[2]) and x < inverseF(n, y, perp[3]):
                     pixel = image.getpixel((math.floor(x), math.floor(y)))
@@ -284,7 +284,7 @@ def intensitySAANS(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
 def intensitySAAW(img, data, reg, threshold=127, r=1,\
                   twidth=10, binwidth=1, spss=0.5):
     """
-    intensitySAANB is the sixth iteration of the intensity function which aims
+    intensitySAAW is the eighth iteration of the intensity function which aims
     to deal with the plotting of regressed non-orthogonal spectra given in
     an open image img, the pixel data in data, and a regArray generated
     using regression().
@@ -309,35 +309,50 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
     yMap = np.ones((len(yvals),len(xvals)))
     for i in range(len(yvals)):
         xMap[i,:] = xMap[i,:] * xvals
+        to.pbar(i/len(yvals))
     for i in range(len(xvals)):
         yMap[:,i] = yMap[:,i] * yvals
+        to.pbar(i/len(xvals))
 
     #map pixels in sub-pixel step size to their respective large pixel
     #i.e. 1.2, 1.3, 1.9 map to pixels 1, 1, and 2 respectively
-    xMapOnto = xMap.astype(int)
-    yMapOnto = yMap.astype(int)
+    xMapInt = xMap.astype(int)
+    yMapInt = yMap.astype(int)
 
     offsetTrace = binwidth * np.sqrt(m**2 + 1) / m
     offsetVertical = twidth * np.sqrt(m**2 + 1)
 
     binwidthAdjusted = binwidth / np.sqrt(m**2+1)
-    testXSize = upperx
+    xSize = upperx
 
     #I fixed the bin calculation requiremnts (added np.ceil)
-    pArray = np.zeros(np.ceil((testXsize+1-binWidth/2.0)/binWidth))
-    qArray = np.zeros(np.ceil((testXsize+1-binWidth/2.0)/binWidth))
-    spec1D = np.zeros(np.ceil((testXsize+1-binWidth/2.0)/binWidth))
+    pArray = np.zeros(np.ceil((xSize+1-binwidth/2.0)/binwidth))
+    qArray = np.zeros(np.ceil((xSize+1-binwidth/2.0)/binwidth))
+    intensities = np.zeros(np.ceil((xSize+1-binwidth/2.0)/binwidth))
 
     i = 0
-    for p in np.arange(0.0 + binwidth/2.0, testXSize + 1, binwidth):
+    for p in np.arange(0.0 + binwidth/2.0, xSize + 1, binwidth):
         #calculate the y coord of p using our regression y=mx+c
         q = m * p + c
         # Slope of perp is -1 / m, Y intercept is the value of the function at p
         perp_m = -1 / m
         perp_c = q + p/m
 
+        pArray[i] = p
+        qArray[i] = q
+        print(i,p,q)
+        include = np.where((yMap < ((-1.0/m)*xMap + perp_c + offsetTrace)) & \
+                           (yMap >= ((-1.0/m)*xMap + perp_c - offsetTrace)) & \
+                           (yMap < (m*xMap + c + offsetVertical)) & \
+                           (yMap >= (m*xMap + c - offsetVertical)))
+        #map sub-pixels back to full pixels
+        includedValues = img[[2-yMapInt[include], xMapInt[include]]]
+        intensities[i] = np.sum(includedValues) #1d array of our spectra values
 
         i += 1
+        to.pbar(p/(xSize+1))
+
+    return intensities
 
 def sumGenerator(data):
     """
@@ -419,7 +434,7 @@ def cropN(image, threshold,\
 
     if v=='yes':
         print("lx,ux,ly,uy:{0},{1},{2},{3}".format(lowerx,upperx,lowery,uppery))
-    
+
     #making sure we will not go out of bounds
     for thing in (lowerx, lowery):
         if not ((thing - margin) < 0):

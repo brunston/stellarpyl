@@ -92,7 +92,7 @@ while toggle == True:
         txt.commands()
     if userInput in ["licence", "license"]:
         txt.licence()
-    
+
     #AUTOPROCESS
     if userInput in ['autoProcess', 'auto']:
         print("""
@@ -159,6 +159,16 @@ We need a file. Place it in the same directory as this script and give the name.
                                              threshI,step,10)
                 sys.stdout = sys.__stdout__
 
+            if autoIntensity in ['saaw']:
+                print("working on intensity_saans. please wait...")
+                sys.stdout = open("foo.log", "w")
+                intensity = st.intensitySAAW(croppedimg,dataArray,regTup,\
+                                             threshI,step,10)
+                timePause2 = time.time()
+                to.plotIntensity(intensity)
+                timePause2s = time.time()
+                sys.stdout = sys.__stdout__
+
             if autoIntensity in ['n']:
                 print("working on intensity_n. please wait...")
                 intensity = st.intensityN(croppedimg,dataArray,regTup,\
@@ -197,12 +207,18 @@ We need a file. Place it in the same directory as this script and give the name.
     if userInput in ["settings_intensity"]:
         print("""
 sets default intensity processing method for the autoProcess feature.
-AVAILABLE OPTIONS: 'saa' (spatial anti-aliasing), 'n' (naive). Default is 'saa'.
+AVAILABLE OPTIONS:
+'saa' (spatial anti-aliasing),
+'n' (naive),
+'saanb',
+'saans' (dev, do not use),
+'saaw' (width-adjustable).
+Default is 'saa'.
             """)
 
         query = input("Set default autoProcess intensity> ")
 
-        if query in ['saa', 'n', 'saanb','saans']:
+        if query in ['saa', 'n', 'saanb','saans','saaw']:
             config['CONTROL']['autointensity'] = query
             with open('settings.ini', 'w') as cfile:
                 config.write(cfile)
@@ -348,7 +364,7 @@ We need a file. Place it in the same directory as this script and give the name.
         print("converting. please wait...")
         img = Image.open(path)
         dataArray = to.converter(path)
-        
+
         if defThresh in ['-1']:
             print("""
 Your answer to the following depends for all commands except 'pixel_d'.
