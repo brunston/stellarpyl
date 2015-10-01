@@ -165,7 +165,7 @@ We need a file. Place it in the same directory as this script and give the name.
                 intensity = st.intensitySAAW(croppedimg,dataArray,regTup,\
                                              threshI,step,10)
                 timePause2 = time.time()
-                to.plotIntensity(intensity)
+                to.plotIntensityW(intensity)
                 timePause2s = time.time()
                 sys.stdout = sys.__stdout__
 

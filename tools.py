@@ -242,7 +242,7 @@ def plotIntensityW(intensity, linetype='b-'):
     Plots an intensity graph with connected points for SAAW
     """
     plotx, ploty = [], []
-    for x in intensity.keys():
+    for x in intensity:
         plotx.append(x)
         ploty.append(intensity[x])
     plotxn, plotyn = np.array(plotx), np.array(ploty)
