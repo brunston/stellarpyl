@@ -216,7 +216,7 @@ def showWalks(img, reg, centerpoint=70, r=1):
     plt.show()
 
     return None
-    
+
 def plotIntensity(intensity, linetype='b-'):
     """
     Plots an intensity graph with connected points
@@ -233,7 +233,27 @@ def plotIntensity(intensity, linetype='b-'):
     plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
     plt.savefig('intensity.png', bbox_inches='tight')
     plt.show()
-    
+
+    print("\nfigure saved to intensity.png")
+    return None
+
+def plotIntensityW(intensity, linetype='b-'):
+    """
+    Plots an intensity graph with connected points for SAAW
+    """
+    plotx, ploty = [], []
+    for x in intensity.keys():
+        plotx.append(x)
+        ploty.append(intensity[x])
+    plotxn, plotyn = np.array(plotx), np.array(ploty)
+
+    plt.figure(1)
+    plt.clf()
+    plt.plot(plotx, ploty, linetype)
+    plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
+    plt.savefig('intensity.png', bbox_inches='tight')
+    plt.show()
+
     print("\nfigure saved to intensity.png")
     return None
 

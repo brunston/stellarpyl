@@ -247,13 +247,15 @@ def intensitySAANS(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     WIDTH = 3
     perpendiculars = []
     for p in np.arange(x1, x2, 0.1):
-    # Calculate the corresponding y coordinate to p (called q) on our long axis, from our regression, where y = mx + b.
+    # Calculate the corresponding y coordinate to p (called q) on our long axis,
+    #from our regression, where y = mx + b.
     # (p, q) is a point on our long axis.
         q = m * p + c
-        # Slope of perpendicular is -1 / m, it's Y intercept is the value of the function at p.
+        # Slope of perpendicular is -1 / m, it's Y intercept is value at f(p).
         perp_m = -1 / m
         perp_c = q
-        perpendiculars.append((p, perp_c, parallel(perp_m, perp_c, -WIDTH), parallel(perp_m, perp_c, WIDTH)))
+        perpendiculars.append((p, perp_c, parallel(perp_m, perp_c, -WIDTH),\
+                               parallel(perp_m, perp_c, WIDTH)))
     SAMPLING_FACTOR = 0.50
     for x in np.arange(x1, x2, SAMPLING_FACTOR):
         for y in np.arange(y1, y2, SAMPLING_FACTOR):
@@ -265,8 +267,10 @@ def intensitySAANS(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
                     intensity = (pixel[0] + pixel[1] + pixel[2]) * SAMPLING_FACTOR
                     p = perp[0]
 
-                    # If we have a value for this x value (known as p) on our long axis, then add it to what we've got.
-                    # Remember that the same p value will be picked for multiple intensities since we are using fractional nx's.
+                    # If we have a value for this x value (known as p) on our
+                    #long axis, then add it to what we've got.
+                    # Remember that the same p value will be picked for
+                    #multiple intensities since we are using fractional nx's.
                     if p in intensities:
                         intensities[p] = intensities[p] + intensity
                     else:
@@ -346,7 +350,7 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
                            (yMap < (m*xMap + c + offsetVertical)) & \
                            (yMap >= (m*xMap + c - offsetVertical)))
         #map sub-pixels back to full pixels
-        includedValues = img[[2-yMapInt[include], xMapInt[include]]]
+        includedValues = data[[2-yMapInt[include], xMapInt[include]]]
         intensities[i] = np.sum(includedValues) #1d array of our spectra values
 
         i += 1
