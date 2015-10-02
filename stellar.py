@@ -307,22 +307,24 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
     xvals = np.arange(lowerx, upperx, spss)
     #we want processing to begin in the lower-left corner.
     yvals = np.arange(-uppery, lowery, -1.0*spss)
+    print("xvals:",xvals)
+    print("yvals:",yvals)
 
     #map generation - 1st dimension in 2d ndarray is y, explaining weird tuple
     xMap = np.ones((len(yvals),len(xvals)))
     yMap = np.ones((len(yvals),len(xvals)))
     for i in range(len(yvals)):
         xMap[i,:] = xMap[i,:] * xvals
-        to.pbar(i/len(yvals))
+        #to.pbar(i/len(yvals))
     for i in range(len(xvals)):
         yMap[:,i] = yMap[:,i] * yvals
-        to.pbar(i/len(xvals))
-
+        #to.pbar(i/len(xvals))
+    print("ymap:",yMap)
     #map pixels in sub-pixel step size to their respective large pixel
     #i.e. 1.2, 1.3, 1.9 map to pixels 1, 1, and 2 respectively
     xMapInt = xMap.astype(int)
     yMapInt = yMap.astype(int)
-
+    print("ymapInt:",yMapInt)
     offsetTrace = binwidth * np.sqrt(m**2 + 1) / m
     offsetVertical = twidth * np.sqrt(m**2 + 1)
 
@@ -351,6 +353,8 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
                            (yMap >= (m*xMap + c - offsetVertical)))
         #map sub-pixels back to full pixels
         includedValues = data[[2-yMapInt[include], xMapInt[include]]]
+
+        #NB! UNLIKE BEFORE, INTENSITIES IS NOT A DICTIONARY, IT IS A 1d ARRAY
         intensities[i] = np.sum(includedValues) #1d array of our spectra values
 
         i += 1
