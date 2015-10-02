@@ -1,0 +1,5 @@
+found the problem
+Line 309 in stellar.py
+yvals = np.arange(-uppery, lowery, -1.0*spss)
+results in an empty array, so yMap and yMapInt are also both empty arrays.
+Not throwing errors because all the operations are happening on an empty array.
