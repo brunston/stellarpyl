@@ -306,7 +306,7 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
 
     xvals = np.arange(lowerx, upperx, spss)
     #we want processing to begin in the lower-left corner.
-    yvals = np.arange(-uppery, lowery, -1.0*spss)
+    yvals = np.arange(lowery, uppery, spss)
     print("xvals:",xvals)
     print("yvals:",yvals)
 
