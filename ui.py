@@ -81,7 +81,8 @@ while toggle == True:
     prgmCommands = ("pixel_d", "image_regression", \
                     "intensity_n", "intensity_saa", \
                     "pd", "imgreg", "saa", "n", "crop", "show_threshold",\
-                    "show_regression", "show_walks", "dev_cgrowth")
+                    "show_regression", "show_walks", "dev_cgrowth", "saaw")
+                    #REMOVE DEV_CGROWTH AND SAAW
 
     userInput = input(">> ")
 
@@ -162,17 +163,21 @@ We need a file. Place it in the same directory as this script and give the name.
                 sys.stdout = sys.__stdout__
 
             if autoIntensity in ['saaw']:
-                print("working on intensity_saans. please wait...")
+                print("working on intensity_saaw. please wait...")
                 sys.stdout = open("foo.log", "w")
+                np.set_printoptions(suppress=True,threshold=65536)
                 #TEMPORARY
                 # intensity = ss.intensityWHERE(croppedimg,dataArray,regTup,\
                 #                               threshI,step,10)
                 intensity = st.intensitySAAW(croppedimg,dataArray,regTup,\
                                              threshI,step,10)
-
                 timePause2 = time.time()
                 to.plotIntensityW(intensity)
                 timePause2s = time.time()
+                #TEMPORARY
+                np.set_printoptions(edgeitems=3,infstr='inf',\
+                                    linewidth=75,nanstr='nan',precision=8,\
+                                    suppress=False,threshold=1000,formatter=None)
                 sys.stdout = sys.__stdout__
 
             if autoIntensity in ['n']:
@@ -388,6 +393,27 @@ What threshold would you like to use as differentiator?
             regTup = st.regression(img)
             intensity = st.intensitySAAN(img,dataArray,regTup,threshI,step)
             to.plotIntensity(intensity)
+
+        #TEMPORARY, need to document
+        if userInput in ["saaw"]:
+            print("working on intensity_saaw. please wait...")
+
+            regTup = st.regression(img)
+            sys.stdout = open("foo.log", "w")
+            np.set_printoptions(suppress=True,threshold=65536)
+            #TEMPORARY
+            # intensity = ss.intensityWHERE(croppedimg,dataArray,regTup,\
+            #                               threshI,step,10)
+            intensity = st.intensitySAAW(img,dataArray,regTup,\
+                                         threshI,step,10)
+            timePause2 = time.time()
+            to.plotIntensityW(intensity)
+            timePause2s = time.time()
+            #TEMPORARY
+            np.set_printoptions(edgeitems=3,infstr='inf',\
+                                linewidth=75,nanstr='nan',precision=8,\
+                                suppress=False,threshold=1000,formatter=None)
+            sys.stdout = sys.__stdout__
 
         if userInput in ["intensity_n", "n"]:
             print("working on intensity_n. please wait...")
