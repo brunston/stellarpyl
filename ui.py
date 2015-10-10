@@ -44,6 +44,8 @@ Please install before continuing.""")
 import stellar as st
 import tools as to
 import text as txt
+#TEMPORARY
+import samplingsample as ss
 #END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT
 
 
@@ -162,8 +164,12 @@ We need a file. Place it in the same directory as this script and give the name.
             if autoIntensity in ['saaw']:
                 print("working on intensity_saans. please wait...")
                 sys.stdout = open("foo.log", "w")
+                #TEMPORARY
+                # intensity = ss.intensityWHERE(croppedimg,dataArray,regTup,\
+                #                               threshI,step,10)
                 intensity = st.intensitySAAW(croppedimg,dataArray,regTup,\
                                              threshI,step,10)
+
                 timePause2 = time.time()
                 to.plotIntensityW(intensity)
                 timePause2s = time.time()
