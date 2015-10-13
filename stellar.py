@@ -350,10 +350,11 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
         qArray[i] = q
         print(i,p,q)
 
-        offsetHorizontalPositive = (perp_m*xMap + perp_c + offsetTrace)
-        offsetHorizontalNegative = (perp_m*xMap + perp_c - offsetTrace)
-        offsetVerticalPositive = (m*xMap + c + offsetVertical)
-        offsetVerticalNegative = (m*xMap + c - offsetVertical)
+        offsetHorizontalPositive = (perp_m*xMapInt + perp_c + offsetTrace)
+        offsetHorizontalNegative = (perp_m*xMapInt + perp_c - offsetTrace)
+        offsetVerticalPositive = (m*xMapInt + c + offsetVertical)
+        offsetVerticalNegative = (m*xMapInt + c - offsetVertical)
+
         include = np.where((yMap < offsetHorizontalPositive) & \
                            (yMap >= offsetHorizontalNegative) & \
                            (yMap < offsetVerticalPositive) & \
