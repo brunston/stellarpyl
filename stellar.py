@@ -15,6 +15,7 @@ import tools as to
 import pdb
 import sys
 import configparser
+import time
 
 import math
 import statistics
@@ -307,69 +308,83 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
     xvals = np.arange(lowerx, upperx, spss)
     #we want processing to begin in the lower-left corner.
     yvals = np.arange(lowery, uppery, spss)
-    print("xvals:",xvals)
-    print("yvals:",yvals)
+    # print("xvals:",xvals)
+    # print("yvals:",yvals)
 
     #map generation - 1st dimension in 2d ndarray is y, explaining weird tuple
     xMap = np.ones((len(yvals),len(xvals)))
     yMap = np.ones((len(yvals),len(xvals)))
+    ti = time.time()
     for i in range(len(yvals)):
         xMap[i,:] = xMap[i,:] * xvals
-        #to.pbar(i/len(yvals))
+        to.pbar(i/len(yvals))
     for i in range(len(xvals)):
         yMap[:,i] = yMap[:,i] * yvals
-        #to.pbar(i/len(xvals))
-    print("xMap:",xMap)
-    print("yMap:",yMap)
+        to.pbar(i/len(xvals))
+    tf = time.time()
+    print("map generation time:", tf-ti)
+    # print("xMap:",xMap)
+    # print("yMap:",yMap)
     #map pixels in sub-pixel step size to their respective large pixel
     #i.e. 1.2, 1.3, 1.9 map to pixels 1, 1, and 2 respectively
+    ti = time.time()
     xMapInt = xMap.astype(int)
     yMapInt = yMap.astype(int)
-    print("xMapInt:",xMapInt)
-    print("yMapInt:",yMapInt)
-    offsetTrace = binwidth * np.sqrt(m**2 + 1) / m
-    offsetVertical = twidth * np.sqrt(m**2 + 1)
+    tf = time.time()
+    print("map to int:",tf-ti)
+    # print("xMapInt:",xMapInt)
+    # print("yMapInt:",yMapInt)
+    offsetTrace = abs(binwidth * np.sqrt(m**2 + 1) / m)
+    offsetVertical = abs(twidth * np.sqrt(m**2 + 1))
+    # print("offsetTrace",offsetTrace)
+    # print("offsetVertical",offsetVertical)
 
     binwidthAdjusted = binwidth / np.sqrt(m**2+1)
     xSize = upperx
 
     #I fixed the bin calculation requiremnts (added np.ceil)
+    ti = time.time()
     pArray = np.zeros(np.ceil((xSize+1-binwidth/2.0)/binwidth))
     qArray = np.zeros(np.ceil((xSize+1-binwidth/2.0)/binwidth))
     intensities = np.zeros(np.ceil((xSize+1-binwidth/2.0)/binwidth))
-
+    tf = time.time()
+    print("zeros matrix generation:", tf-ti)
     i = 0
     for p in np.arange(0.0 + binwidth/2.0, xSize + 1, binwidth):
         #calculate the y coord of p using our regression y=mx+c
         q = m * p + c
         # Slope of perp is -1 / m, Y intercept is the value of the function at p
-        perp_m = -1 / m
+        perp_m = -1.0 / m
         perp_c = q + p/m
 
         pArray[i] = p
         qArray[i] = q
-        print(i,p,q)
+        # print(i,p,q)
 
-        offsetHorizontalPositive = (perp_m*xMapInt + perp_c + offsetTrace)
-        offsetHorizontalNegative = (perp_m*xMapInt + perp_c - offsetTrace)
-        offsetVerticalPositive = (m*xMapInt + c + offsetVertical)
-        offsetVerticalNegative = (m*xMapInt + c - offsetVertical)
+        offsetHorizontalPositive = (perp_m*xMap + perp_c + offsetTrace)
+        offsetHorizontalNegative = (perp_m*xMap + perp_c - offsetTrace)
+        offsetVerticalPositive = (m*xMap + c + offsetVertical)
+        offsetVerticalNegative = (m*xMap + c - offsetVertical)
 
+        # print("diffBetween",offsetHorizontalPositive-offsetHorizontalNegative)
+        timeI = time.time()
         include = np.where((yMap < offsetHorizontalPositive) & \
                            (yMap >= offsetHorizontalNegative) & \
                            (yMap < offsetVerticalPositive) & \
                            (yMap >= offsetVerticalNegative))
+        timeF = time.time()
+        print(timeF-timeI)
         #map sub-pixels back to full pixels
-        print("include:",include)
-        includedValues = data[[2-yMapInt[include], xMapInt[include]]]
-        print("includedValues:",includedValues)
+        # print("include:",include)
+        includedValues = data[[yMapInt[include], xMapInt[include]]]
+        # print("includedValues:",includedValues)
         #NB! UNLIKE BEFORE, INTENSITIES IS NOT A DICTIONARY, IT IS A 1d ARRAY
         intensities[i] = np.sum(includedValues) #1d array of our spectra values
 
         i += 1
-        #TEMPORARY
-        # to.pbar(p/(xSize+1))
-    print("intensities:\n",intensities)
+
+        #to.pbar(p/(xSize+1))
+    # print("intensities:\n",intensities)
     return intensities
 
 def sumGenerator(data):

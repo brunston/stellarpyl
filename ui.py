@@ -164,8 +164,8 @@ We need a file. Place it in the same directory as this script and give the name.
 
             if autoIntensity in ['saaw']:
                 print("working on intensity_saaw. please wait...")
-                sys.stdout = open("foo.log", "w")
-                np.set_printoptions(suppress=True,threshold=65536)
+                #sys.stdout = open("foo.log", "w")
+                # np.set_printoptions(suppress=True,threshold=65536)
                 #TEMPORARY
                 # intensity = ss.intensityWHERE(croppedimg,dataArray,regTup,\
                 #                               threshI,step,10)
@@ -175,10 +175,10 @@ We need a file. Place it in the same directory as this script and give the name.
                 to.plotIntensityW(intensity)
                 timePause2s = time.time()
                 #TEMPORARY
-                np.set_printoptions(edgeitems=3,infstr='inf',\
-                                    linewidth=75,nanstr='nan',precision=8,\
-                                    suppress=False,threshold=1000,formatter=None)
-                sys.stdout = sys.__stdout__
+                # np.set_printoptions(edgeitems=3,infstr='inf',\
+                #                     linewidth=75,nanstr='nan',precision=8,\
+                #                     suppress=False,threshold=1000,formatter=None)
+                #sys.stdout = sys.__stdout__
 
             if autoIntensity in ['n']:
                 print("working on intensity_n. please wait...")

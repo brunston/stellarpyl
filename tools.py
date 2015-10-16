@@ -242,9 +242,11 @@ def plotIntensityW(intensity, linetype='b-'):
     Plots an intensity graph with connected points for SAAW
     """
     plotx, ploty = [], []
-    for x in intensity:
+    i = 0
+    for x in range(len(intensity)):
         plotx.append(x)
         ploty.append(intensity[x])
+
     plotxn, plotyn = np.array(plotx), np.array(ploty)
 
     plt.figure(1)
@@ -255,6 +257,21 @@ def plotIntensityW(intensity, linetype='b-'):
     plt.show()
 
     print("\nfigure saved to intensity.png")
+    return None
+
+def plotSamples(intensity, reg, point=620.):
+    """
+    Plots samples for some point along the intensity given
+    """
+    lowerx, lowery, upperx, uppery = img.getbbox()
+    m, c = reg[0:2]
+    q = m * point + c
+
+    # perpendicular
+    plt.figure(5)
+    plt.clf()
+    plt.plot(point,q, color='white', marker='*', markersize=20)
+    plt.show()
     return None
 
 def plotRegression(reg):
