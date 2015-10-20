@@ -259,18 +259,80 @@ def plotIntensityW(intensity, linetype='b-'):
     print("\nfigure saved to intensity.png")
     return None
 
-def plotSamples(intensity, reg, point=620.):
+def plotSamples(img, intensity, reg, point=620.):
     """
     Plots samples for some point along the intensity given
     """
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     q = m * point + c
+    #TODO add plotSetting as well as other features from sampling sample
+    #  select a subset of the image to use, and scale it
+    xmin = 0
+    xmax = 1000
+    ymin = 700
+    ymax = 1100
+    # scaling
+    displayImg = (img[ymin:ymax,xmin:xmax] - \
+                  np.min(img[ymin:ymax,xmin:xmax]))**(0.25)
+
+    perp_m = -1.0 / m
+    perp_c = q + point/m
+
+    plotIntensityW(intensity)
+
+    xTrace = np.arange(1.0*xmin,xmax)
+    yTrace = m* xTrace + c
+
+    imgplot = plt.imshow(displayImg,zorder=0, extent = [xmin,xmax,ymin,ymax])
+    ax2 = plt.subplot(plotSetting)
+    ax2.plot(xTrace,yTrace, color='red')
+    plt.show()
 
     # perpendicular
-    plt.figure(5)
-    plt.clf()
-    plt.plot(point,q, color='white', marker='*', markersize=20)
+    ax3 = plt.subplot(plotSetting)
+    ax3.plot(point, q, color='white', marker='*', markersize=20)
+    plt.show()
+
+    xPerp = 1.0*np.arange(point - 20, point + 20)
+    yPerp = perp_m * xPerp + perp_c
+    ax4 = plt.subplot(plotSetting)
+    ax4.plot(xPerp, yPerp, color='red', linestyle='dashed')
+    plt.show()
+
+    yPerpHigh = yPerp + offsetTrace
+    ax5 = plt.subplot(plotSetting)
+    ax5.plot(xPerp, yPerpHigh, color='white', linestyle='dashed')
+    plt.show()
+
+    yPerpLow = yPerp - offsetTrace
+    ax6 = plt.subplot(plotSetting)
+    ax6.plot(xPerp, yPerpLow, color='white', linestyle='dashed')
+    plt.show()
+
+    yTraceHigh = yTrace + offsetVertical
+    ax7 = plt.subplot(plotSetting)
+    ax7.plot(xTrace, yTraceHigh, color='white', linestyle='dashed')
+    plt.show()
+
+    yTraceLow = yTrace - offsetVertical
+    ax8 = plt.subplot(plotSetting)
+    ax8.plot(xTrace, yTraceLow, color='white', linestyle='dashed')
+    plt.show()
+
+    #  show all nearby possible points
+    subpoints = np.where((np.abs(xMap - point) < 20) & (np.abs(yMap - q) < 20))
+    ax9 = plt.subplot(plotSetting)
+    ax9.scatter(xMap[subpoints], yMap[subpoints], color='black', marker='.')
+    plt.show()
+
+    #  show all points within the box
+    include = np.where((yMap < ((-1.0/m)*xMap + perp_c + offsetTrace)) & \
+                       (yMap >= ((-1.0/m)*xMap + perp_c - offsetTrace)) & \
+                       (yMap < (m*xMap + c + offsetVertical)) & \
+                       (yMap >= (m*xMap + c - offsetVertical)))
+    ax10 = plt.subplot(plotSetting)
+    ax10.scatter(xMap[include],yMap[include], color='red', marker='o')
     plt.show()
     return None
 

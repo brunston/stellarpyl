@@ -173,6 +173,7 @@ We need a file. Place it in the same directory as this script and give the name.
                                              threshI,step,10)
                 timePause2 = time.time()
                 to.plotIntensityW(intensity)
+                to.plotSamples(croppedimg,intensity,regTup)
                 timePause2s = time.time()
                 #TEMPORARY
                 # np.set_printoptions(edgeitems=3,infstr='inf',\
