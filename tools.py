@@ -266,15 +266,18 @@ def plotSamples(img, intensity, reg, point=620.):
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     q = m * point + c
+
+    plotSetting = 111
+
     #TODO add plotSetting as well as other features from sampling sample
     #  select a subset of the image to use, and scale it
     xmin = 0
     xmax = 1000
     ymin = 700
     ymax = 1100
-    # scaling
-    displayImg = (img[ymin:ymax,xmin:xmax] - \
-                  np.min(img[ymin:ymax,xmin:xmax]))**(0.25)
+    # # scaling
+    # displayImg = (img[ymin:ymax,xmin:xmax] - \
+    #               np.min(img[ymin:ymax,xmin:xmax]))**(0.25)
 
     perp_m = -1.0 / m
     perp_c = q + point/m
@@ -284,7 +287,7 @@ def plotSamples(img, intensity, reg, point=620.):
     xTrace = np.arange(1.0*xmin,xmax)
     yTrace = m* xTrace + c
 
-    imgplot = plt.imshow(displayImg,zorder=0, extent = [xmin,xmax,ymin,ymax])
+    imgplot = plt.imshow(img, zorder=0, extent = [xmin,xmax,ymin,ymax])
     ax2 = plt.subplot(plotSetting)
     ax2.plot(xTrace,yTrace, color='red')
     plt.show()
