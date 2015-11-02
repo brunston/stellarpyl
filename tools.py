@@ -266,15 +266,20 @@ def plotSamples(img, intensity, reg, point=620.):
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     q = m * point + c
-
+    cropRect = (lowerx, uppery, upperx, lowery)
+    img = img.crop(cropRect)
     plotSetting = 111
 
     #TODO add plotSetting as well as other features from sampling sample
     #  select a subset of the image to use, and scale it
     xmin = 0
     xmax = 1000
-    ymin = 700
-    ymax = 1100
+    ymin = 0
+    ymax = 55
+    xmin = lowerx
+    xmax = upperx
+    ymin = lowery
+    ymax = uppery
     # # scaling
     # displayImg = (img[ymin:ymax,xmin:xmax] - \
     #               np.min(img[ymin:ymax,xmin:xmax]))**(0.25)
