@@ -400,8 +400,8 @@ What threshold would you like to use as differentiator?
             print("working on intensity_saaw. please wait...")
 
             regTup = st.regression(img)
-            sys.stdout = open("foo.log", "w")
-            np.set_printoptions(suppress=True,threshold=65536)
+            # sys.stdout = open("foo.log", "w")
+            # np.set_printoptions(suppress=True,threshold=65536)
             #TEMPORARY
             # intensity = ss.intensityWHERE(croppedimg,dataArray,regTup,\
             #                               threshI,step,10)
@@ -409,12 +409,13 @@ What threshold would you like to use as differentiator?
                                          threshI,step,10)
             timePause2 = time.time()
             to.plotIntensityW(intensity)
+            to.plotSamples(img,intensity,regTup)
             timePause2s = time.time()
             #TEMPORARY
-            np.set_printoptions(edgeitems=3,infstr='inf',\
-                                linewidth=75,nanstr='nan',precision=8,\
-                                suppress=False,threshold=1000,formatter=None)
-            sys.stdout = sys.__stdout__
+            # np.set_printoptions(edgeitems=3,infstr='inf',\
+            #                     linewidth=75,nanstr='nan',precision=8,\
+            #                     suppress=False,threshold=1000,formatter=None)
+            # sys.stdout = sys.__stdout__
 
         if userInput in ["intensity_n", "n"]:
             print("working on intensity_n. please wait...")
@@ -439,7 +440,6 @@ What threshold would you like to use as differentiator?
 
             cropped = st.cropN(img, threshI, top, bottom, left, right, margin)
             filename = input("filename for cropped? DO NOT ADD EXTENSION> ")
-
             to.restorer(cropped, filename)
             print("file has been created at: ", filename + ".tiff")
 

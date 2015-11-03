@@ -262,24 +262,28 @@ def plotIntensityW(intensity, linetype='b-'):
 def plotSamples(img, intensity, reg, point=620.):
     """
     Plots samples for some point along the intensity given
+    (feed the cropped image to plotsamples and recrop??)
     """
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     q = m * point + c
-    cropRect = (lowerx, uppery, upperx, lowery)
-    img = img.crop(cropRect)
+
     plotSetting = 111
 
     #TODO add plotSetting as well as other features from sampling sample
     #  select a subset of the image to use, and scale it
     xmin = 0
-    xmax = 1000
+    xmax = 800
     ymin = 0
     ymax = 55
-    xmin = lowerx
-    xmax = upperx
-    ymin = lowery
-    ymax = uppery
+    # xmin = lowerx
+    # xmax = upperx
+    # ymin = lowery
+    # ymax = uppery
+
+    cropRect = (xmin, ymax, xmax, ymin)
+    img = img.crop(cropRect)
+    img.load()
     # # scaling
     # displayImg = (img[ymin:ymax,xmin:xmax] - \
     #               np.min(img[ymin:ymax,xmin:xmax]))**(0.25)
@@ -291,8 +295,8 @@ def plotSamples(img, intensity, reg, point=620.):
 
     xTrace = np.arange(1.0*xmin,xmax)
     yTrace = m* xTrace + c
-
-    imgplot = plt.imshow(img, zorder=0, extent = [xmin,xmax,ymin,ymax])
+    print(img)
+    imgplot = plt.imshow(img)#, extent = [xmin,xmax,ymin,ymax])
     ax2 = plt.subplot(plotSetting)
     ax2.plot(xTrace,yTrace, color='red')
     plt.show()
