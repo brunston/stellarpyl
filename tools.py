@@ -259,7 +259,7 @@ def plotIntensityW(intensity, linetype='b-'):
     print("\nfigure saved to intensity.png")
     return None
 
-def plotSamples(img, intensity, reg, point=620.):
+def plotSamples(img, intensity, reg, point=200.):
     """
     Plots samples for some point along the intensity given
     (feed the cropped image to plotsamples and recrop??)
@@ -268,6 +268,9 @@ def plotSamples(img, intensity, reg, point=620.):
     m, c = reg[0:2]
     q = m * point + c
 
+    print("img",img)
+    img = np.asarray(img)
+    print("img as ndarray", img)
     plotSetting = 111
 
     #TODO add plotSetting as well as other features from sampling sample
@@ -281,9 +284,9 @@ def plotSamples(img, intensity, reg, point=620.):
     # ymin = lowery
     # ymax = uppery
 
-    cropRect = (xmin, ymax, xmax, ymin)
-    img = img.crop(cropRect)
-    img.load()
+    # cropRect = (xmin, ymax, xmax, ymin)
+    # img = img.crop(cropRect)
+    # img.load()
     # # scaling
     # displayImg = (img[ymin:ymax,xmin:xmax] - \
     #               np.min(img[ymin:ymax,xmin:xmax]))**(0.25)
@@ -291,7 +294,7 @@ def plotSamples(img, intensity, reg, point=620.):
     perp_m = -1.0 / m
     perp_c = q + point/m
 
-    plotIntensityW(intensity)
+    # plotIntensityW(intensity) #just for debugging
 
     xTrace = np.arange(1.0*xmin,xmax)
     yTrace = m* xTrace + c
