@@ -287,7 +287,7 @@ def intensitySAANS(img, data, reg, threshold=127, r=1, twidth=10,spss=0.1):
     return None
 
 def intensitySAAW(img, data, reg, threshold=127, r=1,\
-                  twidth=10, binwidth=1, spss=0.5):
+                  twidth=10, binwidth=1, spss=0.5, plot=False):
     """
     intensitySAAW is the eighth iteration of the intensity function which aims
     to deal with the plotting of regressed non-orthogonal spectra given in
@@ -299,6 +299,8 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
     twidth is the width of the trace on each side of the line y = mx + c
     so the total will be double
     spss is the subpixel sampling size
+    function will not plot sample images by default, change the value of plot
+        to true to do so.
     """
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
@@ -385,6 +387,13 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
 
         #to.pbar(p/(xSize+1))
     # print("intensities:\n",intensities)
+
+    #run plotSamples feeding it required information
+    if plot==True:
+        offsetTuple = (offsetVerticalPositive, offsetVerticalNegative,\
+                       offsetHorizontalPositive, offsetHorizontalNegative)
+        offsetTuple2 = (offsetVertical, offsetTrace)
+        to.plotSamples(img, intensities, reg, offsetTuple2, xMap, yMap)
     return intensities
 
 def sumGenerator(data):

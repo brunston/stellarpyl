@@ -259,15 +259,15 @@ def plotIntensityW(intensity, linetype='b-'):
     print("\nfigure saved to intensity.png")
     return None
 
-def plotSamples(img, intensity, reg, point=200.):
+def plotSamples(img, intensity, reg, offsetTuple2, xMap, yMap, point=200.):
     """
     Plots samples for some point along the intensity given
-    (feed the cropped image to plotsamples and recrop??)
     """
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     q = m * point + c
-
+    offsetVertical = offsetTuple2[0]
+    offsetTrace = offestTuple2[1]
     print("img",img)
     img = np.asarray(img)
     print("img as ndarray", img)
@@ -279,22 +279,9 @@ def plotSamples(img, intensity, reg, point=200.):
     xmax = 800
     ymin = 0
     ymax = 55
-    # xmin = lowerx
-    # xmax = upperx
-    # ymin = lowery
-    # ymax = uppery
-
-    # cropRect = (xmin, ymax, xmax, ymin)
-    # img = img.crop(cropRect)
-    # img.load()
-    # # scaling
-    # displayImg = (img[ymin:ymax,xmin:xmax] - \
-    #               np.min(img[ymin:ymax,xmin:xmax]))**(0.25)
 
     perp_m = -1.0 / m
     perp_c = q + point/m
-
-    # plotIntensityW(intensity) #just for debugging
 
     xTrace = np.arange(1.0*xmin,xmax)
     yTrace = m* xTrace + c
