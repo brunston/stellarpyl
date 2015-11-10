@@ -406,10 +406,9 @@ What threshold would you like to use as differentiator?
             # intensity = ss.intensityWHERE(croppedimg,dataArray,regTup,\
             #                               threshI,step,10)
             intensity = st.intensitySAAW(img,dataArray,regTup,\
-                                         threshI,step,10)
+                                         threshI,step,10, plot=True)
             timePause2 = time.time()
             to.plotIntensityW(intensity)
-            to.plotSamples(img,intensity,regTup)
             timePause2s = time.time()
             #TEMPORARY
             # np.set_printoptions(edgeitems=3,infstr='inf',\

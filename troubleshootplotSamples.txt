@@ -1,0 +1,99 @@
+imageToConvert = '127.tiff'
+image = Image.open(imageToConvert)
+imageArray = np.array(image)
+
+imFlipped = np.flipud(imageArray)
+imgplot = plt.imshow(imFlipped)
+xmin,xmax,ymin,ymax = 0,500,0,40
+imCropped = imFlipped[ymin:ymax,xmin:xmax,:]
+
+imgplot = plt.imshow(imCropped)
+
+m,c = 0.0457,0.
+point = 200.0
+
+q = m * point + c
+perp_m = -1.0 / m
+
+perp_c = q + point/m
+
+perp_m, perp_c
+#Out[100]: (-21.88183807439825, 4385.507614879651)
+
+xTrace = np.arange(1.0*xmin,xmax)
+yTrace = m* xTrace + c
+
+ax2 = plt.subplot(plotSetting)
+ax2.plot(xTrace,yTrace, color='red')
+plt.show()
+
+ax3 = plt.subplot(plotSetting)
+ax3.plot(point, q, color='white', marker='*', markersize=20)
+
+xPerp = 1.0*np.arange(point - 20, point + 20)
+yPerp = perp_m * xPerp + perp_c
+
+ax4 = plt.subplot(plotSetting)
+ax4.plot(xPerp, yPerp, color='red', linestyle='dashed')
+plt.show()
+
+##################################################
+#  offsetTrace wasn't defined in plotSamples, nor was the bin width
+##################################################
+w = 10.0
+offsetTrace = w * np.sqrt(m**2 + 1) / m
+
+yPerpHigh = yPerp + offsetTrace
+ax5 = plt.subplot(plotSetting)
+ax5.plot(xPerp, yPerpHigh, color='white', linestyle='dashed')
+plt.show()
+
+yPerpLow = yPerp - offsetTrace
+ax6 = plt.subplot(plotSetting)
+ax6.plot(xPerp, yPerpLow, color='white', linestyle='dashed')
+plt.show()
+
+##################################################
+#  offsetVertical wasn't defined in plotSamples
+##################################################
+v = 20.0
+offsetVertical = v * np.sqrt(m**2 + 1)
+
+yTraceHigh = yTrace + offsetVertical
+ax7 = plt.subplot(plotSetting)
+ax7.plot(xTrace, yTraceHigh, color='white', linestyle='dashed')
+plt.show()
+
+yTraceLow = yTrace - offsetVertical
+ax8 = plt.subplot(plotSetting)
+ax8.plot(xTrace, yTraceLow, color='white', linestyle='dashed')
+plt.show()
+
+##################################################
+#  xMap and yMap weren't defined
+##################################################
+dims = imCropped.shape
+subSample = 0.25
+xVals = np.arange(0,dims[1],subSample)
+xMap = np.ones((len(yVals),len(xVals)))
+yMap = np.ones((len(yVals),len(xVals)))
+
+for i in range(len(yVals)):
+  xMap[i,:] = xMap[i,:] * xVals
+
+for i in range(len(xVals)):
+  yMap[:,i] = yMap[:,i] * yVals
+
+subpoints = np.where((np.abs(xMap - point) < 20) & (np.abs(yMap - q) < 20))
+ax9 = plt.subplot(plotSetting)
+ax9.scatter(xMap[subpoints], yMap[subpoints], color='black', marker='.')
+plt.show()
+
+include = np.where((yMap < ((-1.0/m)*xMap + perp_c + offsetTrace)) & \
+    (yMap >= ((-1.0/m)*xMap + perp_c - offsetTrace)) & \
+    (yMap < (m*xMap + c + offsetVertical)) & \
+    (yMap >= (m*xMap + c - offsetVertical)))
+ax10 = plt.subplot(plotSetting)
+ax10.scatter(xMap[include],yMap[include], color='red', marker='o')
+plt.show()
+#return None

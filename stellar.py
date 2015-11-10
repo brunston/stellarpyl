@@ -324,7 +324,7 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
         yMap[:,i] = yMap[:,i] * yvals
         to.pbar(i/len(xvals))
     tf = time.time()
-    print("map generation time:", tf-ti)
+    print("\nmap generation time:", tf-ti)
     # print("xMap:",xMap)
     # print("yMap:",yMap)
     #map pixels in sub-pixel step size to their respective large pixel
@@ -338,8 +338,8 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
     # print("yMapInt:",yMapInt)
     offsetTrace = abs(binwidth * np.sqrt(m**2 + 1) / m)
     offsetVertical = abs(twidth * np.sqrt(m**2 + 1))
-    # print("offsetTrace",offsetTrace)
-    # print("offsetVertical",offsetVertical)
+    print("offsetTrace",offsetTrace)
+    print("offsetVertical",offsetVertical)
 
     binwidthAdjusted = binwidth / np.sqrt(m**2+1)
     xSize = upperx
@@ -375,7 +375,7 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
                            (yMap < offsetVerticalPositive) & \
                            (yMap >= offsetVerticalNegative))
         timeF = time.time()
-        print(timeF-timeI)
+        #print(timeF-timeI)
         #map sub-pixels back to full pixels
         # print("include:",include)
         includedValues = data[[yMapInt[include], xMapInt[include]]]
@@ -385,7 +385,7 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
 
         i += 1
 
-        #to.pbar(p/(xSize+1))
+        to.pbar(p/(xSize+1))
     # print("intensities:\n",intensities)
 
     #run plotSamples feeding it required information

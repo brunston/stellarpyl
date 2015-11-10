@@ -259,34 +259,39 @@ def plotIntensityW(intensity, linetype='b-'):
     print("\nfigure saved to intensity.png")
     return None
 
-def plotSamples(img, intensity, reg, offsetTuple2, xMap, yMap, point=200.):
+def plotSamples(img, intensity, reg, offsetTuple, xMap, yMap, point=200.):
     """
     Plots samples for some point along the intensity given
     """
     lowerx, lowery, upperx, uppery = img.getbbox()
     m, c = reg[0:2]
     q = m * point + c
-    offsetVertical = offsetTuple2[0]
-    offsetTrace = offestTuple2[1]
+    print("offsetTuple,", offsetTuple)
+    offsetVertical = offsetTuple[0]
+    offsetTrace = offsetTuple[1]
     print("img",img)
-    img = np.asarray(img)
+    imageArray = np.asarray(img)
     print("img as ndarray", img)
+    imFlipped = np.flipud(imageArray)
+    xmin,xmax,ymin,ymax = 30,700,0,40
+    imCropped = imFlipped[ymin:ymax,xmin:xmax,:]
+    imgplot = plt.imshow(imCropped)
     plotSetting = 111
 
     #TODO add plotSetting as well as other features from sampling sample
     #  select a subset of the image to use, and scale it
-    xmin = 0
-    xmax = 800
-    ymin = 0
-    ymax = 55
+    # xmin = 0
+    # xmax = 800
+    # ymin = 0
+    # ymax = 55
 
     perp_m = -1.0 / m
     perp_c = q + point/m
 
     xTrace = np.arange(1.0*xmin,xmax)
-    yTrace = m* xTrace + c
+    yTrace = m * xTrace + c
     print(img)
-    imgplot = plt.imshow(img)#, extent = [xmin,xmax,ymin,ymax])
+    #imgplot = plt.imshow((img), zorder = 0, extent = [xmin,xmax,ymin,ymax])
     ax2 = plt.subplot(plotSetting)
     ax2.plot(xTrace,yTrace, color='red')
     plt.show()
