@@ -2,7 +2,7 @@
 """
 stellarPYL - python stellar spectra processing software
 Copyright (c) 2015 Brunston Poon
-@file: debuggerance
+@file: thedebuggerance
 This program comes with absolutely no warranty.
 """
 import numpy as np
