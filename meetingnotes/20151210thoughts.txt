@@ -1,0 +1,4 @@
+thoughts:
+    * table5.dat seems to show that the wavelength data from the pulkovo survey may
+    not be very granular
+    * can we still use this data to create our fitted function?

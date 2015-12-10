@@ -8,6 +8,7 @@ This program comes with absolutely no warranty.
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
+from astropy.io import fits
 
 import sys
 import configparser
@@ -357,3 +358,11 @@ def plotRegression(reg):
     plt.show()
 
     return None
+
+def comparer(stars):
+    """
+    Grab the regression from the pulkovo catalog data in pulkovo/
+    http://vizier.cfa.harvard.edu/viz-bin/Cat?III/201
+    """
+    fitsList = fits.open("pulkovo/stars.fits")
+    stars = np.loadtxt("pulkovo/stars.dat")
