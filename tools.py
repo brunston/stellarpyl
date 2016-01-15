@@ -372,7 +372,17 @@ def comparer(star):
     starData = np.loadtxt("pulkovo/sirius.dat")
     #above imports as ndarray of 2-item ndarrays
     
-    
     #fitsList = fits.open("pulkovo/stars.fits")
     #stars = np.loadtxt("pulkovo/stars.dat")
     return None
+    
+def pixelLambda(intensities,hAlpha, hBeta):
+    """
+    Converts intensities to wavelength values based on particular intensities
+    being identified as Hydrogen Balmer lines alpha and beta, where halpha
+    and hbeta are the positional values within intensities
+    """
+    nmAB = 656.3-486.1 # difference between halpha and hbeta in nm
+    pixelAB = hBeta-hAlpha # difference between halpha and hbeta in pixels
+    nmPixel = nmAB / pixelAB #ratio nm to pixels
+    
