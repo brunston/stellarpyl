@@ -385,4 +385,7 @@ def pixelLambda(intensities,hAlpha, hBeta):
     nmAB = 656.3-486.1 # difference between halpha and hbeta in nm
     pixelAB = hBeta-hAlpha # difference between halpha and hbeta in pixels
     nmPixel = nmAB / pixelAB #ratio nm to pixels
-    
+    wavelengths = []
+    for pixel in range(len(intensities)):
+        
+    wavelengthsND = np.toarray(wavelengths)
