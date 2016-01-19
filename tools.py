@@ -263,7 +263,7 @@ def plotIntensityW(intensity, linetype='b-'):
 
 def plotIntensityWLambda(intensity,zero,maximum, linetype='b-'):
     """
-    Plots an intensity graph with connected points for SAAW and pixelLambda
+    Plots intensity graph with connected points for SAAW and pixelLambda
     """
     plotx, ploty = [], []
     i = 0
