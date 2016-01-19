@@ -1,0 +1,14 @@
+hr_num hip_num alt_name loc mag type
+2990 37826 betaGem pollux 1.15 K0IIIvar
+7001 91262 alphaLyr vega 0.00 A0Vvar
+2609 37391 OVCepheus polaris_near 5.05 M2III
+285 5372 nil polaris_near 4.2 K2II-III
+6789 85822 Yildun polaris_near 4.35 A1Vn
+5340 69673 Arcturus arcturus 0.15 K2IIIp
+5235 67927 Muphrid arcturus_near 2.65 G0IV
+5201 67480 etaBoo arcturus_near 4.90 K4III
+5185 67275 tauBoo arcturus_near 4.50 F7V
+5200 67459 psilonBoo arcturus_near 4.05 KVIIIvar
+3982 49669 Regulus regulus 1.35 B7V
+3980 49637 31Leo regulus_near 4.35 K4III
+3975 49583 etaLeo regulus_near 3.45 A0Ib
