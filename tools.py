@@ -8,6 +8,10 @@ This program comes with absolutely no warranty.
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
+
+#required for plotIntensityWLambda2
+from mpl_toolkits.axes_grid1 import host_subplot
+import mpl_toolkits.axisartist as AA
 #from astropy.io import fits
 #fits files are messed up if gotten from VizieR and pulkovo
 
@@ -261,14 +265,14 @@ def plotIntensityW(intensity, linetype='b-'):
     print("\nfigure saved to intensity.png")
     return None
 
-def plotIntensityWLambda(intensity,zero,maximum, linetype='b-'):
+def plotIntensityWLambda(intensity,wavelengths, linetype='b-'):
     """
     Plots intensity graph with connected points for SAAW and pixelLambda
     """
     plotx, ploty = [], []
     i = 0
     for x in range(len(intensity)):
-        plotx.append(x)
+        plotx.append(wavelengths[x])
         ploty.append(intensity[x])
 
     plotxn, plotyn = np.array(plotx), np.array(ploty)
@@ -276,7 +280,39 @@ def plotIntensityWLambda(intensity,zero,maximum, linetype='b-'):
     plt.figure(1)
     plt.clf()
     plt.plot(plotx, ploty, linetype)
-    plt.imshow(extent=[zero,maximum,0,100])
+    plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
+    plt.savefig('intensity.png', bbox_inches='tight')
+    plt.show()
+
+    print("\nfigure saved to intensity.png")
+    return None
+
+def plotIntensityWLambda2(intensity,wavelengths, linetype='b-'):
+    """
+    Plots intensity graph with connected points for SAAW and pixelLambda
+    This is the version with two axes (one with pixels, one with nm)
+    """
+    plotx, ploty = [], []
+    i = 0
+    for x in range(len(intensity)):
+        plotx.append(wavelengths[x])
+        ploty.append(intensity[x])
+
+    plotxn, plotyn = np.array(plotx), np.array(ploty)
+    host = host_subplot(111,axes_class=AA.Axes)
+    plt.subplots_adjust(right=0.75)
+    
+    par1 = host.twinx()
+    par2 = host.twinx()
+    
+    offset = 60
+    new_fixed_axis = par2.get_grid_helper().new_fixed_axis
+    
+    par2.axis['bot'] = new_fixed_axis(loc='right',axes=par2,offset=(offset,0)
+    par2.axis['bott'].toggle(all=True)
+    
+    par1.set_xlabel
+    plt.plot(plotx, ploty, linetype)
     plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
     plt.savefig('intensity.png', bbox_inches='tight')
     plt.show()

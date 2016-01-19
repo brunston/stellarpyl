@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 stellarPYL - python stellar spectra processing software
-Copyright (c) 2015 Brunston Poon
+Copyright (c) 2016 Brunston Poon
 @file: tools
 This program comes with absolutely no warranty.
 """
@@ -261,6 +261,51 @@ def plotIntensityW(intensity, linetype='b-'):
     print("\nfigure saved to intensity.png")
     return None
 
+def plotIntensityWLambda(intensity,wavelengths, linetype='b-'):
+    """
+    Plots intensity graph with connected points for SAAW and pixelLambda
+    """
+    plotx, ploty = [], []
+    i = 0
+    for x in range(len(intensity)):
+        plotx.append(wavelengths[x])
+        ploty.append(intensity[x])
+
+    plotxn, plotyn = np.array(plotx), np.array(ploty)
+
+    plt.figure(1)
+    plt.clf()
+    plt.plot(plotx, ploty, linetype)
+    plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
+    plt.savefig('intensity.png', bbox_inches='tight')
+    plt.show()
+
+    print("\nfigure saved to intensity.png")
+    return None
+
+def plotIntensityWLambda2(intensity,wavelengths, linetype='b-'):
+    """
+    Plots intensity graph with connected points for SAAW and pixelLambda
+    This is the version with two axes (one with pixels, one with nm)
+    """
+    plotx, ploty = [], []
+    i = 0
+    for x in range(len(intensity)):
+        plotx.append(wavelengths[x])
+        ploty.append(intensity[x])
+
+    plotxn, plotyn = np.array(plotx), np.array(ploty)
+
+    plt.figure(1)
+    plt.clf()
+    plt.plot(plotx, ploty, linetype)
+    plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
+    plt.savefig('intensity.png', bbox_inches='tight')
+    plt.show()
+
+    print("\nfigure saved to intensity.png")
+    return None
+
 def plotSamples(img, intensity, reg, offsetTuple, xMap, yMap, point=200.):
     """
     Plots samples for some point along the intensity given
@@ -368,24 +413,33 @@ def comparer(star):
     load data from.
     """
     #TODO Currently should only be importing from Sirius. Make generalized later
-    
+
     starData = np.loadtxt("pulkovo/sirius.dat")
     #above imports as ndarray of 2-item ndarrays
-    
+
     #fitsList = fits.open("pulkovo/stars.fits")
     #stars = np.loadtxt("pulkovo/stars.dat")
     return None
-    
-def pixelLambda(intensities,hAlpha, hBeta):
+
+def pixelLambda(intensities, pixelA, pixelB):
     """
     Converts intensities to wavelength values based on particular intensities
     being identified as Hydrogen Balmer lines alpha and beta, where halpha
     and hbeta are the positional values within intensities
     """
-    nmAB = 656.3-486.1 # difference between halpha and hbeta in nm
-    pixelAB = hBeta-hAlpha # difference between halpha and hbeta in pixels
-    nmPixel = nmAB / pixelAB #ratio nm to pixels
-    wavelengths = []
+    nmA = 656.3
+    nmB = 486.1
+    nmG = 434.1
+    pixelAB = abs(pixelB - pixelA) # difference between halpha and hbeta in pixels
+    nmPixel = (nmB - nmG) / pixelAB #ratio nm to pixels #TODO BG IS TEMP
+    wavelengths = [] #empty array
+
+    c = nmB - (nmPixel)*pixelB
+    print(c)
     for pixel in range(len(intensities)):
-        
-    wavelengthsND = np.toarray(wavelengths)
+        value = nmPixel*pixel + c
+        print(value)
+        wavelengths.append(value)
+        #above from rise/run equations
+    wavelengthsND = np.array(wavelengths)
+    return wavelengthsND

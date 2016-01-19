@@ -65,5 +65,5 @@ if threshI >= 0:
         wavelengths = to.pixelLambda(intensity, 515, 627)
         print(wavelengths)
         to.plotIntensityWLambda(intensity,wavelengths)
-        to.plotIntensityWLambda2(intensity,wavelengths)
+        to.plotIntensityWLamda2(intensity,wavelengths)
         #to.plotSamples(croppedimg,intensity,regTup) #TODO fix
