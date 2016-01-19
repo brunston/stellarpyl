@@ -292,29 +292,26 @@ def plotIntensityWLambda2(intensity,wavelengths, linetype='b-'):
     Plots intensity graph with connected points for SAAW and pixelLambda
     This is the version with two axes (one with pixels, one with nm)
     """
-    plotx, ploty = [], []
+    plotx, ploty, px = [], [], []
     i = 0
     for x in range(len(intensity)):
         plotx.append(wavelengths[x])
+        px.append(x)
         ploty.append(intensity[x])
 
-    plotxn, plotyn = np.array(plotx), np.array(ploty)
-    host = host_subplot(111,axes_class=AA.Axes)
-    plt.subplots_adjust(right=0.75)
-    
-    par1 = host.twinx()
-    par2 = host.twinx()
-    
-    offset = 60
-    new_fixed_axis = par2.get_grid_helper().new_fixed_axis
-    
-    par2.axis['bot'] = new_fixed_axis(loc='right',axes=par2,offset=(offset,0)
-    par2.axis['bott'].toggle(all=True)
-    
-    par1.set_xlabel
-    plt.plot(plotx, ploty, linetype)
-    plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
-    plt.savefig('intensity.png', bbox_inches='tight')
+    fig, ax1 = plt.subplots()
+
+    ax1.plot(plotx, ploty, linetype)
+    ax1.set_xlabel('wavelengths')
+    ax1.set_ylabel('intensity', color='b')
+    for tl in ax1.get_yticklabels():
+        tl.set_color('b')
+
+    ax2 = ax1.twinx()
+    ax2.plot(px,ploty, linetype)
+    ax2.set_xlabel('pixels', color='r')
+    for tl in ax2.get_yticklabels():
+        tl.set_color('r')
     plt.show()
 
     print("\nfigure saved to intensity.png")
