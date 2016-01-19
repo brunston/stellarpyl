@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 stellarPYL - python stellar spectra processing software
-Copyright (c) 2015 Brunston Poon
+Copyright (c) 2016 Brunston Poon
 @file: ui
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

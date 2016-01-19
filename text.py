@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 stellarPYL - python stellar spectra processing software
-Copyright (c) 2015 Brunston Poon
+Copyright (c) 2016 Brunston Poon
 @file: text
 This program comes with absolutely no warranty.
 """
@@ -33,19 +33,19 @@ program. For your convenience, press enter to view the commands now.
 def about():
     print("""
 This is stellar spectra reduction and analysis command-line software written
-using the Python 3.4 version of the Anaconda Scientific Python distribution. It 
-is work done for an internship at the Unversity of Hawaii in conjunction with 
+using the Python 3.4 version of the Anaconda Scientific Python distribution. It
+is work done for an internship at the Unversity of Hawaii in conjunction with
 the St. Paul's School Engineering Honors program.
 
 It aims to provide a simplified workflow for analyzing uncompressed TIFF stellar
 spectra images obtained from a DSLR through a diffraction grating. The goals of
-the project are: to automatically crop the image; to perform background 
+the project are: to automatically crop the image; to perform background
 subtraction; to create an intensity plot of the spectrum (accounting for non-
 orthogonal spectra); and to account for the use of a DSLR sensor by using either
-a relative response function or an absolute response function to normalize the 
+a relative response function or an absolute response function to normalize the
 intensity plot.
 
-It is written by Brunston Poon. 
+It is written by Brunston Poon.
             """)
     return None
 
@@ -66,7 +66,7 @@ threshold.
 The threshold is used throughout the program to determine what data is relevant
 and what parts of the image can be discarded without damaging the value of the
 data. It needs to be an integer value between 0 and 765 as the threshold is
-measured as the sum of the R, G, and B bin values in a pixel, therefore, 
+measured as the sum of the R, G, and B bin values in a pixel, therefore,
 each RGB value can be an integer from 0-255; total value can be from 0-765. If
 you do not have a value you are already using for all of your images, you can
 type 'pixel_d' at the command prompt to run a function that plots the
@@ -101,7 +101,7 @@ a default threshold to use by using the 'settings_threshold' command.
 takes an image and shows the pixel distribution of the image over the intensity
 of the pixels.
 
-- 'crop' - 
+- 'crop' -
 takes an image and crop it based on your selected threshold.
 
 - 'image_regression' (short 'imgreg') -
@@ -291,7 +291,7 @@ modification follow.
 
 def jellyfish():
     print("""
-                
+
                                         (hello!)
                                       .'
                                      '
