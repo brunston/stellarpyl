@@ -67,3 +67,4 @@ if threshI >= 0:
         to.plotIntensityWLambda(intensity,wavelengths)
         #to.plotIntensityWLambda2(intensity,wavelengths)
         #to.plotSamples(croppedimg,intensity,regTup) #TODO fix
+        st.response(intensity, wavelengths, "pulkovo/sirius.dat")

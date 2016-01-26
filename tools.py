@@ -424,13 +424,13 @@ def comparer(star):
     load data from.
     """
     #TODO Currently should only be importing from Sirius. Make generalized later
-
+    #TODO DO NOT USE RIGHT NOW!!
     starData = np.loadtxt("pulkovo/sirius.dat")
     #above imports as ndarray of 2-item ndarrays
 
     #fitsList = fits.open("pulkovo/stars.fits")
     #stars = np.loadtxt("pulkovo/stars.dat")
-    return None
+    return starData
 
 def pixelLambda(intensities, pixelA, pixelB):
     """
@@ -454,3 +454,5 @@ def pixelLambda(intensities, pixelA, pixelB):
         #above from rise/run equations
     wavelengthsND = np.array(wavelengths)
     return wavelengthsND
+    
+
