@@ -9,6 +9,7 @@ This program comes with absolutely no warranty.
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
+import scipy as sp
 
 import tools as to
 
@@ -641,7 +642,15 @@ def response(intensities, wavelengths, pulkovo):
     with type [w1, w1.5, ... , wn][adj1, adj2, ... , adjn]
     """
     star = np.loadtxt(pulkovo)
-    
+    adjustmentArray = []
+    for wavelength in wavelengths:
+        #TODO transfer to python code
+        #TODO
+        # interpFunction = sp.interplolate.interp1d(x_pulkovo,y_pulkovo, fill_value = 0.0, bounds_error=False)
+        # interpolatedY = interpFunction(X_values)
+        find closest to wavelength in pulkovo
+        divide value
+        add to adjustmentArray
     adjustmentArrayND=np.array(adjustmentArray)
     return adjustmentArrayND
     
