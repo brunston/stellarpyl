@@ -442,7 +442,7 @@ def pixelLambda(intensities, pixelA, pixelB):
     nmB = 486.1
     nmG = 434.1
     pixelAB = pixelB - pixelA # difference between halpha and hbeta in pixels
-    nmPixel = (nmG - nmB) / pixelAB #ratio nm to pixels #TODO BG IS TEMP
+    nmPixel = (nmB - nmG) / pixelAB #ratio nm to pixels #TODO BG IS TEMP
     wavelengths = [] #empty array
 
     c = nmB - (nmPixel)*pixelB

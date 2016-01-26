@@ -8,6 +8,10 @@ This program comes with absolutely no warranty.
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
+
+#required for plotIntensityWLambda2
+from mpl_toolkits.axes_grid1 import host_subplot
+import mpl_toolkits.axisartist as AA
 #from astropy.io import fits
 #fits files are messed up if gotten from VizieR and pulkovo
 
@@ -288,19 +292,26 @@ def plotIntensityWLambda2(intensity,wavelengths, linetype='b-'):
     Plots intensity graph with connected points for SAAW and pixelLambda
     This is the version with two axes (one with pixels, one with nm)
     """
-    plotx, ploty = [], []
+    plotx, ploty, px = [], [], []
     i = 0
     for x in range(len(intensity)):
         plotx.append(wavelengths[x])
+        px.append(x)
         ploty.append(intensity[x])
 
-    plotxn, plotyn = np.array(plotx), np.array(ploty)
+    fig, ax1 = plt.subplots()
 
-    plt.figure(1)
-    plt.clf()
-    plt.plot(plotx, ploty, linetype)
-    plt.legend(bbox_to_anchor=(1.05,1), loc = 2, borderaxespad=0.)
-    plt.savefig('intensity.png', bbox_inches='tight')
+    ax1.plot(plotx, ploty, linetype)
+    ax1.set_xlabel('wavelengths')
+    ax1.set_ylabel('intensity', color='b')
+    for tl in ax1.get_yticklabels():
+        tl.set_color('b')
+
+    ax2 = ax1.twinx()
+    ax2.plot(px,ploty, linetype)
+    ax2.set_xlabel('pixels', color='r')
+    for tl in ax2.get_yticklabels():
+        tl.set_color('r')
     plt.show()
 
     print("\nfigure saved to intensity.png")
@@ -430,8 +441,8 @@ def pixelLambda(intensities, pixelA, pixelB):
     nmA = 656.3
     nmB = 486.1
     nmG = 434.1
-    pixelAB = abs(pixelB - pixelA) # difference between halpha and hbeta in pixels
-    nmPixel = (nmB - nmG) / pixelAB #ratio nm to pixels #TODO BG IS TEMP
+    pixelAB = pixelB - pixelA # difference between halpha and hbeta in pixels
+    nmPixel = (nmG - nmB) / pixelAB #ratio nm to pixels #TODO BG IS TEMP
     wavelengths = [] #empty array
 
     c = nmB - (nmPixel)*pixelB
