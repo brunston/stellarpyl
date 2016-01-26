@@ -641,7 +641,12 @@ def response(intensities, wavelengths, pulkovo):
     with type [w1, w1.5, ... , wn][adj1, adj2, ... , adjn]
     """
     star = np.loadtxt(pulkovo)
-    
+    adjustmentArray = []
+    for wavelength in wavelengths:
+        #TODO transfer to python code
+        find closest to wavelength in pulkovo
+        subtract value
+        add to adjustmentArray
     adjustmentArrayND=np.array(adjustmentArray)
     return adjustmentArrayND
     

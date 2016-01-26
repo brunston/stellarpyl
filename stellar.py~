@@ -636,8 +636,12 @@ def crop(image,deletionThreshold,autostopTB, autostopBT, autostopRL, autostopLR)
 def response(intensities, wavelengths, pulkovo):
     """
     Generates a camera response function, based on pulkovo wavelengths.
+    pulkovo should be a file imported from vizier with one star's data in it
     Returns an array with the appropriate adjustment to make for a wavelength
     with type [w1, w1.5, ... , wn][adj1, adj2, ... , adjn]
     """
+    star = np.loadtxt(pulkovo)
     
+    adjustmentArrayND=np.array(adjustmentArray)
+    return adjustmentArrayND
     
