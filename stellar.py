@@ -9,7 +9,7 @@ This program comes with absolutely no warranty.
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
-import scipy as sp
+import scipy.interpolate as spinterp
 
 import tools as to
 
@@ -295,7 +295,8 @@ def intensitySAAW(img, data, reg, threshold=127, r=1,\
     an open image img, the pixel data in data, and a regArray generated
     using regression().
     SAA - spatial antialiasing; W - np.where method
-    Returns a dictionary where key is x value and y value is intensity.
+    Returns a one dimensional array where the position indicates x value,
+    value of item indicates y value
     r is the step rate along the spectral trace (default to size of one pixel)
     twidth is the width of the trace on each side of the line y = mx + c
     so the total will be double
@@ -634,23 +635,45 @@ def crop(image,deletionThreshold,autostopTB, autostopBT, autostopRL, autostopLR)
     to.pbar(1)
     return duplicate
     
-def response(intensities, wavelengths, pulkovo):
+def response(intensities, wavelengths, pulkovo, exposure):
     """
     Generates a camera response function, based on pulkovo wavelengths.
     pulkovo should be a file imported from vizier with one star's data in it
     Returns an array with the appropriate adjustment to make for a wavelength
     with type [w1, w1.5, ... , wn][adj1, adj2, ... , adjn]
+    exposure time in seconds.
     """
     star = np.loadtxt(pulkovo)
+    #turning strings into floats
+    for i in range(len(star)):
+        star[i][0] = float(star[i][0])
+        star[i][1] = float(star[i][1])
+        
     adjustmentArray = []
-    for wavelength in wavelengths:
-        #TODO transfer to python code
-        #TODO
-        # interpFunction = sp.interplolate.interp1d(x_pulkovo,y_pulkovo, fill_value = 0.0, bounds_error=False)
-        # interpolatedY = interpFunction(X_values_wavelengths)
-        find closest to wavelength in pulkovo
-        divide value
-        add to adjustmentArray
+    #Divide by exposure time to get energy / time = power
+    for i in range(len(intensities)-1):
+        intensities[i] = intensities[i]/exposure
+    
+    #generate blank arrays for filling by next for loop
+    x_star = np.zeros(len(star))
+    y_star = np.zeros(len(star))
+    
+    #places pulkovo data into separate arrays for use in interpolation functions
+    for i in range(len(star)):
+        x_star[i] = star[i][0]
+        y_star[i] = star[i][1]
+    
+    #our interpolation function
+    interpFunc = spinterp.interp1d(x_star, y_star, \
+                                         fill_value = -1, bounds_error = False)
+    interpolatedY = interpFunc(wavelengths)
+    print(interpolatedY)
+    
+    # # for wavelength in wavelengths:
+        # # #TODO transfer to python code
+        # # find closest to wavelength in pulkovo
+        # # divide value
+        # # add to adjustmentArray
     adjustmentArrayND=np.array(adjustmentArray)
     return adjustmentArrayND
     

@@ -63,8 +63,8 @@ if threshI >= 0:
         #using IMG_2617.tif of sirius and using hA = beta, hB = gamma b/c of
         #apparent visibles.
         wavelengths = to.pixelLambda(intensity, 515, 627)
-        print(wavelengths)
+        #print(wavelengths)
         to.plotIntensityWLambda(intensity,wavelengths)
         #to.plotIntensityWLambda2(intensity,wavelengths)
         #to.plotSamples(croppedimg,intensity,regTup) #TODO fix
-        st.response(intensity, wavelengths, "pulkovo/sirius.dat")
+        st.response(intensity, wavelengths, "pulkovo/sirius.dat", 0.5)
