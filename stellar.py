@@ -650,6 +650,7 @@ def response(intensities, wavelengths, pulkovo, exposure):
         star[i][1] = float(star[i][1])
         
     adjustmentArray = []
+    
     #Divide by exposure time to get energy / time = power
     for i in range(len(intensities)-1):
         intensities[i] = intensities[i]/exposure
@@ -663,11 +664,18 @@ def response(intensities, wavelengths, pulkovo, exposure):
         x_star[i] = star[i][0]
         y_star[i] = star[i][1]
     
+    plt.figure(2)
+    plt.clf()
+    plt.plot(x_star, y_star,'o',label='original data',markersize=4)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.show()
+    
     #our interpolation function
-    interpFunc = spinterp.interp1d(x_star, y_star, \
+    interpFunc = spinterp.interp1d(x_star, y_star, kind="nearest",\
                                          fill_value = -1, bounds_error = False)
     interpolatedY = interpFunc(wavelengths)
-    print(interpolatedY)
+    for line in interpolatedY:
+        print(interpolatedY)
     
     # # for wavelength in wavelengths:
         # # #TODO transfer to python code
