@@ -673,9 +673,15 @@ def response(intensities, wavelengths, pulkovo, exposure):
     #our interpolation function
     interpFunc = spinterp.interp1d(x_star, y_star, kind="nearest",\
                                          fill_value = -1, bounds_error = False)
+    #TODO nearest neighbor is supposed to be temporary.
     interpolatedY = interpFunc(wavelengths)
-    for line in interpolatedY:
-        print(interpolatedY)
+    #TODO Debugging print statements
+    print("wavelengths:")
+    for item in wavelengths:
+        print(wavelengths)
+    print("interpolatedY")
+    for item in interpolatedY:
+        print(interpolatedY[item])
     
     # # for wavelength in wavelengths:
         # # #TODO transfer to python code
