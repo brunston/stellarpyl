@@ -634,7 +634,7 @@ def crop(image,deletionThreshold,autostopTB, autostopBT, autostopRL, autostopLR)
     print("\n")
     to.pbar(1)
     return duplicate
-    
+
 def response(intensities, wavelengths, pulkovo, exposure):
     """
     Generates a camera response function, based on pulkovo wavelengths.
@@ -648,46 +648,58 @@ def response(intensities, wavelengths, pulkovo, exposure):
     for i in range(len(star)):
         star[i][0] = float(star[i][0])
         star[i][1] = float(star[i][1])
-        
+
     adjustmentArray = []
-    
+
     #Divide by exposure time to get energy / time = power
     for i in range(len(intensities)-1):
         intensities[i] = intensities[i]/exposure
-    
+
     #generate blank arrays for filling by next for loop
     x_star = np.zeros(len(star))
     y_star = np.zeros(len(star))
-    
+
     #places pulkovo data into separate arrays for use in interpolation functions
     for i in range(len(star)):
         x_star[i] = star[i][0]
         y_star[i] = star[i][1]
-    
+
     plt.figure(2)
     plt.clf()
     plt.plot(x_star, y_star,'o',label='original data',markersize=4)
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.show()
-    
+
     #our interpolation function
     interpFunc = spinterp.interp1d(x_star, y_star, kind="nearest",\
                                          fill_value = -1, bounds_error = False)
     #TODO nearest neighbor is supposed to be temporary.
-    interpolatedY = interpFunc(wavelengths)
+    #TODO weird double values in wavelengths? try removing?
+    new_wavelengths = []
+    for item in range(0,len(wavelengths), 2):
+        new_wavelengths.append(wavelengths[item])
+    new_wavelengths = np.array(new_wavelengths)
+
+    interpolatedY = interpFunc(new_wavelengths)
     #TODO Debugging print statements
-    print("wavelengths:")
-    for item in wavelengths:
-        print(wavelengths)
+    # print("wavelengths:")
+    # for item in wavelengths:
+    #     print(wavelengths[item])
+    for item in new_wavelengths:
+        print(item)
     print("interpolatedY")
     for item in interpolatedY:
-        print(interpolatedY[item])
-    
-    # # for wavelength in wavelengths:
-        # # #TODO transfer to python code
-        # # find closest to wavelength in pulkovo
-        # # divide value
-        # # add to adjustmentArray
+        print(item)
+
+    for nm in range(len(new_wavelengths)):
+        # find closest to wavelength in pulkovo
+        # divide value
+        # add to adjustmentArray
+        adjustmentArray.append(interpolatedY[nm]/new_wavelengths[nm])
+
     adjustmentArrayND=np.array(adjustmentArray)
+
+    #TODO Debugging
+    for item in adjustmentArrayND:
+        print(item)
     return adjustmentArrayND
-    
