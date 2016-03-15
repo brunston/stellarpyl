@@ -642,6 +642,7 @@ def response(intensities, wavelengths, pulkovo, exposure):
     Returns an array with the appropriate adjustment to make for a wavelength
     with type [w1, w1.5, ... , wn][adj1, adj2, ... , adjn]
     exposure time in seconds.
+    #TODO currently only is a one dimensional array with adjustments. please fix
     """
     star = np.loadtxt(pulkovo)
     #turning strings into floats
@@ -663,11 +664,13 @@ def response(intensities, wavelengths, pulkovo, exposure):
     for i in range(len(star)):
         x_star[i] = star[i][0]
         y_star[i] = star[i][1]
-
+    
+    #Plotting the pulkovo data.
     plt.figure(2)
     plt.clf()
     plt.plot(x_star, y_star,'o',label='original data',markersize=4)
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.title("Pulkovo Data from {0}".format(pulkovo))
     plt.show()
 
     #our interpolation function
@@ -680,26 +683,28 @@ def response(intensities, wavelengths, pulkovo, exposure):
         new_wavelengths.append(wavelengths[item])
     new_wavelengths = np.array(new_wavelengths)
 
-    interpolatedY = interpFunc(new_wavelengths)
+    interpolatedY = interpFunc(wavelengths) #TODO TEMP TEST
+    #interpolatedY = interpFunc(new_wavelengths)
+    
     #TODO Debugging print statements
-    # print("wavelengths:")
-    # for item in wavelengths:
-    #     print(wavelengths[item])
-    for item in new_wavelengths:
-        print(item)
-    print("interpolatedY")
-    for item in interpolatedY:
-        print(item)
+    print("wavelengths:")
+    for item in wavelengths:
+        print(wavelengths[item])
+    # for item in new_wavelengths:
+        # print(item)
+    # print("interpolatedY")
+    # for item in interpolatedY:
+        # print(item)
 
-    for nm in range(len(new_wavelengths)):
+    for nm in range(len(intensities)):#TODO TEMP TEST CHANGE BACK TO NEW_W
         # find closest to wavelength in pulkovo
         # divide value
         # add to adjustmentArray
-        adjustmentArray.append(interpolatedY[nm]/new_wavelengths[nm])
+        adjustmentArray.append(interpolatedY[nm]/intensities[nm])
 
     adjustmentArrayND=np.array(adjustmentArray)
 
     #TODO Debugging
-    for item in adjustmentArrayND:
-        print(item)
+    # for item in adjustmentArrayND:
+        # print(item)
     return adjustmentArrayND

@@ -442,17 +442,27 @@ def pixelLambda(intensities, pixelA, pixelB):
     nmB = 486.1
     nmG = 434.1
     pixelAB = pixelB - pixelA # difference between halpha and hbeta in pixels
-    nmPixel = (nmB - nmG) / pixelAB #ratio nm to pixels #TODO BG IS TEMP
+    nmPixel = (nmB - nmG) / pixelAB #ratio nm to pixels
+    #TODO BG IS TEMP - generalize for different combinations of hydrogen lines?
+    #Currently using beta and gamma, original plan was alpha and beta, or
+    #alpha and gamma.
     wavelengths = [] #empty array
 
     c = nmB - (nmPixel)*pixelB
     print(c)
     for pixel in range(len(intensities)):
         value = nmPixel*pixel + c
-        print(value)
+        #print(value)
         wavelengths.append(value)
         #above from rise/run equations
+        
     wavelengthsND = np.array(wavelengths)
+    
+    #TODO debugging
+    print("len, intensities: {0}".format(len(intensities)))
+    print("len, wavelengths: {0}".format(len(wavelengths)))
+    print("len, wavelengthsND: {0}".format(len(wavelengthsND)))
+    
     return wavelengthsND
     
 
