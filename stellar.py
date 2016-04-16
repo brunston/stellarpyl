@@ -674,7 +674,7 @@ def response(intensities, wavelengths, pulkovo, exposure):
     plt.show()
 
     #our interpolation function
-    interpFunc = spinterp.interp1d(x_star, y_star, kind="nearest",\
+    interpFunc = spinterp.interp1d(x_star, y_star, kind="linear",\
                                          fill_value = -1, bounds_error = False)
     #TODO nearest neighbor is supposed to be temporary.
     #TODO weird double values in wavelengths? try removing?
@@ -687,7 +687,7 @@ def response(intensities, wavelengths, pulkovo, exposure):
     #interpolatedY = interpFunc(new_wavelengths)
     
     #TODO Debugging print statements
-    print("wavelengths:")
+    input("wavelengths:")
     for item in wavelengths:
         print(wavelengths[item])
     # for item in new_wavelengths:
