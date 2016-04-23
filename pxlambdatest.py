@@ -32,6 +32,7 @@ print("""
 We need a file. Place it in the same directory as this script and give the name.
     """)
 path = input("enter filename> ")
+image2 = input("file for second image to be adjusted")
 
 threshI = int(defThresh)
 if threshI >= 0:
