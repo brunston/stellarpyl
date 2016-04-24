@@ -32,7 +32,7 @@ print("""
 We need a file. Place it in the same directory as this script and give the name.
     """)
 path = input("enter filename> ")
-image2 = input("file for second image to be adjusted")
+dataImage = input("file for second image to be adjusted (the data image) ")
 
 threshI = int(defThresh)
 if threshI >= 0:
@@ -88,3 +88,33 @@ if threshI >= 0:
         # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
         # plt.title("Pulkovo Data from {0}".format(pulkovo))
         # plt.show()
+
+    #adjust our second image: convert to data as well as overlay our new
+    #adjusted array (to account for camera sensitivity)
+
+    dataImageObject = Image.open(path)
+    dataImageArray = to.converter(path)
+    
+    if showthresh == "yes":
+        to.showThreshold(dataArray, threshI)
+
+    print("working on dataImage crop")
+    dataImageCropped = st.cropN(dataImageObject, threshI, top, bottom, left,\
+                                right, margin)
+    to.restorer(dataImageCropped, 'dataImageCropped')
+    print("cropped image saved to dataImageCropped.tiff")
+
+    dataImageCroppedObject = Image.open('dataImageCropped.tiff')
+    print("converting cropped dataImage")
+    dataImageCroppedArray = to.converter('dataImaeCropped.tiff')
+
+    regTupDI = st.regression(dataImageCroppedObject)
+    to.showRegression(dataImageCroppedObject, regTupDI)
+
+    if autoIntensity in ['saaw']:
+        print("working on intensity_saaw. please wait...")
+
+        intensityDI = st.intensitySAAW(dataImageCroppedObject,\
+                                       dataImageCroppedArray, regTupDI,\
+                                       threshI, step, 10)
+        #need to identify wavelengths for target image... 
