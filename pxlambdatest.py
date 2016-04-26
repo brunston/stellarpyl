@@ -117,4 +117,4 @@ if threshI >= 0:
         intensityDI = st.intensitySAAW(dataImageCroppedObject,\
                                        dataImageCroppedArray, regTupDI,\
                                        threshI, step, 10)
-        #need to identify wavelengths for target image... 
+        #need to identify wavelengths for target image, see line 69 of file.
