@@ -118,3 +118,5 @@ if threshI >= 0:
                                        dataImageCroppedArray, regTupDI,\
                                        threshI, step, 10)
         #need to identify wavelengths for target image, see line 69 of file.
+        #use with data collected same night to ensure that the other params
+        #remain the same (background, clouds, amt of atmosphere in between, etc
