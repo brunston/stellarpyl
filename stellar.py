@@ -649,7 +649,7 @@ def response(intensities, wavelengths, pulkovo, exposure):
     for i in range(len(star)):
         star[i][0] = float(star[i][0])
         star[i][1] = float(star[i][1])
-
+    
     adjustmentArray = []
 
     #Divide by exposure time to get energy / time = power
@@ -662,8 +662,8 @@ def response(intensities, wavelengths, pulkovo, exposure):
 
     #places pulkovo data into separate arrays for use in interpolation functions
     for i in range(len(star)):
-        x_star[i] = star[i][0]
-        y_star[i] = star[i][1]
+        x_star[i] = float(star[i][0])
+        y_star[i] = float(star[i][1])
     
     #Plotting the pulkovo data.
     plt.figure(2)
@@ -687,9 +687,19 @@ def response(intensities, wavelengths, pulkovo, exposure):
     #interpolatedY = interpFunc(new_wavelengths)
     
     #TODO Debugging print statements
-    input("wavelengths:")
+    input("wavelengths and interpolatedY to text file, enter to continue")
+    f = open('wavelengths_interpolatedy.txt','w')
+    f.write("wavelengths\n")
     for item in wavelengths:
-        print(wavelengths[item])
+        f.write(str(wavelengths[item]))
+        f.write("\n")
+    f.write("interpolatedY\n")
+    for item in interpolatedY:
+        f.write(str(interpolatedY[item]))
+        f.write("\n")
+    f.close()
+    #for item in wavelengths:
+    #    print(wavelengths[item])
     # for item in new_wavelengths:
         # print(item)
     # print("interpolatedY")
