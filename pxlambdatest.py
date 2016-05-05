@@ -71,6 +71,15 @@ if threshI >= 0:
         to.plotIntensityWLambda(intensity,wavelengths)
         #to.plotIntensityWLambda2(intensity,wavelengths)
         #to.plotSamples(croppedimg,intensity,regTup) #TODO fix
+        
+        #TODO remove debugging
+        pulkovoData = np.loadtxt('pulkovo/sirius.dat')
+        for i in range(len(pulkovoData)):
+            pulkovoData[i][0] = float(pulkovoData[i][0])
+            pulkovoData[i][1] = float(pulkovoData[i][1])
+        pulkovoResponse = st.response(pulkovoData[:,1], pulkovoData[:,0], "pulkovo/sirius.dat", 1)
+        #first column in pulkovo is equiv to intensity, zeroth wavelength
+
         response = st.response(intensity, wavelengths, "pulkovo/sirius.dat", 0.5)
         print("len, response: {0}".format(len(response)))
         print(response)
@@ -106,7 +115,7 @@ if threshI >= 0:
 
     dataImageCroppedObject = Image.open('dataImageCropped.tiff')
     print("converting cropped dataImage")
-    dataImageCroppedArray = to.converter('dataImaeCropped.tiff')
+    dataImageCroppedArray = to.converter('dataImageCropped.tiff')
 
     regTupDI = st.regression(dataImageCroppedObject)
     to.showRegression(dataImageCroppedObject, regTupDI)

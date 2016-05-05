@@ -687,17 +687,17 @@ def response(intensities, wavelengths, pulkovo, exposure):
     #interpolatedY = interpFunc(new_wavelengths)
     
     #TODO Debugging print statements
-    input("wavelengths and interpolatedY to text file, enter to continue")
-    f = open('wavelengths_interpolatedy.txt','w')
-    f.write("wavelengths\n")
-    for item in wavelengths:
-        f.write(str(wavelengths[item]))
-        f.write("\n")
-    f.write("interpolatedY\n")
-    for item in interpolatedY:
-        f.write(str(interpolatedY[item]))
-        f.write("\n")
-    f.close()
+    #input("wavelengths and interpolatedY to text file, enter to continue")
+    #f = open('wavelengths_interpolatedy.txt','w')
+    #f.write("wavelengths\n")
+    #for item in wavelengths:
+    #    f.write(str(wavelengths[item]))
+    #    f.write("\n")
+    #f.write("interpolatedY\n")
+    #for item in interpolatedY:
+    #    f.write(str(interpolatedY[item]))
+    #    f.write("\n")
+    #f.close()
     #for item in wavelengths:
     #    print(wavelengths[item])
     # for item in new_wavelengths:
