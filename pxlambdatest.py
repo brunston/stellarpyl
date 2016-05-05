@@ -31,6 +31,7 @@ margin = int(config['CONTROL']['margin'])
 print("""
 We need a file. Place it in the same directory as this script and give the name.
     """)
+
 path = input("enter filename> ")
 dataImage = input("file for second image to be adjusted (the data image) ")
 
