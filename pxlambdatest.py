@@ -72,14 +72,7 @@ if threshI >= 0:
         #to.plotIntensityWLambda2(intensity,wavelengths)
         #to.plotSamples(croppedimg,intensity,regTup) #TODO fix
         
-        #TODO remove debugging
-        pulkovoData = np.loadtxt('pulkovo/sirius.dat')
-        for i in range(len(pulkovoData)):
-            pulkovoData[i][0] = float(pulkovoData[i][0])
-            pulkovoData[i][1] = float(pulkovoData[i][1])
-        pulkovoResponse = st.response(pulkovoData[:,1], pulkovoData[:,0], "pulkovo/sirius.dat", 1)
-        #first column in pulkovo is equiv to intensity, zeroth wavelength
-
+       
         response = st.response(intensity, wavelengths, "pulkovo/sirius.dat", 0.5)
         print("len, response: {0}".format(len(response)))
         print(response)
@@ -98,6 +91,26 @@ if threshI >= 0:
         # plt.title("Pulkovo Data from {0}".format(pulkovo))
         # plt.show()
 
+        #TODO DEBUGGING TEXT FILES DEBUGGING TEXT FILES AND IPYTHON
+        #TODO remove debugging, examine pulkovoResponse in iPython
+        pulkovoData = np.loadtxt('pulkovo/sirius.dat')
+        for i in range(len(pulkovoData)):
+            pulkovoData[i][0] = float(pulkovoData[i][0])
+            pulkovoData[i][1] = float(pulkovoData[i][1])
+        pulkovoResponse = st.response(pulkovoData[:,1], pulkovoData[:,0], "pulkovo/sirius.dat", 1)
+        #first column in pulkovo is equiv to intensity, zeroth wavelength
+
+        #TODO debugging column text files...
+        f = open('debug_response_wavelength.txt','w')
+        f.write("#num wavelengths adjustedND")
+        for i in range(max(len(wavelengths),len(adjustedND))):
+            f.write(str(i)+" "+str(wavelengths[i])+" "+str(adjustedND[i])+"\n")
+        f.close()
+        print("debug of wavelength and adjustedND to debug_response_wavelength.txt")
+
+
+
+    #SECOND IMAGE SECOND IMAGE SECOND IMAGE SECOND IMAGE!!!
     #adjust our second image: convert to data as well as overlay our new
     #adjusted array (to account for camera sensitivity)
 
