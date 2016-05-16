@@ -72,8 +72,15 @@ if threshI >= 0:
         #to.plotIntensityWLambda2(intensity,wavelengths)
         #to.plotSamples(croppedimg,intensity,regTup) #TODO fix
         
-       
-        response = st.response(intensity, wavelengths, "pulkovo/sirius.dat", 0.5)
+        #TODO debugging text file printing intensity and wavelengths from response
+        f = open("debug_wavelengths_intensities_pre-reponse_from-pxlt.txt","w")
+        f.write("#values from pxlambdatest.py before feeding to response\n#wavelengths intensity\n")
+        for i in range(len(wavelengths)):
+            f.write(str(wavelengths[i])+" "+str(intensity[i])+"\n")
+        f.close()
+        asdfjkl = "asdfjkl"
+        print("string before response: ",asdfjkl)
+        response = st.response(intensity, wavelengths, "pulkovo/sirius.dat", 0.5,asdfjkl)
         print("len, response: {0}".format(len(response)))
         print(response)
         
@@ -104,20 +111,20 @@ if threshI >= 0:
 
         #TODO DEBUGGING TEXT FILES DEBUGGING TEXT FILES AND IPYTHON
         #TODO remove debugging, examine pulkovoResponse in iPython
-        pulkovoData = np.loadtxt('pulkovo/sirius.dat')
-        for i in range(len(pulkovoData)):
-            pulkovoData[i][0] = float(pulkovoData[i][0])
-            pulkovoData[i][1] = float(pulkovoData[i][1])
-        pulkovoResponse = st.response(pulkovoData[:,1], pulkovoData[:,0], "pulkovo/sirius.dat", 1)
+        #pulkovoData = np.loadtxt('pulkovo/sirius.dat')
+        #for i in range(len(pulkovoData)):
+        #    pulkovoData[i][0] = float(pulkovoData[i][0])
+        #    pulkovoData[i][1] = float(pulkovoData[i][1])
+        #pulkovoResponse = st.response(pulkovoData[:,1], pulkovoData[:,0], "pulkovo/sirius.dat", 1,asdfjkl)
         #first column in pulkovo is equiv to intensity, zeroth wavelength
 
         #TODO debugging column text files...
-        f = open('debug_response_wavelength.txt','w')
-        f.write("#num wavelengths adjustedND")
-        for i in range(max(len(wavelengths),len(adjustedND))):
-            f.write(str(i)+" "+str(wavelengths[i])+" "+str(adjustedND[i])+"\n")
-        f.close()
-        print("debug of wavelength and adjustedND to debug_response_wavelength.txt")
+        #f = open('debug_response_wavelength.txt','w')
+        #f.write("#num wavelengths adjustedND")
+        #for i in range(max(len(wavelengths),len(adjustedND))):
+        #    f.write(str(i)+" "+str(wavelengths[i])+" "+str(adjustedND[i])+"\n")
+        #f.close()
+        #print("debug of wavelength and adjustedND to debug_response_wavelength.txt")
 
 
 

@@ -635,7 +635,7 @@ def crop(image,deletionThreshold,autostopTB, autostopBT, autostopRL, autostopLR)
     to.pbar(1)
     return duplicate
 
-def response(intensities, wavelengths, pulkovo, exposure):
+def response(aintensities, awavelengths, apulkovo, aexposure,string):
     """
     Generates a camera response function, based on pulkovo wavelengths.
     pulkovo should be a file imported from vizier with one star's data in it
@@ -644,7 +644,21 @@ def response(intensities, wavelengths, pulkovo, exposure):
     exposure time in seconds.
     #TODO currently only is a one dimensional array with adjustments. please fix
     """
-    star = np.loadtxt(pulkovo)
+    print("string in response: ",string)
+    print("wavelengths:\n")
+    print(awavelengths)
+    print("intensities:\n")
+    print(aintensities)
+    #TODO DEBUGGING DUMP TO TXT FILE
+    f = open('debug_wavelengths_intensities_pre-interp.txt','w')
+    f.write("#wavelengths intensities\n")
+    for i in range(max(len(awavelengths), len(aintensities))):
+        f.write(str(awavelengths[i])+" "+str(aintensities[i])+"\n")
+    f.close()
+    print("debug file written to debug_wavelengths_intensities_pre-interp.txt")
+
+
+    star = np.loadtxt(apulkovo)
     #turning strings into floats
     for i in range(len(star)):
         star[i][0] = float(star[i][0])
@@ -653,8 +667,8 @@ def response(intensities, wavelengths, pulkovo, exposure):
     adjustmentArray = []
 
     #Divide by exposure time to get energy / time = power
-    for i in range(len(intensities)-1):
-        intensities[i] = intensities[i]/exposure
+    for i in range(len(aintensities)-1):
+        aintensities[i] = aintensities[i]/aexposure
 
     #generate blank arrays for filling by next for loop
     x_star = np.zeros(len(star))
@@ -670,30 +684,16 @@ def response(intensities, wavelengths, pulkovo, exposure):
     plt.clf()
     plt.plot(x_star, y_star,'o',label='original data',markersize=4)
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    plt.title("Pulkovo Data from {0}".format(pulkovo))
+    plt.title("Pulkovo Data from {0}".format(apulkovo))
     plt.show()
     
-    #TODO DEBUGGING DUMP TO TXT FILE
-    f = open('debug_wavelengths_intensities_pulkovo_pre-interp.txt','w')
-    f.write("#wavelengths intensities x_star_from_pulkovo y_star_from_pulkovo\n")
-    for element in (wavelengths, intensities, x_star, y_star):
-        print("len {0}:".format(element), len(element))
-    for i in range(max(len(wavelengths), len(intensities), len(x_star), len(y_star))):
-        try:
-            wavelengths[i]
-            f.write(str(wavelengths[i])+" ")
-        except IndexError:
-            f.write("-999 ")
-        try: f.write(str(intensities[i])+" ")
-        except IndexError: f.write("-999 ")
-        try: f.write(str(x_star[i])+" ")
-        except IndexError: f.write("-999 ")
-        try: f.write(str(y_star[i]))
-        except IndexError: f.write("-999")
-        f.write("\n")
+    #TODO debugging text file literature/ pulkovo values
+    f = open('debug_literature-pulkovo_pre-interp.txt','w')
+    f.write("#pulkovo_wavelengths pulkovo_intensities\n")
+    for i in range(max(len(x_star),len(y_star))):
+        f.write(str(x_star[i])+" "+str(y_star[i])+"\n")
     f.close()
-    print("debug file written to debug_wavelengths_intensities_pulkovo_pre-interp.txt")
-
+    print("debug file written to debug_literature-pulkovo_pre-interp.txt")
 
     #our interpolation function
     interpFunc = spinterp.interp1d(x_star, y_star, kind="linear",\
@@ -701,11 +701,11 @@ def response(intensities, wavelengths, pulkovo, exposure):
     #TODO nearest neighbor is supposed to be temporary.
     #TODO weird double values in wavelengths? try removing?
     new_wavelengths = []
-    for item in range(0,len(wavelengths), 2):
-        new_wavelengths.append(wavelengths[item])
+    for item in range(0,len(awavelengths), 2):
+        new_wavelengths.append(awavelengths[item])
     new_wavelengths = np.array(new_wavelengths)
 
-    interpolatedY = interpFunc(wavelengths) #TODO TEMP TEST
+    interpolatedY = interpFunc(awavelengths) #TODO TEMP TEST
     #interpolatedY = interpFunc(new_wavelengths)
     
     #TODO Debugging print statements
@@ -728,11 +728,11 @@ def response(intensities, wavelengths, pulkovo, exposure):
     # for item in interpolatedY:
         # print(item)
 
-    for nm in range(len(intensities)):#TODO TEMP TEST CHANGE BACK TO NEW_W
+    for nm in range(len(aintensities)):#TODO TEMP TEST CHANGE BACK TO NEW_W
         # find closest to wavelength in pulkovo
         # divide value
         # add to adjustmentArray
-        adjustmentArray.append(interpolatedY[nm]/intensities[nm])
+        adjustmentArray.append(interpolatedY[nm]/aintensities[nm])
 
     adjustmentArrayND=np.array(adjustmentArray)
 
