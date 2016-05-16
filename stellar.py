@@ -676,10 +676,23 @@ def response(intensities, wavelengths, pulkovo, exposure):
     #TODO DEBUGGING DUMP TO TXT FILE
     f = open('debug_wavelengths_intensities_pulkovo_pre-interp.txt','w')
     f.write("#wavelengths intensities x_star_from_pulkovo y_star_from_pulkovo\n")
+    for element in (wavelengths, intensities, x_star, y_star):
+        print("len {0}:".format(element), len(element))
     for i in range(max(len(wavelengths), len(intensities), len(x_star), len(y_star))):
-        f.write(str(wavelengths[i])+" "+str(intensities[i])+" "+str(x_star[i])+" "+
-                str(y_star[i])+"\n")
+        try:
+            wavelengths[i]
+            f.write(str(wavelengths[i])+" ")
+        except IndexError:
+            f.write("-999 ")
+        try: f.write(str(intensities[i])+" ")
+        except IndexError: f.write("-999 ")
+        try: f.write(str(x_star[i])+" ")
+        except IndexError: f.write("-999 ")
+        try: f.write(str(y_star[i]))
+        except IndexError: f.write("-999")
+        f.write("\n")
     f.close()
+    print("debug file written to debug_wavelengths_intensities_pulkovo_pre-interp.txt")
 
 
     #our interpolation function
