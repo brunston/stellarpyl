@@ -673,9 +673,13 @@ def response(intensities, wavelengths, pulkovo, exposure):
     plt.title("Pulkovo Data from {0}".format(pulkovo))
     plt.show()
     
-    #TODO DEBUGGING VALUES
-    pulkovo_data_x = x_star
-    pulkovo_data_y = y_star
+    #TODO DEBUGGING DUMP TO TXT FILE
+    f = open('debug_wavelengths_intensities_pulkovo_pre-interp.txt','w')
+    f.write("#wavelengths intensities x_star_from_pulkovo y_star_from_pulkovo\n")
+    for i in range(max(len(wavelengths), len(intensities), len(x_star), len(y_star))):
+        f.write(str(wavelengths[i])+" "+str(intensities[i])+" "+str(x_star[i])+" "+
+                str(y_star[i])+"\n")
+    f.close()
 
 
     #our interpolation function
