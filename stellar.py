@@ -672,6 +672,11 @@ def response(intensities, wavelengths, pulkovo, exposure):
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.title("Pulkovo Data from {0}".format(pulkovo))
     plt.show()
+    
+    #TODO DEBUGGING VALUES
+    pulkovo_data_x = x_star
+    pulkovo_data_y = y_star
+
 
     #our interpolation function
     interpFunc = spinterp.interp1d(x_star, y_star, kind="linear",\
