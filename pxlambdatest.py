@@ -84,6 +84,17 @@ if threshI >= 0:
         adjustedND = np.array(adjusted)
         
         to.plotIntensityWLambda(adjustedND,wavelengths)
+        #TODO just realized above convention is confusing. Order of variables
+        #     passing to function is (y,x)
+
+        #TODO debugging text files output of plot...
+        f = open("debug_first_plot_x_y.txt","w")
+        f.write("#X Y\n#wavelengths, adjustedND\n")
+        for i in range(len(adjustedND)):
+            f.write(str(wavelengths[i])+" "+str(adjustedND[i])+"\n")
+        f.close()
+        print("debug file of plot that just popped up (adjusted intensity plot)")
+
         # plt.figure(3)
         # plt.clf()
         # plt.plot(x_star, y_star,'o',label='original data',markersize=4)
