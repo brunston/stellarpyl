@@ -644,6 +644,7 @@ def response(aintensities, awavelengths, apulkovo, aexposure,string):
     exposure time in seconds.
     #TODO currently only is a one dimensional array with adjustments. please fix
     """
+    #TODO debugging printing strings
     print("string in response: ",string)
     print("wavelengths:\n")
     print(awavelengths)
