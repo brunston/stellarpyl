@@ -81,6 +81,13 @@ def converter(imageToConvert):
 
     image = Image.open(imageToConvert)
     imageArray = np.array(image)
+    #TODO make sure this works properly
+    #Flipping the array during 'import' so that the wavelengths align properly
+    #Make sure this does not wreck havoc with the regression or the intensity
+    #portion of the program!!!!!!
+    imageArray2 = np.array()
+    #for i in 
+
 
     #troubleshooting statements
     if v=='yes':
