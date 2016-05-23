@@ -49,9 +49,15 @@ if threshI >= 0:
     to.restorer(cropped, 'cropped')
     print("cropped image saved to cropped.tiff")
 
+    #TODO debugging - check to see if numpy.fliplr does what we want
+    dataArrayFlipped = np.fliplr(dataArray)
+    to.restorer(dataArrayFlipped, 'flipped_img')
+
     croppedimg = Image.open('cropped.tiff')
     print("converting cropped image. please wait...")
     dataArray = to.converter('cropped.tiff')
+    #TODO trying to flip here.
+    dataArray = np.fliplr(dataArray)
 
     regTup = st.regression(croppedimg)
     to.showRegression(croppedimg,regTup)
