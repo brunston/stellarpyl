@@ -11,6 +11,8 @@ import configparser
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import host_subplot
+import mpl_toolkits.axisartist as AA
 
 import stellar as st
 import tools as to
@@ -72,7 +74,7 @@ if threshI >= 0:
             print(element)
         #using IMG_2617.tif of sirius and using hA = beta, hB = gamma b/c of
         #apparent visibles.
-        wavelengths = to.pixelLambda(intensity, 515, 627)
+        wavelengths = to.pixelLambda(intensity, 640, 692)
         #print(wavelengths)
         to.plotIntensityWLambda(intensity,wavelengths)
         #to.plotIntensityWLambda2(intensity,wavelengths)
@@ -132,7 +134,42 @@ if threshI >= 0:
         #f.close()
         #print("debug of wavelength and adjustedND to debug_response_wavelength.txt")
 
+    #WE WANT TO PLOT ALL THE THINGS ON A SINGLE GRAPH. LET'S PRACTICE
+    #THAT HERE BEFORE WE DO IT IN A FUNCTION
+    #TODO ADD TO FUNCTION
+    host = host_subplot(111, axes_class = AA.Axes)
+    plt.subplots_adjust(right=0.75)
 
+    par1 = host.twinx() #parasite vert. axis 1
+    par2 = host.twinx()
+
+    offset = 60
+    new_fixed_axis = par2.get_grid_helper().new_fixed_axis
+    par2.axis["right"] = new_fixed_axis(loc="right",
+                                        axes=par2,
+                                        offset=(offset, 0))
+    par2.axis["right"].toggle(all=True)
+    par2.axis["right"].toggle(all=True)
+
+    host.set_xlabel("Wavelength")
+    host.set_ylabel("Adjusted Intensity")
+    par1.set_ylabel("Original Intensity")
+    par2.set_ylabel("Literature Intensity")
+    
+    #literature val
+    pulkovoData = np.loadtxt('pulkovo/sirius.dat')
+
+    p1, = host.plot(wavelengths, adjustedND, label="Adjusted Intensity")
+    p2, = par1.plot(wavelengths, intensity, label="Original Intensity")
+    p3, = par2.plot(pulkovoData[:,0], pulkovoData[:,1], label="Literature Intensity")
+
+    host.legend()
+    host.axis["left"].label.set_color(p1.get_color())
+    par1.axis["right"].label.set_color(p2.get_color())
+    par2.axis["right"].label.set_color(p3.get_color())
+
+    plt.draw()
+    plt.show()
 
     #SECOND IMAGE SECOND IMAGE SECOND IMAGE SECOND IMAGE!!!
     #adjust our second image: convert to data as well as overlay our new
