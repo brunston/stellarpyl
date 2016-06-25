@@ -44,7 +44,7 @@ Please install before continuing.""")
 import stellar as st
 import tools as to
 import text as txt
-#TODO
+#TEMPORARY
 import samplingsample as ss
 #END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT END IMPORT
 
@@ -128,11 +128,9 @@ We need a file. Place it in the same directory as this script and give the name.
             to.restorer(cropped, 'cropped')
             print("cropped image saved to cropped.tiff")
 
-            #additions made to flip image here
             croppedimg = Image.open('cropped.tiff')
             print("converting cropped image. please wait...")
             dataArray = to.converter('cropped.tiff')
-            dataArray = np.fliplr(dataArray) #flips the image from left to right
 
             regTup = st.regression(croppedimg)
             timePause1 = time.time()
@@ -173,20 +171,15 @@ We need a file. Place it in the same directory as this script and give the name.
                 #                               threshI,step,10)
                 intensity = st.intensitySAAW(croppedimg,dataArray,regTup,\
                                              threshI,step,10)
-                if verbose in ["yes"]:
-                    for element in intensity:
-                        print(element)
-                A_wavelength = int(input("integer x-pixel value for A wavelength"))
-                B_wavelength = int(input("integer y-pixel value for B wavelength"))
-                #TODO temporary fix
-                A_wavelength = 640
-                B_wavelength = 692
-                wavelengths = to.pixelLambda(intensity, A_wavelength, B_wavelength)
-                to.plotIntensity
                 timePause2 = time.time()
                 to.plotIntensityW(intensity)
                 to.plotSamples(croppedimg,intensity,regTup) #TODO fix
                 timePause2s = time.time()
+                #TEMPORARY
+                # np.set_printoptions(edgeitems=3,infstr='inf',\
+                #                     linewidth=75,nanstr='nan',precision=8,\
+                #                     suppress=False,threshold=1000,formatter=None)
+                #sys.stdout = sys.__stdout__
 
             if autoIntensity in ['n']:
                 print("working on intensity_n. please wait...")

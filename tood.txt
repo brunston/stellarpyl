@@ -1,0 +1,7 @@
+stellarPYL todo:
+
+  for test, identify wavelengths for target image and finish second image
+    comparison stuff.
+  change wavelengths to just use "A" and "B" arbitrary wavelengths, let this
+    value be set by the user (default to hydrogen balmer lines though
+    in our case, beta and gamma)
