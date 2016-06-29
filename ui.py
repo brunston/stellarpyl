@@ -178,13 +178,16 @@ We need a file. Place it in the same directory as this script and give the name.
                         print(element)
                 A_wavelength = int(input("integer x-pixel value for A wavelength"))
                 B_wavelength = int(input("integer y-pixel value for B wavelength"))
-                #TODO temporary fix
+                #TODO temporary fix. Remove in prod. or else the A and B values
+                #will always be the same!!!!
                 A_wavelength = 640
                 B_wavelength = 692
                 wavelengths = to.pixelLambda(intensity, A_wavelength, B_wavelength)
-                to.plotIntensity
+                adjusted = []
+                for i in wavelengths:
+                    adjusted.append(intensity[i]*response[i])
                 timePause2 = time.time()
-                to.plotIntensityW(intensity)
+                to.plotIntensityWLambda(intensity)
                 to.plotSamples(croppedimg,intensity,regTup) #TODO fix
                 timePause2s = time.time()
 
