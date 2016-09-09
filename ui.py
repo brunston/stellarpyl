@@ -180,15 +180,20 @@ We need a file. Place it in the same directory as this script and give the name.
                 B_wavelength = int(input("integer y-pixel value for B wavelength"))
                 #TODO temporary fix. Remove in prod. or else the A and B values
                 #will always be the same!!!!
-                A_wavelength = 640
-                B_wavelength = 692
                 wavelengths = to.pixelLambda(intensity, A_wavelength, B_wavelength)
+                
+                #adjust and display new plot
                 adjusted = []
                 for i in wavelengths:
                     adjusted.append(intensity[i]*response[i])
+                adjustedND = np.array(adjusted)
                 timePause2 = time.time()
-                to.plotIntensityWLambda(intensity)
-                to.plotSamples(croppedimg,intensity,regTup) #TODO fix
+                to.plotIntensityWLambda(adjustedND, wavelengths)
+                # dunno if we need this line now to.plotSamples(croppedimg,intensity,regTup) #TODO fix
+                # Plot everything at once. 
+                to.plotLOA(wavelengths, intensity, adjustedND, 'pulkovo/sirius.dat')
+                #TODO add user option to change litDataPath
+
                 timePause2s = time.time()
 
             if autoIntensity in ['n']:

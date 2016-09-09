@@ -465,4 +465,41 @@ def pixelLambda(intensities, pixelA, pixelB):
     
     return wavelengthsND
     
+def plotLOA(wavelengths, intensity, adjustedND, litDataPath):
+    """
+    Plots original measurement, adjusted measurement, and literature data
+    all on one graph. litDataPath is a file path to a file with lit data
+    """
 
+    host = host_subplot(111, axes_class = AA.Axes)
+    plt.subplots_adjust(right = 0.75)
+
+    par1 = host.twinx() #parasite vertical axis
+    par2 = host.twinx() #parasite vertical axis
+
+    offset = 60
+    new_fixed_axis = par2.get_grid_helper().new_fixed_axis
+    par2.axis["right"] = new_fixed_axis(loc="right", axes=par2,
+                                        offset=(offset,0))
+    par2.axis["right"].toggle(all=True)
+    par2.axis["right"].toggle(all=True) #do we need this second one?
+    
+    host.set_xlabel("Wavelength")
+    host.set_ylabel("Adjusted Intensity")
+    par1.set_ylabel("Original Intensity")
+    par2.set_ylabel("Literature Intensity")
+
+    litData = np.loadtxt(litDataPath)
+    p1, = host.plot(wavelengths, adjustedND, label="Adjusted Intensity")
+    p2, = par1.plot(wavelengths, intensity, label="Original Intensity")
+    p3, = par2.plot(litData[:,0], litData[:,1], label="Literature Intensity")
+
+    host.legend()
+    host.axis["left"].label.set_color(p1.get_color())
+    par1.axis["right"].label.set_color(p2.get_color())
+    par2.axis["right"].label.set_color(p3.get_color())
+
+    plt.draw()
+    plt.show()
+
+    return None
