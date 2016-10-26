@@ -183,6 +183,8 @@ We need a file. Place it in the same directory as this script and give the name.
                 wavelengths = to.pixelLambda(intensity, A_wavelength, B_wavelength)
                 
                 #adjust and display new plot
+
+                #TODO NEED TO ADD st.response WITH VARIABLE (ie not hardcoded sirius.dat)
                 adjusted = []
                 for i in wavelengths:
                     adjusted.append(intensity[i]*response[i])
@@ -191,7 +193,7 @@ We need a file. Place it in the same directory as this script and give the name.
                 to.plotIntensityWLambda(adjustedND, wavelengths)
                 # dunno if we need this line now to.plotSamples(croppedimg,intensity,regTup) #TODO fix
                 # Plot everything at once. 
-                to.plotLOA(wavelengths, intensity, adjustedND, 'pulkovo/sirius.dat')
+                to.plotLOA(wavelengths, intensity, adjustedND, 'pulkovo/sirius.dat') #TODO REMOVE HARDCODE
                 #TODO add user option to change litDataPath
 
                 timePause2s = time.time()
