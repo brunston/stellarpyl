@@ -183,7 +183,8 @@ We need a file. Place it in the same directory as this script and give the name.
                 wavelengths = to.pixelLambda(intensity, A_wavelength, B_wavelength)
                 
                 #adjust and display new plot
-
+                uinf = input("filepath to literature values?")
+                response = st.response(intensity, wavelengths, uinf, 0.5) 
                 #TODO NEED TO ADD st.response WITH VARIABLE (ie not hardcoded sirius.dat)
                 adjusted = []
                 for i in wavelengths:

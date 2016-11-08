@@ -635,7 +635,7 @@ def crop(image,deletionThreshold,autostopTB, autostopBT, autostopRL, autostopLR)
     to.pbar(1)
     return duplicate
 
-def response(aintensities, awavelengths, apulkovo, aexposure,string):
+def response(aintensities, awavelengths, apulkovo, aexposure):
     """
     Generates a camera response function, based on pulkovo wavelengths.
     pulkovo should be a file imported from vizier with one star's data in it
@@ -645,7 +645,6 @@ def response(aintensities, awavelengths, apulkovo, aexposure,string):
     #TODO currently only is a one dimensional array with adjustments. please fix
     """
     #TODO debugging printing strings
-    print("string in response: ",string)
     print("wavelengths:\n")
     print(awavelengths)
     print("intensities:\n")

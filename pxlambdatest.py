@@ -88,7 +88,7 @@ if threshI >= 0:
         f.close()
         asdfjkl = "asdfjkl"
         print("string before response: ",asdfjkl)
-        response = st.response(intensity, wavelengths, "pulkovo/sirius.dat", 0.5,asdfjkl)
+        response = st.response(intensity, wavelengths, "pulkovo/sirius.dat", 0.5)
         print("len, response: {0}".format(len(response)))
         print(response)
         
