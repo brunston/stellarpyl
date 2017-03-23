@@ -2,7 +2,7 @@ project: stellarPYL // file: README // author: Brunston Poon // org: UH-IFA and 
 
 For licensing information see LICENCE.txt.
 
-##Summary:
+## Summary:
 
 This is stellar spectra reduction and analysis command-line software written
 using the Python 3.4 version of the Anaconda Scientific Python distribution. It 
@@ -17,7 +17,7 @@ orthogonal spectra); and to account for the use of a DSLR sensor by using either
 a relative response function or an absolute response function to negate the 
 effects of sensor response on the intensity plot.
 
-##Workflow:
+## Workflow:
 
 Run ui.py in the command line:
 
@@ -63,9 +63,9 @@ The program will graph this intensity plot, which can be saved using the tools
 already provided by matplotlib.
 
 
-##Command list:
+## Command list:
 
-###IMAGE PROCESSING
+### IMAGE PROCESSING
 - 'autoProcess' (short 'auto') -
 autoProcess will take care of cropping and doing intensity plotting for you.
 just provide a filename. In order to use this feature you must first set
@@ -99,7 +99,7 @@ shows regressed line overlayed on the original (cropped) image.
 - 'show_walks' -
 shows walking lines overlayed on the original (cropped) image.
 
-###PROGRAM
+### PROGRAM
 
 - 'about' -
 displays information about this program
@@ -145,7 +145,7 @@ sets verboseness. 'yes' to include debug statements, 'no' is default.
 - 'view_settings' -
 view your current settings
 
-###Additional commands:
+### Additional commands:
 
 <table border="1" style="width:100%">
   <tr>
@@ -154,7 +154,7 @@ view your current settings
   </tr>
 </table>
 
-##Name
+## Name
 The name stellarPYL is derived from three things: 'stellar' from its purpose
 as stellar spectra reduction software, 'PY' from its codebase written in Python,
 and the 'L' from 'libre' in reference to the license under which it is released,
